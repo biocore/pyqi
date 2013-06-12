@@ -16,10 +16,12 @@ from os import popen, remove, makedirs, getenv
 from os.path import join, abspath, exists, isdir, isfile
 
 
-__author__ = "Greg Caporaso"
-__copyright__ = "Copyright 2007-2012, The Cogent Project"
-__credits__ = ["Greg Caporaso","Daniel McDonald",
-               "Gavin Huttley","Rob Knight"]
+__author__ = "Greg Caporaso, Gavin Huttley, Rob Knight, Daniel McDonald"
+__copyright__ = "Copyright 2013, The BiPy Project"
+__credits__ = ["Greg Caporaso",
+               "Daniel McDonald",
+               "Gavin Huttley",
+               "Rob Knight"]
 __license__ = "GPL"
 __version__ = "0.0.0-dev"
 __maintainer__ = "Greg Caporaso"
