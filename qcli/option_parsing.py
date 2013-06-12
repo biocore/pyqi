@@ -21,10 +21,10 @@ __copyright__ = "Copyright 2007-2012, The Cogent Project"
 __credits__ = ["Greg Caporaso","Daniel McDonald",
                "Gavin Huttley","Rob Knight"]
 __license__ = "GPL"
-__version__ = "1.5.3-dev"
+__version__ = "0.0.0-dev"
 __maintainer__ = "Greg Caporaso"
 __email__ = "gregcaporaso@gmail.com"
-__status__ = "Production"
+__status__ = "Development"
 
 ## Definition of CogentOption option type, a subclass of Option that
 ## contains specific types for filepaths and directory paths. This 
@@ -73,7 +73,7 @@ def check_new_path(option, opt, value):
     return value
 
 
-class CogentOption(Option):
+class QcliOption(Option):
     TYPES = Option.TYPES + ("existing_path",
                             "new_path",
                             "existing_filepath",
@@ -103,7 +103,9 @@ class CogentOption(Option):
     # create (e.g., an output dir which will contain many result files)
     TYPE_CHECKER["new_dirpath"] = check_new_dirpath
 
-make_option = CogentOption
+# When this code was in PyCogent, the option object was called
+# CogentOption, so leaving that name in place for backward compatibility.
+make_option = CogentOption = QcliOption
 
 ## End definition of new option type
 
@@ -218,7 +220,6 @@ def parse_command_line_parameters(**kwargs):
     if help_on_no_arguments and (not command_line_args) and len(sys.argv) == 1:
         parser.print_usage()
         return parser.exit(-1)
-
     
     # Process the required options
     if required_options:
