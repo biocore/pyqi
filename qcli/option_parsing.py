@@ -21,7 +21,8 @@ __copyright__ = "Copyright 2013, The BiPy Project"
 __credits__ = ["Greg Caporaso",
                "Daniel McDonald",
                "Gavin Huttley",
-               "Rob Knight"]
+               "Rob Knight",
+               "Jose Antonio Navas Molina"]
 __license__ = "GPL"
 __version__ = "0.0.0-dev"
 __maintainer__ = "Greg Caporaso"
