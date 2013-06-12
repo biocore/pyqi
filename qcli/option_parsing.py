@@ -44,9 +44,17 @@ def check_existing_filepath(option, opt, value):
         return value
 
 def check_existing_filepaths(option, opt, value):
-    values = value.split(',')
-    for v in values:
+    paths = []
+    for v in value.split(','):
+        paths.extend(glob(v))
+    values = []
+    for v in paths:
         check_existing_filepath(option,opt,v)
+        values.append(v)
+    if len(paths) == 0:
+        raise OptionValueError(
+            "No filepaths match pattern(s) passed via -i: %s" % 
+            ','.join(opts.input_fps))
     return values
 
 def check_existing_dirpath(option, opt, value):
@@ -74,15 +82,39 @@ def check_existing_path(option, opt, value):
 def check_new_path(option, opt, value):
     return value
 
+def check_multiple_choice(option, opt, value):
+    #split_char = ';' if ';' in value else ','
+    values = value.split(option.split_char)
+    for v in values:
+        if v not in option.mchoices:
+            choices = ",".join(map(repr, option.mchoices))
+            raise OptionValueError(
+                "option %s: invalid choice: %r (choose from %s)"
+                % (opt, v, choices))
+    return values
+
+def check_blast_db(option, opt, value):
+    db_dir, db_name = split(abspath(value))
+    if not exists(db_dir):
+        raise OptionValueError(
+            "option %s: path does not exists: %r" % (opt, db_dir))
+    elif not isdir(db_dir):
+        raise OptionValueError(
+            "option %s: not a directory: %r" % (opt, db_dir))
+    return value
 
 class QcliOption(Option):
+    ATTRS = Option.ATTRS + ['mchoices','split_char']
+
     TYPES = Option.TYPES + ("existing_path",
                             "new_path",
                             "existing_filepath",
                             "existing_filepaths",
                             "new_filepath",
                             "existing_dirpath",
-                            "new_dirpath",)
+                            "new_dirpath",
+                            "multiple_choice",
+                            "blast_db")
     TYPE_CHECKER = copy(Option.TYPE_CHECKER)
     # for cases where the user specifies an existing file or directory
     # as input, but it can be either a dir or a file
@@ -104,6 +136,30 @@ class QcliOption(Option):
     # for cases where the user is passing a new directory to be 
     # create (e.g., an output dir which will contain many result files)
     TYPE_CHECKER["new_dirpath"] = check_new_dirpath
+    # for cases where the user is passing one or more values
+    # as comma- or semicolon-separated list
+    # choices are returned as a list
+    TYPE_CHECKER["multiple_choice"] = check_multiple_choice
+    # for cases where the user is passing a blast database option
+    # blast_db is returned as a string
+    TYPE_CHECKER["blast_db"] = check_blast_db
+
+    def _check_multiple_choice(self):
+        if self.type == "multiple_choice":
+            if self.mchoices is None:
+                raise OptionError(
+                    "must supply a list of mchoices for type '%s'" % self.type, self)
+            elif type(self.mchoices) not in (types.TupleType, types.ListType):
+                raise OptionError(
+                    "choices must be a list of strings ('%s' supplied)"
+                    % str(type(self.mchoices)).split("'")[1], self)
+            if self.split_char is None:
+                self.split_char = ','
+        elif self.mchoices is not None:
+            raise OptionError(
+                "must not supply mchoices for type %r" % self.type, self)
+
+    CHECK_METHODS = Option.CHECK_METHODS + [_check_multiple_choice]
 
 # When this code was in PyCogent, the option object was called
 # CogentOption, so leaving that name in place for backward compatibility.
@@ -222,6 +278,7 @@ def parse_command_line_parameters(**kwargs):
     if help_on_no_arguments and (not command_line_args) and len(sys.argv) == 1:
         parser.print_usage()
         return parser.exit(-1)
+
     
     # Process the required options
     if required_options:
