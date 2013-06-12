@@ -9,11 +9,13 @@ dependencies.
 """
 
 from copy import copy
+import types
 import sys
 from optparse import (OptionParser, OptionGroup, Option, 
-                      OptionValueError)
+                      OptionValueError, OptionError)
 from os import popen, remove, makedirs, getenv
-from os.path import join, abspath, exists, isdir, isfile
+from os.path import join, abspath, exists, isdir, isfile, split
+from glob import glob
 
 
 __author__ = "Greg Caporaso, Gavin Huttley, Rob Knight, Daniel McDonald"
