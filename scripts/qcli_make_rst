@@ -19,6 +19,7 @@ from string import replace
 import types
 import re
 from sys import exit, stderr
+from site import addsitedir
 from qcli import (parse_command_line_parameters, 
                   make_option)
 
@@ -92,6 +93,7 @@ def main():
 
     #Create a list of the scripts to create rst files for.
     file_names = os.listdir(opts.input_dir)
+    addsitedir(opts.input_dir)
     #Only take files which do not start with "."
     file_names = [fname for fname in file_names if not fname.startswith('.')]
     
