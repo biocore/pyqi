@@ -55,7 +55,7 @@ script_info['brief_description']="""Make Sphinx RST file"""
 script_info['script_description'] = """This script will take a qcli script and convert the \
 usage strings and options to generate a documentation .rst file."""
 script_info['script_usage']=[]
-script_info['script_usage'].append(("""Example:""","""""","""%prog -i Qiime/scripts/make_2d_plots.py -o doc/"""))
+script_info['script_usage'].append(("""Example""","""Create an example script""","""%prog -i my_script.py -o rst/"""))
 script_info['output_description']="""This will output a Sphinx rst-formatted file."""
 
 script_info['required_options'] = [
