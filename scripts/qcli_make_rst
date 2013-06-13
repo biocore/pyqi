@@ -55,12 +55,12 @@ script_info['brief_description']="""Make Sphinx RST file"""
 script_info['script_description'] = """This script will take a qcli script and convert the \
 usage strings and options to generate a documentation .rst file."""
 script_info['script_usage']=[]
-script_info['script_usage'].append(("""Example""","""Create an example script""","""%prog -i my_script.py -o rst/"""))
+script_info['script_usage'].append(("""Example""","""Create an example script""","""%prog -i scripts -o rst"""))
 script_info['output_description']="""This will output a Sphinx rst-formatted file."""
 
 script_info['required_options'] = [
- make_option('-i','--input_fp',
-             help='the input script (or directory containing scripts)'),
+ make_option('-i','--input_dir',
+             help='the input directory containing scripts to generate rst files for'),
  make_option('-o','--output_dir',
              help='The directory where the resulting rst file(s) should be written.'),
 ]
@@ -90,14 +90,14 @@ def main():
 
     #Determine if the input is a directory containing python scripts or a single
     #file and then create a list of those scripts
-    if os.path.isdir(opts.input_fp):
-        file_names = os.listdir(opts.input_fp)
+    if os.path.isdir(opts.input_dir):
+        file_names = os.listdir(opts.input_dir)
         #Only take files which do not start with "." and end with a ".py"
         file_names = [fname for fname in file_names if not \
                         fname.startswith('.') and fname.endswith('.py')]
         
-    elif os.path.isfile(opts.input_fp):
-        file_names=[str(opts.input_fp)]
+    elif os.path.isfile(opts.input_dir):
+        file_names=[str(opts.input_dir)]
     
     else:
         print("io error, input path not valid.  Does it exist?")
