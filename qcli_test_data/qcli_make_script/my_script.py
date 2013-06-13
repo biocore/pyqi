@@ -1,32 +1,33 @@
 #!/usr/bin/env python
-# File created on 16 Oct 2012
+# File created on 12 Jun 2013
 from __future__ import division
 
 __author__ = "Greg Caporaso"
-__copyright__ = "Copyright 2011, The QIIME project"
+__copyright__ = "Copyright 2013, The BiPy project"
 __credits__ = ["Greg Caporaso"]
 __license__ = "GPL"
-__version__ = "1.5.0-dev"
+__version__ = "0.0.0"
 __maintainer__ = "Greg Caporaso"
 __email__ = "gregcaporaso@gmail.com"
 __status__ = "Development"
 
 
-
-from qiime.util import parse_command_line_parameters, make_option
+from qcli import (parse_command_line_parameters, 
+                  make_option)
 
 script_info = {}
 script_info['brief_description'] = ""
 script_info['script_description'] = ""
-script_info['script_usage'] = [("","","")]
+script_info['script_usage'] = []
+script_info['script_usage'].append(("","",""))
 script_info['output_description']= ""
-script_info['required_options'] = [\
+script_info['required_options'] = [
  # Example required option
- #make_option('-i','--input_fp',type="existing_filepath",help='the input filepath'),\
+ #make_option('-i','--input_fp',type="existing_filepath",help='the input filepath'),
 ]
-script_info['optional_options'] = [\
+script_info['optional_options'] = [
  # Example optional option
- #make_option('-o','--output_dir',type="new_dirpath",help='the output directory [default: %default]'),\
+ #make_option('-o','--output_dir',type="new_dirpath",help='the output directory [default: %default]'),
 ]
 script_info['version'] = __version__
 
