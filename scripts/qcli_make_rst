@@ -12,13 +12,15 @@ __maintainer__ = "Jesse Stombaugh"
 __email__ = "gregcaporaso@gmail.com"
 __status__ = "Development"
 
-from qcli import (parse_command_line_parameters, 
-                  make_option)
 import os
+from os import makedirs
+from os.path import exists
 from string import replace
 import types
 import re
 from sys import exit, stderr
+from qcli import (parse_command_line_parameters, 
+                  make_option)
 
 rst_text= \
 '''\
@@ -88,26 +90,17 @@ def convert_py_file_to_link(input_str):
 def main():
     option_parser, opts, args = parse_command_line_parameters(**script_info)
 
-    #Determine if the input is a directory containing python scripts or a single
-    #file and then create a list of those scripts
-    if os.path.isdir(opts.input_dir):
-        file_names = os.listdir(opts.input_dir)
-        #Only take files which do not start with "." and end with a ".py"
-        file_names = [fname for fname in file_names if not \
-                        fname.startswith('.') and fname.endswith('.py')]
-        
-    elif os.path.isfile(opts.input_dir):
-        file_names=[str(opts.input_dir)]
-    
-    else:
-        print("io error, input path not valid.  Does it exist?")
-        exit(1)
-
+    #Create a list of the scripts to create rst files for.
+    file_names = os.listdir(opts.input_dir)
+    #Only take files which do not start with "."
+    file_names = [fname for fname in file_names if not fname.startswith('.')]
     
     #Identify the directory where results should be written.
-    dir_path = opts.output_dir
-    if dir_path and not dir_path.endswith('/'):
-        dir_path = dir_path + '/'
+    output_dir = opts.output_dir
+    if output_dir and not output_dir.endswith('/'):
+        output_dir = output_dir + '/'
+    if not exists(output_dir):
+        makedirs(output_dir)
 
     script={}
     #Iterate through list of filenames
@@ -125,7 +118,7 @@ def main():
         #print script.__maintainer__
         
         #Define output file path
-        outf=os.path.join(dir_path,file+'.rst')
+        outf=os.path.join(output_dir,file+'.rst')
         
         
         #This try block attempts to parse the dictionary and if the dictionary
