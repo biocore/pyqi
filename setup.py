@@ -15,4 +15,5 @@ from glob import glob
 setup(name='qcli',
       version='0.0.0-dev',
       packages=['qcli'],
+      scripts=glob('scripts/qcli*')
       )
