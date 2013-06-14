@@ -7,14 +7,11 @@ without those dependencies.
 
 """
 
-from copy import copy
-import types
-import sys
-from optparse import (OptionParser, OptionGroup, Option, 
-                      OptionValueError, OptionError)
-from os import popen, remove, makedirs, getenv
-from os.path import join, abspath, exists, isdir, isfile, split
+from os.path import isdir, split, join, abspath, exists
+from os import chdir, getcwd
+from shutil import copytree, rmtree
 from glob import glob
+from site import addsitedir
 from qcli.util import qcli_system_call
 
 
