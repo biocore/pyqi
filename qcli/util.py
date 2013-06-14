@@ -16,6 +16,7 @@ __maintainer__ = "Greg Caporaso"
 __email__ = "gregcaporaso@gmail.com"
 __status__ = "Development"
 
+from os import remove
 from subprocess import Popen, PIPE, STDOUT
 
 def qcli_system_call(cmd, shell=True):
@@ -26,6 +27,8 @@ def qcli_system_call(cmd, shell=True):
 
     Please see Python's subprocess. Popen for a description of the shell
     parameter and how cmd is interpreted differently based on its value.
+    
+    This function is ported from QIIME (previously qiime_system_call).
     """
     proc = Popen(cmd,
                  shell=shell,
@@ -37,3 +40,19 @@ def qcli_system_call(cmd, shell=True):
     stdout, stderr = proc.communicate()
     return_value = proc.returncode
     return stdout, stderr, return_value
+
+def remove_files(list_of_filepaths, error_on_missing=True):
+    """Remove list of filepaths, optionally raising an error if any are missing
+    
+       This function is ported from PyCogent.
+    """
+    missing = []
+    for fp in list_of_filepaths:
+        try:
+            remove(fp)
+        except OSError:
+            missing.append(fp)
+
+    if error_on_missing and missing:
+        raise OSError, "Some filepaths were not accessible: %s" % '\t'.join(missing)
+        
