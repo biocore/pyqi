@@ -17,4 +17,4 @@ from qcli.option_parsing import (
 from qcli.test import (run_script_usage_tests)
 from qcli.util import (qcli_system_call)
 
-__all__ = ['option_parsing','test']
+__all__ = ['option_parsing','test','util']
