@@ -2,7 +2,8 @@
 """ Utilities for parsing command line options and arguments
 
 This code was derived from QIIME (www.qiime.org), where it was initally
-developed. It has been ported to qcli to support accessing this functionality without those dependencies.
+developed. It has been ported to qcli to support accessing this functionality 
+without those dependencies.
 
 """
 
@@ -14,6 +15,7 @@ from optparse import (OptionParser, OptionGroup, Option,
 from os import popen, remove, makedirs, getenv
 from os.path import join, abspath, exists, isdir, isfile, split
 from glob import glob
+from qcli.util import qcli_system_call
 
 
 __author__ = "Greg Caporaso"
@@ -25,25 +27,21 @@ __maintainer__ = "Greg Caporaso"
 __email__ = "gregcaporaso@gmail.com"
 __status__ = "Development"
 
-def run_script_usage_tests(qiime_test_data_dir,
-                           qiime_scripts_dir,
+def run_script_usage_tests(test_data_dir,
+                           scripts_dir,
                            working_dir,
                            verbose=False,
                            tests=None,
                            failure_log_fp=None,
                            force_overwrite=False,
                            timeout=60):
-    """ Test script_usage examples when test data is present in qiime_test_data_dir
-    
-        qiime_test_data_dir will typically point to the qiime_test_data
-        directory that is included with QIIME at the root level
-        (e.g. Qiime/qiime_test_data).
+    """ Test script_usage examples when test data is present in test_data_dir
 
         Returns a result summary string and the number of script usage
         examples (i.e. commands) that failed.
     """
     # process input filepaths and directories
-    qiime_test_data_dir = abspath(qiime_test_data_dir)
+    test_data_dir = abspath(test_data_dir)
     working_dir = join(working_dir,'script_usage_tests')
     if force_overwrite and exists(working_dir):
         rmtree(working_dir)
@@ -51,12 +49,12 @@ def run_script_usage_tests(qiime_test_data_dir,
         failure_log_fp = abspath(failure_log_fp)
 
     if tests == None:
-        tests = [split(d)[1] for d in sorted(glob('%s/*' % qiime_test_data_dir)) if isdir(d)]
+        tests = [split(d)[1] for d in sorted(glob('%s/*' % test_data_dir)) if isdir(d)]
     
     if verbose:
         print 'Tests to run:\n %s' % ' '.join(tests)
     
-    addsitedir(qiime_scripts_dir)
+    addsitedir(scripts_dir)
     
     failed_tests = []
     warnings = []
@@ -64,8 +62,8 @@ def run_script_usage_tests(qiime_test_data_dir,
     for test in tests:
         
         # import the usage examples - this is possible because we added 
-        # qiime_scripts_dir to the PYTHONPATH above
-        script_fn = '%s/%s.py' % (qiime_scripts_dir,test)
+        # scripts_dir to the PYTHONPATH above
+        script_fn = '%s/%s.py' % (scripts_dir,test)
         script = __import__(test)
         usage_examples = script.script_info['script_usage']
         
@@ -73,7 +71,7 @@ def run_script_usage_tests(qiime_test_data_dir,
             print 'Testing %d usage examples from: %s' % (len(usage_examples),script_fn)
         
         # init the test environment
-        test_input_dir = '%s/%s' % (qiime_test_data_dir,test)
+        test_input_dir = '%s/%s' % (test_data_dir,test)
         test_working_dir = '%s/%s' % (working_dir,test)
         copytree(test_input_dir,test_working_dir)
         chdir(test_working_dir)
@@ -101,7 +99,7 @@ def run_script_usage_tests(qiime_test_data_dir,
             timed_out = False
             initiate_timeout(timeout)
             try:
-                stdout, stderr, return_value = qiime_system_call(cmd)
+                stdout, stderr, return_value = qcli_system_call(cmd)
             except TimeExceededError:
                 timed_out = True
             else:
