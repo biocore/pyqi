@@ -9,11 +9,11 @@ __maintainer__ = "Greg Caporaso"
 __email__ = "gregcaporaso@gmail.com"
 __status__ = "Development"
 
-
 # import most commonly used objects and functions so they can
 # be imported directly from qlci (e.g., from qcli import make_option)
 from qcli.option_parsing import (
  make_option, 
  parse_command_line_parameters)
+from qcli.test import (run_script_usage_tests)
 
-__all__ = ['option_parsing']
+__all__ = ['option_parsing','test']
