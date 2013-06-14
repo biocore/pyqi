@@ -13,7 +13,8 @@ from os import chdir, getcwd
 from shutil import copytree, rmtree
 from glob import glob
 from site import addsitedir
-from qcli.util import qcli_system_call
+from qcli.util import (qcli_system_call, 
+                       remove_files)
 
 
 __author__ = "Greg Caporaso"
