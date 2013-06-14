@@ -55,3 +55,4 @@ def remove_files(list_of_filepaths, error_on_missing=True):
 
     if error_on_missing and missing:
         raise OSError, "Some filepaths were not accessible: %s" % '\t'.join(missing)
+        
