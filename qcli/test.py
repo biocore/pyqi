@@ -7,6 +7,7 @@ without those dependencies.
 
 """
 
+import signal
 from os.path import isdir, split, join, abspath, exists
 from os import chdir, getcwd
 from shutil import copytree, rmtree
@@ -23,6 +24,34 @@ __version__ = "0.0.0-dev"
 __maintainer__ = "Greg Caporaso"
 __email__ = "gregcaporaso@gmail.com"
 __status__ = "Development"
+
+### Code for timing out tests that exceed a time limit
+## The test case timing code included in this file is adapted from
+## recipes provided at:
+##  http://code.activestate.com/recipes/534115-function-timeout/
+##  http://stackoverflow.com/questions/492519/timeout-on-a-python-function-call
+
+# to use this, call initiate_timeout(allowed_seconds_per_test) in 
+# TestCase.setUp() and then disable_timeout() in TestCase.tearDown()
+
+class TimeExceededError(Exception):
+    pass
+
+def initiate_timeout(seconds=60):
+    
+    def timeout(signum, frame):
+        raise TimeExceededError,\
+         "Test failed to run in allowed time (%d seconds)." % seconds
+    
+    signal.signal(signal.SIGALRM, timeout)
+    # set the 'alarm' to go off in seconds seconds
+    signal.alarm(seconds)
+
+def disable_timeout():
+    # turn off the alarm
+    signal.alarm(0)
+
+### End code for timing out tests that exceed a time limit
 
 def run_script_usage_tests(test_data_dir,
                            scripts_dir,
