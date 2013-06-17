@@ -13,7 +13,7 @@ qcli (canonically pronounced *queue sea el eye*) contains tools for developing a
 
 qcli makes the command line interface originally developed for `QIIME <www.qiime.org>`_ a standalone package, as it  became apparent that it would be useful in tools other than QIIME, but without the very heavy-weight QIIME dependency. The name of this package may change as it reaches maturity.
 
-qcli is very light-weight. It's only requirement is a working Python 2.6. 
+qcli is very light-weight. Its only requirement is a working Python 2.6. 
 
 Documentation index
 -------------------
