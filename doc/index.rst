@@ -11,9 +11,7 @@ qcli (canonically pronounced *queue sea el eye*) contains tools for developing a
  * An automated test framework, which can supplement unit tests (which typically don't test command line interfaces) to alert you of changes that break your usage examples.
  * An automated documentation framework. Sphinx-compatible rst files can be auto-generated for your qcli scripts.
 
-qcli makes the command line interface originally developed for `QIIME <www.qiime.org>`_ a standalone package, as it  became apparent that it would be useful in tools other than QIIME, but without the very heavy-weight QIIME dependency. The name of this package may change as it reaches maturity.
-
-qcli is very light-weight. Its only requirement is a working Python 2.6. 
+qcli (canonically pronounced *queue sea el eye*) is being designed to make `QIIME <http://www.qiime.org>`_'s Command Line Interface framework a standalone package so it can be used in tools other than QIIME without the very heavy-weight dependency of QIIME itself. The name of this package may change as it reaches maturity. qcli is very light-weight. Its only requirement is a working Python 2.6 installation. 
 
 Documentation index
 -------------------
