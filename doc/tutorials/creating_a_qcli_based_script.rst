@@ -8,7 +8,7 @@ This document covers how to create a new qcli script, and all of the options tha
 
 The primary object that defines a qcli script is the ``script_info`` dictionary. This is where all of the parameters and help text are defined, as well as various options you have for configuring how the script works. The easiest way to start a new qcli script is using the ``qcli_make_script`` script that is included with qcli. This document will start there, and then provide details on how to customize your script.
 
-This page will help you develop your command line interfaces, but you should still familiarize yourself with Python's ``optparse`` module. qcli provides some convenient wrappers for ``optparse``, but will not be a replacement to a general understanding of how to interact with ``optparse`` (see the `optparse documentation). <http://docs.python.org/library/optparse.html>`_. 
+This page will help you develop your command line interfaces, but you should still familiarize yourself with Python's ``optparse`` module. qcli provides some convenient wrappers for ``optparse``, but will not be a replacement to a general understanding of how to interact with ``optparse`` (see the `optparse documentation <http://docs.python.org/library/optparse.html>`_). 
 
 .. note:: As support for ``optparse`` will not continue into Python 3.0, we will transition to using ``argparse`` behind the scenes in the very near future. Our goal is to make these changes fully backward compatible so qcli users won't need to change anything or do anything differently following the transition.
 
@@ -77,12 +77,12 @@ It's also possible to add your own values to the ``script_info`` dictionary, if 
 | option_label                  | a dictionary matching option names to "human readable" names, used in some graphical interfaces       |   Q          |
 +-------------------------------+-------------------------------------------------------------------------------------------------------+--------------+
 
-* "Used by" key : Q: `QIIME <http://www.qiime.org>`_; PG: PyCogent beta GUI; T: tax2tree.
+"Used by" key : Q: `QIIME <http://www.qiime.org>`_; PG: PyCogent beta GUI; T: tax2tree.
 
 Setting values in script_info
 -----------------------------
 
-The ``script_info`` object is simply a dict, so the standard method for setting and working with dict entries applies. Some examples are::
+The ``script_info`` object is simply a python dictionary, so the standard method for setting and working with dict entries applies. Some examples are::
 
 	script_info['brief_description'] = "Count sequences in one or more fasta files."
 	script_info['required_options'] = [
@@ -183,7 +183,7 @@ This helps with reducing clutter and saving convenient short-form parameter name
 
 Make paths to files end with ``_fp`` (for *filepath*) and paths to directories end with ``_dir``. This helps users understand exactly what must be passed to a script.
 
-Some standard names for common options are listed below. You should use these whenever possible.
+Some good names for common options are listed below. You should use these whenever possible.
 
 +-------------------------------+----------------------------------------------------------------------------------------------------+
 |        Description            | Option name                                                                                        |
