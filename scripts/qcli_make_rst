@@ -14,7 +14,7 @@ __status__ = "Development"
 
 import os
 from os import makedirs
-from os.path import exists
+from os.path import exists, abspath, split, splitext
 from string import replace
 import types
 import re
@@ -93,7 +93,7 @@ def main():
 
     #Create a list of the scripts to create rst files for.
     file_names = os.listdir(opts.input_dir)
-    addsitedir(opts.input_dir)
+    addsitedir(abspath(opts.input_dir))
     #Only take files which do not start with "."
     file_names = [fname for fname in file_names if not fname.startswith('.')]
     
@@ -106,22 +106,18 @@ def main():
 
     script={}
     #Iterate through list of filenames
-    for file in file_names:
+    for filename in file_names:
         #Get only the name of the script and remove other path information.
-        file=file.split('/')[-1]
-        file=file.split('.')[0]
+        filename = splitext(split(filename)[1])[0]
 
         #Import the script file to get the dictionary values
         try:
-            script=__import__(file)
-            
-        except ValueError:
-            print "Error"
-        #print script.__maintainer__
+            script=__import__(filename)
+        except ImportError:
+            raise ImportError, "Can't import %s" % filename
         
         #Define output file path
-        outf=os.path.join(output_dir,file+'.rst')
-        
+        outf=os.path.join(output_dir,'%s.rst' % filename)
         
         #This try block attempts to parse the dictionary and if the dictionary
         #is not present, then it will write that information to stdout
@@ -215,31 +211,35 @@ def main():
                     script_ex=convert_py_file_to_link(ex[1])
                     script_examples += '\n' + script_ex + '\n'
                 if ex[2] <>'':
-                    new_cmd=ex[2].replace('%prog',file+'.py')
+                    new_cmd=ex[2].replace('%prog',filename+'.py')
                     script_examples += '\n::\n\n\t' + new_cmd + '\n'
     
             script_out = \
                   script.script_info['output_description'].replace('--','`-`-')
             new_script_out=convert_py_file_to_link(script_out)
 
-            output_text = rst_text % (file, file, file,         
-                                        imported_brief_description,  
-                                        new_script_description, file, 
-                                        inputs, new_script_out, 
-                                        script_examples)
+            output_text = rst_text % (filename,
+                                      filename,
+                                      filename,
+                                      imported_brief_description,
+                                      new_script_description,
+                                      filename,
+                                      inputs,
+                                      new_script_out,
+                                      script_examples)
 
             ###Write rst file
             f = open(outf, 'w')
-            f.write((output_text.replace('%prog',file+'.py')))
+            f.write((output_text.replace('%prog',filename+'.py')))
             f.close()
             
             #script.close()
         except AttributeError:
             print "%s: This file does not contain the appropriate dictionary" \
-            % (file)
+            % (filename)
         except KeyError:
             print "%s: This file does not contain necessary fields" \
-            % (file)
+            % (filename)
 
 
 if __name__ == "__main__":
