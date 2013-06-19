@@ -56,8 +56,7 @@ def check_existing_filepaths(option, opt, value):
         values.append(v)
     if len(paths) == 0:
         raise OptionValueError(
-            "No filepaths match pattern(s) passed via -i: %s" % 
-            ','.join(opts.input_fps))
+            "No filepaths match pattern(s): %s" % value)
     return values
 
 def check_existing_dirpath(option, opt, value):
