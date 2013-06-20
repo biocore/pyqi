@@ -238,10 +238,10 @@ The following is a complete example of a script for counting the number of nucle
 	from __future__ import division
 
 	__author__ = "Greg Caporaso"
-	__copyright__ = "Copyright 2011, The PyCogent project"
+	__copyright__ = "Copyright 2013, The qcli project"
 	__credits__ = ["Greg Caporaso"]
 	__license__ = "GPL"
-	__version__ = "1.6.0dev"
+	__version__ = "0.0.0-dev"
 	__maintainer__ = "Greg Caporaso"
 	__email__ = "gregcaporaso@gmail.com"
 	__status__ = "Development"
