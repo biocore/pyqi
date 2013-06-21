@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>qcli_make_rst – Make Sphinx RST file for one or more qcli-based scripts &mdash; qcli: QIIME&#39;s Command Line Interface framework</title>
+    <title>qcli_make_script – Create a template qcli script. &mdash; qcli: QIIME&#39;s Command Line Interface framework</title>
     
     <link rel="stylesheet" href="../_static/haiku.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -29,49 +29,53 @@
     <script type="text/javascript" src="../_static/theme_extras.js"></script>
     <link rel="top" title="qcli: QIIME&#39;s Command Line Interface framework" href="../index.html" />
     <link rel="up" title="qcli script documentation" href="index.html" />
-    <link rel="next" title="qcli_make_script – Create a template qcli script." href="qcli_make_script.html" />
-    <link rel="prev" title="qcli script documentation" href="index.html" /> 
+    <link rel="prev" title="qcli_make_rst – Make Sphinx RST file for one or more qcli-based scripts" href="qcli_make_rst.html" /> 
   </head>
   <body>
       <div class="header"><h1 class="heading"><a href="../index.html">
           <span>qcli: Qiime&#39;s Command Line Interface framework</span></a></h1>
-        <h2 class="heading"><span>qcli_make_rst – Make Sphinx RST file for one or more qcli-based scripts</span></h2>
+        <h2 class="heading"><span>qcli_make_script – Create a template qcli script.</span></h2>
       </div>
       <div class="topnav">
       
         <p>
-        «&#160;&#160;<a href="index.html">qcli script documentation</a>
+        «&#160;&#160;<a href="qcli_make_rst.html"><em>qcli_make_rst</em> &#8211; Make Sphinx RST file for one or more qcli-based scripts</a>
         &#160;&#160;::&#160;&#160;
         <a class="uplink" href="../index.html">Contents</a>
-        &#160;&#160;::&#160;&#160;
-        <a href="qcli_make_script.html"><em>qcli_make_script</em> &#8211; Create a template qcli script.</a>&#160;&#160;»
         </p>
 
       </div>
       <div class="content">
         
         
-  <span class="target" id="qcli-make-rst"></span><div class="section" id="qcli-make-rst-make-sphinx-rst-file-for-one-or-more-qcli-based-scripts">
-<span id="index-0"></span><h1><em>qcli_make_rst</em> &#8211; Make Sphinx RST file for one or more qcli-based scripts<a class="headerlink" href="#qcli-make-rst-make-sphinx-rst-file-for-one-or-more-qcli-based-scripts" title="Permalink to this headline">¶</a></h1>
+  <span class="target" id="qcli-make-script"></span><div class="section" id="qcli-make-script-create-a-template-qcli-script">
+<span id="index-0"></span><h1><em>qcli_make_script</em> &#8211; Create a template qcli script.<a class="headerlink" href="#qcli-make-script-create-a-template-qcli-script" title="Permalink to this headline">¶</a></h1>
 <p><strong>Description:</strong></p>
-<p>This script will take a qcli script and convert the usage strings and options to generate a documentation .rst file.</p>
-<p><strong>Usage:</strong> <tt class="file docutils literal"><span class="pre">qcli_make_rst</span> <span class="pre">[options]</span></tt></p>
+<p>This script will create a template qcli script and make it executable.</p>
+<p><strong>Usage:</strong> <tt class="file docutils literal"><span class="pre">qcli_make_script</span> <span class="pre">[options]</span></tt></p>
 <p><strong>Input Arguments:</strong></p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p><strong>[REQUIRED]</strong></p>
+<dl class="docutils">
+<dt>-o, <cite>-</cite>-output_fp</dt>
+<dd>The output filepath.</dd>
+</dl>
+<p><strong>[OPTIONAL]</strong></p>
 <dl class="last docutils">
-<dt>-i, <cite>-</cite>-input_fps</dt>
-<dd>The input file(s) to generate rst files for</dd>
-<dt>-o, <cite>-</cite>-output_dir</dt>
-<dd>The directory where the resulting rst file(s) should be written</dd>
+<dt>-a, <cite>-</cite>-author_name</dt>
+<dd>The script author&#8217;s (probably you) name to be included in the header variables. This will typically need to be enclosed  in quotes to handle spaces. [default:AUTHOR_NAME]</dd>
+<dt>-e, <cite>-</cite>-author_email</dt>
+<dd>The script author&#8217;s (probably you) e-mail address to be included in the header variables. [default:AUTHOR_EMAIL]</dd>
+<dt>-c, <cite>-</cite>-copyright</dt>
+<dd>The copyright information to be included in the header variables. [default:Copyright 2013, The BiPy project]</dd>
 </dl>
 </div>
 <p><strong>Output:</strong></p>
-<p>This script will output one or more Sphinx rst-formatted files.</p>
-<p><strong>Create RST for many files:</strong></p>
-<p>Create rst files for all files ending with .py in the scripts/ directory. Write the rst files to the rst directory. Note that if the value you pass for -i contains a wildcard character (e.g., &#8220;*&#8221;), the value must be wrapped in quotes.</p>
-<div class="highlight-python"><pre>qcli_make_rst.py -i "scripts/*py" -o rst</pre>
+<p>The result of this script is a qcli template script.</p>
+<p><strong>Example usage:</strong></p>
+<p>Create a new script</p>
+<div class="highlight-python"><pre>qcli_make_script -a "Greg Caporaso" -e gregcaporaso@gmail.com -o my_script.py</pre>
 </div>
 </div>
 
@@ -80,11 +84,9 @@
       <div class="bottomnav">
       
         <p>
-        «&#160;&#160;<a href="index.html">qcli script documentation</a>
+        «&#160;&#160;<a href="qcli_make_rst.html"><em>qcli_make_rst</em> &#8211; Make Sphinx RST file for one or more qcli-based scripts</a>
         &#160;&#160;::&#160;&#160;
         <a class="uplink" href="../index.html">Contents</a>
-        &#160;&#160;::&#160;&#160;
-        <a href="qcli_make_script.html"><em>qcli_make_script</em> &#8211; Create a template qcli script.</a>&#160;&#160;»
         </p>
 
       </div>
