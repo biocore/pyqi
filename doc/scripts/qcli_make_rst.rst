@@ -1,8 +1,8 @@
 .. _qcli_make_rst:
 
-.. index:: qcli_make_rst.py
+.. index:: qcli_make_rst
 
-*qcli_make_rst.py* -- Make Sphinx RST file for one or more qcli-based scripts
+*qcli_make_rst* -- Make Sphinx RST file for one or more qcli-based scripts
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 **Description:**
@@ -10,7 +10,7 @@
 This script will take a qcli script and convert the usage strings and options to generate a documentation .rst file.
 
 
-**Usage:** :file:`qcli_make_rst.py [options]`
+**Usage:** :file:`qcli_make_rst [options]`
 
 **Input Arguments:**
 

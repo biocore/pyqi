@@ -1,8 +1,8 @@
 .. _qcli_make_script:
 
-.. index:: qcli_make_script.py
+.. index:: qcli_make_script
 
-*qcli_make_script.py* -- Create a template qcli script.
+*qcli_make_script* -- Create a template qcli script.
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 **Description:**
@@ -10,7 +10,7 @@
 This script will create a template qcli script and make it executable.
 
 
-**Usage:** :file:`qcli_make_script.py [options]`
+**Usage:** :file:`qcli_make_script [options]`
 
 **Input Arguments:**
 
@@ -43,6 +43,6 @@ Create a new script
 
 ::
 
-	qcli_make_script.py -a "Greg Caporaso" -e gregcaporaso@gmail.com -o my_script.py
+	qcli_make_script -a "Greg Caporaso" -e gregcaporaso@gmail.com -o my_script.py
 
 
