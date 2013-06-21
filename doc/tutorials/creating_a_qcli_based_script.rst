@@ -14,7 +14,7 @@ This page will help you develop your command line interfaces, but you should sti
 
 Creating script templates
 =========================
-qcli provides a script, ``make_qcli_script`` for creating template qcli-based scripts. The output of ``make_qcli_script`` is a full functionally qcli script (though it doesn't do very much). To create a qcli script, you can do the following::
+qcli provides a script, ``make_qcli_script`` for creating template qcli-based scripts. The output of ``make_qcli_script`` is a fully functional qcli script (though it doesn't do very much). To create a qcli script, you can do the following::
 	
 	qcli_make_script -o my_script.py
 
