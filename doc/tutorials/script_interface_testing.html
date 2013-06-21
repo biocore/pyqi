@@ -1,0 +1,164 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Script interface testing &mdash; qcli: QIIME&#39;s Command Line Interface framework</title>
+    
+    <link rel="stylesheet" href="../_static/haiku.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/print.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.0.0-dev',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/theme_extras.js"></script>
+    <link rel="top" title="qcli: QIIME&#39;s Command Line Interface framework" href="../index.html" />
+    <link rel="up" title="qcli tutorials" href="index.html" />
+    <link rel="next" title="Guidelines for creating qcli-based scripts" href="../guidelines/index.html" />
+    <link rel="prev" title="Creating a qcli-based script" href="creating_a_qcli_based_script.html" /> 
+  </head>
+  <body>
+      <div class="header"><h1 class="heading"><a href="../index.html">
+          <span>qcli: Qiime&#39;s Command Line Interface framework</span></a></h1>
+        <h2 class="heading"><span>Script interface testing</span></h2>
+      </div>
+      <div class="topnav">
+      
+        <p>
+        «&#160;&#160;<a href="creating_a_qcli_based_script.html">Creating a qcli-based script</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="../index.html">Contents</a>
+        &#160;&#160;::&#160;&#160;
+        <a href="../guidelines/index.html">Guidelines for creating qcli-based scripts</a>&#160;&#160;»
+        </p>
+
+      </div>
+      <div class="content">
+        
+        
+  <div class="section" id="script-interface-testing">
+<span id="testing"></span><h1>Script interface testing<a class="headerlink" href="#script-interface-testing" title="Permalink to this headline">¶</a></h1>
+<p>It is often difficult to test script interfaces, which are often the primary point of interaction with users. So, for example, if python script contains code that looks like this:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">qiime.filter</span> <span class="kn">import</span> <span class="n">filter_samples_from_otu_table</span>
+<span class="kn">from</span> <span class="nn">qiime.filter</span> <span class="kn">import</span> <span class="n">filter_otus_from_otu_table</span>
+
+<span class="o">...</span>
+
+<span class="k">if</span> <span class="n">run_mode</span> <span class="o">==</span> <span class="s">&#39;filter_samples&#39;</span><span class="p">:</span>
+        <span class="n">filter_samples_from_otu_table</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<span class="k">elif</span> <span class="n">run_mode</span> <span class="o">==</span> <span class="s">&#39;filter_otus&#39;</span><span class="p">:</span>
+        <span class="n">filter_otus_from_otu_table</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">,</span> <span class="s">&quot;Unknown run_mode.&quot;</span>
+</pre></div>
+</div>
+<p>and a developer accidentally removes the <tt class="docutils literal"><span class="pre">from</span> <span class="pre">qiime.filter</span> <span class="pre">import</span> <span class="pre">filter_otus_from_otu_table</span></tt> line but manually only tests with <tt class="docutils literal"><span class="pre">run_mode</span> <span class="pre">==</span> <span class="pre">'filter_samples'</span></tt>, they likely would not catch the error before release of the software. These types of errors generally result in cryptic error messages, which frustrates users and increases technical support loads. As powerful as the underlying code may be, this simple, common mistake makes it useless to the end user.</p>
+<p>To detect these types of errors, qcli implements a script interface testing framework that makes use of the <tt class="docutils literal"><span class="pre">usage_examples</span></tt> in the <tt class="docutils literal"><span class="pre">script_info</span></tt> object that is implemented by all scripts. This framework relies on a set of example files that can be used as additional documentation of qcli-based scripts, as well as a function for running the script usage tests which, for example, can be called from within your continuous integration testing framework.</p>
+<p>The following sections first illustrate how to apply this testing framework locally, and then how to develop qcli scripts so they can be used with this framework.</p>
+<div class="section" id="running-script-usage-tests">
+<h2>Running script usage tests<a class="headerlink" href="#running-script-usage-tests" title="Permalink to this headline">¶</a></h2>
+<p>After obtaining the <tt class="docutils literal"><span class="pre">qcli</span></tt> repository, you can <tt class="docutils literal"><span class="pre">cd</span></tt> to <tt class="docutils literal"><span class="pre">qcli/tests</span></tt> directory. You&#8217;ll see a script called <tt class="docutils literal"><span class="pre">all_tests.py</span></tt>. You can run this from the <tt class="docutils literal"><span class="pre">tests</span></tt> directory by calling:</p>
+<div class="highlight-python"><pre>./all_tests.py --suppress_unit_tests</pre>
+</div>
+<p>This will run all of the script usage tests which are currently defined in verbose mode. You can run specific tests by passing the names of those tests via the <tt class="docutils literal"><span class="pre">--script_tests</span></tt> parameter. For example, to run only the tests for <tt class="docutils literal"><span class="pre">qcli_make_script</span></tt> and <tt class="docutils literal"><span class="pre">qcli_make_rst</span></tt> you can run the following:</p>
+<div class="highlight-python"><pre>./all_tests.py --suppress_unit_tests --script_tests add_qiime_labels,make_otu_table</pre>
+</div>
+<p>These tests will print output to the screen.</p>
+<p>The recommended way of testing qcli is to run qcli&#8217;s unit tests and script usage tests. You can do this simply by running:</p>
+<div class="highlight-python"><pre>./all_tests.py</pre>
+</div>
+</div>
+<div class="section" id="how-the-script-usage-tests-work">
+<h2>How the script usage tests work<a class="headerlink" href="#how-the-script-usage-tests-work" title="Permalink to this headline">¶</a></h2>
+<p>You&#8217;ll see many sub-directories in <tt class="docutils literal"><span class="pre">qcli_test_data</span></tt> with names corresponding to the names of qcli scripts. Each of these directories contains example input and output for the corresponding qcli script. For example, the <tt class="docutils literal"><span class="pre">qcli_make_rst</span></tt> directory contains the following test data for the <tt class="docutils literal"><span class="pre">qcli_make_rst</span></tt> script:</p>
+<div class="highlight-python"><pre>ls -R qcli_test_data/qcli_make_rst
+rst     scripts
+
+qcli_test_data/qcli_make_rst/rst:
+my_script.rst
+
+qcli_test_data/qcli_make_rst/scripts:
+my_script.py</pre>
+</div>
+<p>If you call <tt class="docutils literal"><span class="pre">qcli_make_rst.py</span> <span class="pre">-h</span></tt>, you&#8217;ll see the following usage examples:</p>
+<div class="highlight-python"><pre>Example usage:
+Print help message and exit
+ qcli_make_rst -h
+
+Example: Create an example script
+ qcli_make_rst -i scripts -o rst</pre>
+</div>
+<p>What you&#8217;ll notice is that the usage example input and output files correspond to the files in <tt class="docutils literal"><span class="pre">qcli/qcli_test_data/qcli_make_rst</span></tt>. The script interface testing works by copying all of the files in <tt class="docutils literal"><span class="pre">qcli_make_rst</span></tt> to a temporary directory, changing into that directory, running each of the usage examples, and confirming that the script exited successfully (i.e., with an exit status of <tt class="docutils literal"><span class="pre">0</span></tt>).</p>
+<blockquote>
+<div><div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Currently the script usage tests only test whether a script exits successfully: they do not check whether the results correspond to the example output. The reasoning is that that would duplicate the functionality of the unit tests (which isn&#8217;t a bad thing, except that implementing this would be a lot of work). These are tests that the interfaces themselves are working.</p>
+</div>
+</div></blockquote>
+<p>If you don&#8217;t see a directory corresponding to a script name in the <tt class="docutils literal"><span class="pre">qcli_test_data</span></tt> directory, that means that a script interface test has not been defined for that script.</p>
+</div>
+<div class="section" id="adding-script-interface-testing-for-new-scripts">
+<h2>Adding script interface testing for new scripts<a class="headerlink" href="#adding-script-interface-testing-for-new-scripts" title="Permalink to this headline">¶</a></h2>
+<p>Adding new script interface tests is easy. All you do is create a new test directory under your repository&#8217;s <tt class="docutils literal"><span class="pre">test_data</span></tt> directory (by convention this would be named <tt class="docutils literal"><span class="pre">&lt;repo&gt;_test_data</span></tt>, where <tt class="docutils literal"><span class="pre">&lt;repo&gt;</span></tt> would be replaced with the name of your repository), where the name of the directory corresponds to the script&#8217;s name. For example, if you&#8217;re adding tests for <tt class="docutils literal"><span class="pre">my_script.py</span></tt> or <tt class="docutils literal"><span class="pre">my_script</span></tt> (i.e., with or without the <tt class="docutils literal"><span class="pre">.py</span></tt> extension), you&#8217;d add a directory called <tt class="docutils literal"><span class="pre">my_script</span></tt>. In that directory you would create example input and output files for all of the script usage examples that are defined in your script. Make several usage examples that make use of different paths through your script.</p>
+<div class="section" id="full-paths">
+<h3>Full paths<a class="headerlink" href="#full-paths" title="Permalink to this headline">¶</a></h3>
+<p>If you recommend that your users specify full paths (which is often safer for jobs that run in parallel on clusters), in your usage example, replace the full path with $PWD. For example (from QIIME&#8217;s <tt class="docutils literal"><span class="pre">pick_de_novo_otus.py</span></tt>):</p>
+<div class="highlight-python"><pre>Simple example: The following command will start an analysis on seqs.fna (-i), which is a
+post-split_libraries fasta file. The sequence identifiers in this file should be of the form
+&lt;sample_id&gt;_&lt;unique_seq_id&gt;. The following steps, corresponding to the preliminary data
+preparation, are applied: Pick de novo OTUs at 97%; pick a representative sequence for each
+OTU (the OTU centroid sequence); align the representative set with PyNAST; assign taxonomy
+with RDP classifier; filter the alignment prior to tree building - remove positions which
+are all gaps, and specified as 0 in the lanemask; build a phylogenetic tree with FastTree;
+build an OTU table. All output files will be written to the directory specified by -o, and
+subdirectories as appropriate. ALWAYS SPECIFY ABSOLUTE FILE PATHS (absolute path represented
+here as $PWD, but will generally look something like /home/ubuntu/my_analysis/).
+ pick_de_novo_otus.py -i $PWD/seqs.fna -o $PWD/otus/</pre>
+</div>
+</div>
+<div class="section" id="cleaning-up-output-files">
+<h3>Cleaning up output files<a class="headerlink" href="#cleaning-up-output-files" title="Permalink to this headline">¶</a></h3>
+<p>If your scripts require that the user-specified output directory does not exist when the script runs, but you provide example output in the test directory, you can tell the testing framework to clean up any existing output directories before running. To automatically remove output directories prior to running the tests, add the <tt class="docutils literal"><span class="pre">script_usage_output_to_remove</span></tt> entry to your script info. For example, from QIIME&#8217;s <tt class="docutils literal"><span class="pre">pick_de_novo_otus.py</span></tt>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">script_info</span><span class="p">[</span><span class="s">&#39;script_usage_output_to_remove&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;$PWD/otus/&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+      </div>
+      <div class="bottomnav">
+      
+        <p>
+        «&#160;&#160;<a href="creating_a_qcli_based_script.html">Creating a qcli-based script</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="../index.html">Contents</a>
+        &#160;&#160;::&#160;&#160;
+        <a href="../guidelines/index.html">Guidelines for creating qcli-based scripts</a>&#160;&#160;»
+        </p>
+
+      </div>
+
+    <div class="footer">
+        &copy; Copyright 2013, The BiPy Development Team.
+      Last updated on Jun 21, 2013.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>
