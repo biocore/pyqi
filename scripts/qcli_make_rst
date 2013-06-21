@@ -54,18 +54,19 @@ rst_text= \
 '''
 
 script_info={}
-script_info['brief_description']="""Make Sphinx RST file"""
-script_info['script_description'] = """This script will take a qcli script and convert the \
-usage strings and options to generate a documentation .rst file."""
+script_info['brief_description']="""Make Sphinx RST file for one or more qcli-based scripts"""
+script_info['script_description'] = """This script will take a qcli script and convert the usage strings and options to generate a documentation .rst file."""
 script_info['script_usage']=[]
-script_info['script_usage'].append(("""Example""","""Create an example script""","""%prog -i scripts -o rst"""))
-script_info['output_description']="""This will output a Sphinx rst-formatted file."""
+script_info['script_usage'].append(("""Create RST for many files""",
+                                    """Create rst files for all files ending with .py in the scripts/ directory. Write the rst files to the rst directory. Note that if the value you pass for -i contains a wildcard character (e.g., "*"), the value must be wrapped in quotes.""",
+                                    """%prog -i "scripts/*py" -o rst"""))
+script_info['output_description']="""This script will output one or more Sphinx rst-formatted files."""
 
 script_info['required_options'] = [
- make_option('-i','--input_dir',
-             help='the input directory containing scripts to generate rst files for'),
- make_option('-o','--output_dir',
-             help='The directory where the resulting rst file(s) should be written.'),
+ make_option('-i','--input_fps',type='existing_filepaths',
+             help='the input file(s) to generate rst files for'),
+ make_option('-o','--output_dir',type='new_filepath',
+             help='the directory where the resulting rst file(s) should be written'),
 ]
 
 script_info['version'] = __version__
@@ -85,17 +86,14 @@ def convert_py_file_to_link(input_str):
         return script_w_link
     else:
         return input_str
-        
-
 
 def main():
     option_parser, opts, args = parse_command_line_parameters(**script_info)
 
     #Create a list of the scripts to create rst files for.
-    file_names = os.listdir(opts.input_dir)
-    addsitedir(abspath(opts.input_dir))
-    #Only take files which do not start with "."
-    file_names = [fname for fname in file_names if not fname.startswith('.')]
+    file_names = opts.input_fps
+    for fn in file_names:
+        addsitedir(abspath(split(fn)[0]))
     
     #Identify the directory where results should be written.
     output_dir = opts.output_dir
