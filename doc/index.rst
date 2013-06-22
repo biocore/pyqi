@@ -22,6 +22,7 @@ Documentation index
    install/index.rst
    tutorials/index.rst
    guidelines/index.rst
+   scripts/index.rst
 
 Getting involved in development
 -------------------------------
