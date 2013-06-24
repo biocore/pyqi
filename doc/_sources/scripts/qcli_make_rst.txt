@@ -36,6 +36,6 @@ Create rst files for all files ending with .py in the scripts/ directory. Write 
 
 ::
 
-	qcli_make_rst.py -i "scripts/*py" -o rst
+	qcli_make_rst -i "scripts/*py" -o rst
 
 
