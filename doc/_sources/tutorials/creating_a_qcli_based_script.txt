@@ -241,10 +241,9 @@ The following is a complete example of a script for counting the number of nucle
 	__copyright__ = "Copyright 2013, The qcli project"
 	__credits__ = ["Greg Caporaso"]
 	__license__ = "GPL"
-	__version__ = "0.0.0-dev"
+	__version__ = "0.1.0"
 	__maintainer__ = "Greg Caporaso"
 	__email__ = "gregcaporaso@gmail.com"
-	__status__ = "Development"
 	
 	from glob import glob
 	from qcli.option_parsing import (
