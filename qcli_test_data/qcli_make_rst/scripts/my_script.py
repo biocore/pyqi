@@ -9,7 +9,6 @@ __license__ = "GPL"
 __version__ = "0.0.0"
 __maintainer__ = "Greg Caporaso"
 __email__ = "gregcaporaso@gmail.com"
-__status__ = "Development"
 
 
 from qcli import (parse_command_line_parameters, 

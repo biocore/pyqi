@@ -14,7 +14,6 @@ __license__ = "GPL"
 __version__ = "0.0.0-dev"
 __maintainer__ = "Greg Caporaso"
 __email__ = "gregcaporaso@gmail.com"
-__status__ = "Development"
 
 from os import remove
 from subprocess import Popen, PIPE, STDOUT

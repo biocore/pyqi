@@ -24,7 +24,6 @@ __license__ = "GPL"
 __version__ = "0.0.0-dev"
 __maintainer__ = "Greg Caporaso"
 __email__ = "gregcaporaso@gmail.com"
-__status__ = "Development"
 
 ### Code for timing out tests that exceed a time limit
 ## The test case timing code included in this file is adapted from
