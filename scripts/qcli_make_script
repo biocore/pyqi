@@ -10,10 +10,9 @@ __author__ = "Greg Caporaso"
 __copyright__ = "Copyright 2013, The BiPy Project"
 __credits__ = ["Greg Caporaso"]
 __license__ = "GPL"
-__version__ = "0.0.0-dev"
+__version__ = "0.1.0"
 __maintainer__ = "Greg Caporaso"
 __email__ = "gregcaporaso@gmail.com"
-__status__ = "Development"
 
 from sys import exit
 from os import popen
@@ -62,10 +61,9 @@ __author__ = "AUTHOR_NAME"
 __copyright__ = "COPYRIGHT"
 __credits__ = ["AUTHOR_NAME"]
 __license__ = "GPL"
-__version__ = "0.0.0"
+__version__ = "0.1.0"
 __maintainer__ = "AUTHOR_NAME"
 __email__ = "AUTHOR_EMAIL"
-__status__ = "Development"
 """ % strftime('%d %b %Y')
 
     script_block = """

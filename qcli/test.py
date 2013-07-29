@@ -21,10 +21,9 @@ __author__ = "Greg Caporaso"
 __copyright__ = "Copyright 2013, The BiPy Project"
 __credits__ = ["Greg Caporaso"]
 __license__ = "GPL"
-__version__ = "0.0.0-dev"
+__version__ = "0.1.0"
 __maintainer__ = "Greg Caporaso"
 __email__ = "gregcaporaso@gmail.com"
-__status__ = "Development"
 
 ### Code for timing out tests that exceed a time limit
 ## The test case timing code included in this file is adapted from

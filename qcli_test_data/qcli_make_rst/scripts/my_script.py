@@ -6,10 +6,9 @@ __author__ = "Greg Caporaso"
 __copyright__ = "Copyright 2013, The BiPy project"
 __credits__ = ["Greg Caporaso"]
 __license__ = "GPL"
-__version__ = "0.0.0"
+__version__ = "0.1.0"
 __maintainer__ = "Greg Caporaso"
 __email__ = "gregcaporaso@gmail.com"
-__status__ = "Development"
 
 
 from qcli import (parse_command_line_parameters, 
