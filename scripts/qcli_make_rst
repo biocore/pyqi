@@ -7,7 +7,7 @@ __copyright__ = "Copyright 2013, The BiPy Project"
 __credits__ = ["Jesse Stombaugh",
                "Greg Caporaso"]
 __license__ = "GPL"
-__version__ = "0.1.0"
+__version__ = "0.1.0-dev"
 __maintainer__ = "Jesse Stombaugh"
 __email__ = "gregcaporaso@gmail.com"
 
