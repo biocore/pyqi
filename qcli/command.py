@@ -17,24 +17,23 @@ import sys
 from optparse import (OptionParser, OptionGroup, Option, 
                       OptionValueError, OptionError)
 from qcli.option_parsing import make_option
+from qcli.log import StdErrLogger
 
-# def clmain(cmd_constructor, argv, logger_constructor=StdErrLogger):
-#     kwargs = argv_to_kwargs(cmd_constructor, argv)
-# 
-#     logger = logger_constructor()
-#     cmd = cmd_constructor(logger)
-#     try:
-#         result = cmd(kwargs)
-#     except Exception, e:
-#         # Possibly do *something*
-#         raise e
-#     else:
-#         output_mapping = cmd.getOutputFilepaths(result, kwargs)
-# 
-#         for k, v in result.items():
-#             v.write(output_mapping[k])
-# 
-#     return 0
+def clmain(cmd_constructor, local_argv, logger_constructor=StdErrLogger):
+    logger = logger_constructor()
+    cmd = cmd_constructor(logger=logger)
+    try:
+        result = cmd(local_argv[1:])
+    except Exception, e:
+        # Possibly do *something*
+        raise e
+    #else:
+    #    output_mapping = cmd.getOutputFilepaths(result, kwargs)
+#
+#        for k, v in result.items():
+#            v.write(output_mapping[k])
+#
+    return 0
 
 # def argv_to_kwargs(cmd, argv):
 #     pass
@@ -70,6 +69,7 @@ class CLParameter(Parameter):
                       parameter,
                       LongName,
                       CLType,
+                      CLAction='store',
                       ShortName=None):
         result = cls(Type=parameter.Type,
                      Help=parameter.Help,
@@ -77,6 +77,7 @@ class CLParameter(Parameter):
                      Required=parameter.Required,
                      LongName=LongName,
                      CLType=CLType,
+                     CLAction=CLAction,
                      Default=parameter.Default,
                      DefaultDescription=parameter.DefaultDescription,
                      ShortName=ShortName)
@@ -88,6 +89,7 @@ class CLParameter(Parameter):
                  Name,
                  LongName,
                  CLType,
+                 CLAction='store',
                  Required=False,
                  Default=None,
                  DefaultDescription=None,
@@ -95,6 +97,7 @@ class CLParameter(Parameter):
         
         self.LongName = LongName
         self.CLType = CLType
+        self.CLAction = CLAction
         self.ShortName = ShortName
         
         super(CLParameter,self).__init__(Type=Type,Help=Help,Name=Name,Required=Required,Default=Default,DefaultDescription=DefaultDescription)
@@ -122,7 +125,12 @@ class Command(object):
 
     BriefDescription = ''
     LongDescription = ''
-    StandardParameters = {}
+    Parameters = []
+    Parameters.append(Parameter(Type=bool,
+                                  Help='Print information during execution -- useful for debugging'
+                                  Name='verbose',
+                                  Required=False,
+                                  Default=False))
 
     def __init__(self, logger, **kwargs):
         """
@@ -157,7 +165,6 @@ class Command(object):
 class FilterSamplesFromOTUTable(Command):
     BriefDescription = "Filters samples from an OTU table on the basis of the number of observations in that sample, or on the basis of sample metadata. Mapping file can also be filtered to the resulting set of sample ids."
     LongDescription = ''
-    Parameters = []
     Parameters.append(Parameter(Type='biom-table',Help='the input otu table',Name='biom-table', Required=True))
     Parameters.append(Parameter(Type=float,Help='the minimum total observation count in a sample for that sample to be retained',Name='min-count', Default=0))
     Parameters.append(Parameter(Type=float,Help='the maximum total observation count in a sample for that sample to be retained',Name='max-count', Default=inf,DefaultDescription='infinity'))
@@ -165,13 +172,9 @@ class FilterSamplesFromOTUTable(Command):
     def run(self, **kwargs):
         print self.Parameters
 
-class CLCommand(object):
-    UsageExamples = []
-    StandardParameters = {}
+class CLCommandParser(object):
+    StandardParameters = []
     # Need to figure out logging...
-    StandardParameters['log_fp'] = None
-    StandardParameters['verbose'] = False
-
     SuppressVerbose = False
     DisallowPositionalArguments = True
     HelpOnNoArguments = True
@@ -263,12 +266,6 @@ class CLCommand(object):
                 required.add_option(option)
             parser.add_option_group(required)
 
-        # Add a verbose parameter (if the caller didn't specify not to)
-        if not self.SuppressVerbose:
-            parser.add_option('-v','--verbose',action='store_true',\
-               dest='verbose',help='Print information during execution '+\
-               '-- useful for debugging [default: %default]',default=False)
-
         # Add the optional options
         for op in optional_params:
             help_text = '%s [default: %s]' % (op.Help, op.DefaultDescription)
@@ -335,37 +332,28 @@ class CLCommand(object):
                  usage_examples)
         return '\n'.join(lines)
 
-
-class CLFilterSamplesFromOTUTable(FilterSamplesFromOTUTable, CLCommand):
+class CLCommand(object):
+    CommandConstructor = None
+    CLParameters = []
     UsageExamples = []
-    UsageExamples.append(("Abundance filtering (low coverage)","Filter samples with fewer than 150 observations from the otu table.","%prog -i otu_table.biom -o otu_table_no_low_coverage_samples.biom -n 150"))
-    UsageExamples.append(("Abundance filtering (high coverage)","Filter samples with greater than 149 observations from the otu table.","%prog -i otu_table.biom -o otu_table_no_high_coverage_samples.biom -x 149"))
-    UsageExamples.append(("Metadata-based filtering (positive)","Filter samples from the table, keeping samples where the value for 'Treatment' in the mapping file is 'Control'","%prog -i otu_table.biom -o otu_table_control_only.biom -m map.txt -s 'Treatment:Control'"))
-    UsageExamples.append(("Metadata-based filtering (negative)","Filter samples from the table, keeping samples where the value for 'Treatment' in the mapping file is not 'Control'","%prog -i otu_table.biom -o otu_table_not_control.biom -m map.txt -s 'Treatment:*,!Control'"))
-    UsageExamples.append(("List-based filtering","Filter samples where the id is listed in samples_to_keep.txt","%prog -i otu_table.biom -o otu_table_samples_to_keep.biom --sample_id_fp samples_to_keep.txt"))
 
-    ParameterMapping = {'biom-table':{'short-name':'i','long-name':'input_fp','cl-type':'existing_filepath'},
-                        'min-count':{'short-name':'n','long-name':'min_count','cl-type':float},
-                        'max-count':{'short-name':'x','long-name':'max_count','cl-type':float}}
-    
-    def __init__(self):
+    ParameterMapping = {'verbose':{'short-name':'v','long-name':'verbose','cl-type':}}
+
+    def __init__(self, **kwargs):
         """ """
+        if self.CommandConstructor is None:
+            raise IncompetentDeveloperError("I don't have a command constructor, idiot!!!")
+
+        cmd = self.CommandConstructor()
         parameters = []
-        for p in self.Parameters:
+        for p in cmd.Parameters:
             name = p.Name
             parameters.append(CLParameter.fromParameter(p,
                                                         self.ParameterMapping[name]['long-name'],
                                                         self.ParameterMapping[name]['cl-type'],
                                                         self.ParameterMapping[name]['short-name']))
-        parameters.append(CLParameter(Type='biom-table',
-                                            Help='the output otu table',
-                                            Name='biom-table',
-                                            Required=True,
-                                            LongName='output_fp',
-                                            CLType='new_filepath',
-                                            ShortName='o'))
-        self.Parameters = parameters
-
+        cmd.Parameters = parameters
+        cmd.Parameters.extend(self.CLParameters)
 
     def getOutputFilepaths(results, **kwargs):
         mapping = {}
@@ -380,6 +368,32 @@ class CLFilterSamplesFromOTUTable(FilterSamplesFromOTUTable, CLCommand):
             mapping[k] = output_fp
 
         return mapping
+
+
+
+class CLFilterSamplesFromOTUTable(CLCommand):
+    CommandConstructor = FilterSamplesFromOTUTable
+    UsageExamples.append(("Abundance filtering (low coverage)","Filter samples with fewer than 150 observations from the otu table.","%prog -i otu_table.biom -o otu_table_no_low_coverage_samples.biom -n 150"))
+    UsageExamples.append(("Abundance filtering (high coverage)","Filter samples with greater than 149 observations from the otu table.","%prog -i otu_table.biom -o otu_table_no_high_coverage_samples.biom -x 149"))
+    UsageExamples.append(("Metadata-based filtering (positive)","Filter samples from the table, keeping samples where the value for 'Treatment' in the mapping file is 'Control'","%prog -i otu_table.biom -o otu_table_control_only.biom -m map.txt -s 'Treatment:Control'"))
+    UsageExamples.append(("Metadata-based filtering (negative)","Filter samples from the table, keeping samples where the value for 'Treatment' in the mapping file is not 'Control'","%prog -i otu_table.biom -o otu_table_not_control.biom -m map.txt -s 'Treatment:*,!Control'"))
+    UsageExamples.append(("List-based filtering","Filter samples where the id is listed in samples_to_keep.txt","%prog -i otu_table.biom -o otu_table_samples_to_keep.biom --sample_id_fp samples_to_keep.txt"))
+
+    ParameterMapping = {'biom-table':{'short-name':'i','long-name':'input_fp','cl-type':'existing_filepath'},
+                        'min-count':{'short-name':'n','long-name':'min_count','cl-type':float},
+                        'max-count':{'short-name':'x','long-name':'max_count','cl-type':float}}
+
+    CLParameters.append(CLParameter(Type='biom-table',
+                                        Help='the output otu table',
+                                        Name='biom-table',
+                                        Required=True,
+                                        LongName='output_fp',
+                                        CLType='new_filepath',
+                                        ShortName='o'))
+    
+
+
+
 
 
 # ParameterMapping['biom_table'] = make_option('-i','--input_fp',type="existing_filepath", help='the input otu table filepath in biom format')

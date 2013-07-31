@@ -10,7 +10,7 @@ __version__ = "0.1.0-dev"
 __maintainer__ = "Greg Caporaso"
 __email__ = "gregcaporaso@gmail.com"
 
-class InvalidLoggerError(CommandError):
+class InvalidLoggerError(Exception):
     pass
 
 class Logger(object):
