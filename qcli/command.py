@@ -10,30 +10,95 @@ __version__ = "0.1.0-dev"
 __maintainer__ = "Greg Caporaso"
 __email__ = "gregcaporaso@gmail.com"
 
+from numpy import inf
 from datetime import datetime
 from sys import stderr
 
-def clmain(cmd_constructor, argv, logger_constructor=StdErrLogger):
-    kwargs = argv_to_kwargs(cmd_constructor, argv)
+# def clmain(cmd_constructor, argv, logger_constructor=StdErrLogger):
+#     kwargs = argv_to_kwargs(cmd_constructor, argv)
+# 
+#     logger = logger_constructor()
+#     cmd = cmd_constructor(logger)
+#     try:
+#         result = cmd(kwargs)
+#     except Exception, e:
+#         # Possibly do *something*
+#         raise e
+#     else:
+#         output_mapping = cmd.getOutputFilepaths(result, kwargs)
+# 
+#         for k, v in result.items():
+#             v.write(output_mapping[k])
+# 
+#     return 0
 
-    logger = logger_constructor()
-    cmd = cmd_constructor(logger)
-    try:
-        result = cmd(kwargs)
-    except Exception, e:
-        # Possibly do *something*
-        raise e
-    else:
-        output_mapping = cmd.getOutputFilepaths(result, kwargs)
+# def argv_to_kwargs(cmd, argv):
+#     pass
 
-        for k, v in result.items():
-            v.write(output_mapping[k])
 
-    return 0
 
-def argv_to_kwargs(cmd, argv):
-    pass
 
+class Parameter(object):
+    
+    def __init__(self,
+                 Type,
+                 Help,
+                 Name,
+                 Default=None,
+                 DefaultDescription=None):
+        self.Type = Type
+        self.Help = Help
+        self.Default = Default
+        self.Name = Name
+        self.DefaultDescription = DefaultDescription
+    
+    def isRequired(self):
+        return self.Default is not None
+        
+class CLParameter(Parameter):
+    
+    LongName = None
+    ShortName = None
+    CLType = None
+    DepWarn = None
+    
+    @classmethod
+    def fromParameter(cls,
+                      parameter,
+                      LongName,
+                      CLType,
+                      ShortName=None):
+        result = cls(Type=parameter.Type,
+                     Help=parameter.Help,
+                     Name=parameter.Name,
+                     LongName=LongName,
+                     CLType=CLType,
+                     Default=parameter.Default,
+                     DefaultDescription=parameter.DefaultDescription,
+                     ShortName=ShortName)
+        return result
+    
+    def __init__(self,
+                 Type,
+                 Help,
+                 Name,
+                 LongName,
+                 CLType,
+                 Default=None,
+                 DefaultDescription=None,
+                 ShortName=None):
+        
+        self.LongName = LongName
+        self.CLType = CLType
+        self.ShortName = ShortName
+        
+        super(CLParameter,self).__init__(Type=Type,Help=Help,Name=Name,Default=Default,DefaultDescription=DefaultDescription)
+        
+        if LongName != self.Name:
+            self.DepWarn = "parameter %s will be renamed %s in QIIME 2.0.0" % (self.LongName, self.Name)
+        else:
+            self.DepWarn = ""
+        
 class CommandError(Exception):
     pass
 
@@ -152,11 +217,13 @@ class Command(object):
 class FilterSamplesFromOTUTable(Command):
     BriefDescription = "Filters samples from an OTU table on the basis of the number of observations in that sample, or on the basis of sample metadata. Mapping file can also be filtered to the resulting set of sample ids."
     LongDescription = ''
-    RequiredParameters = ['biom_table']
-    OptionalParameters = ['sample_metadata', 'output_mapping_fp', 'sample_id_map', 'valid_states', 'min_count', 'max_count']
+    Parameters = []
+    Parameters.append(Parameter(Type='biom-table',Help='the input otu table',Name='biom-table'))
+    Parameters.append(Parameter(Type=float,Help='the minimum total observation count in a sample for that sample to be retained',Name='min-count',Default=0))
+    Parameters.append(Parameter(Type=float,Help='the maximum total observation count in a sample for that sample to be retained',Name='max-count',Default=inf,DefaultDescription='infinity'))
 
     def run(self, **kwargs):
-        pass
+        print self.Parameters
 
 class CLCommand(object):
     UsageExamples = []
@@ -323,17 +390,29 @@ class CLFilterSamplesFromOTUTable(FilterSamplesFromOTUTable, CLCommand):
     UsageExamples.append(("Metadata-based filtering (negative)","Filter samples from the table, keeping samples where the value for 'Treatment' in the mapping file is not 'Control'","%prog -i otu_table.biom -o otu_table_not_control.biom -m map.txt -s 'Treatment:*,!Control'"))
     UsageExamples.append(("List-based filtering","Filter samples where the id is listed in samples_to_keep.txt","%prog -i otu_table.biom -o otu_table_samples_to_keep.biom --sample_id_fp samples_to_keep.txt"))
 
-    RequiredParameters.append('output_fp')
-
-    ParameterMapping = {}
-    ParameterMapping['biom_table'] = make_option('-i','--input_fp',type="existing_filepath", help='the input otu table filepath in biom format')
-    ParameterMapping['output_fp'] = make_option('-o','--output_fp',type="new_filepath", help='the output filepath in biom format')
-    ParameterMapping['mapping_fp'] = make_option('-m', '--mapping_fp', type='existing_filepath', help='path to the map file [default: %default]')
-    ParameterMapping['output_mapping_fp'] = make_option('--output_mapping_fp', type='new_filepath', help='path to write filtered mapping file [default: filtered mapping file is not written]')
-    ParameterMapping['sample_id_fp'] = make_option('--sample_id_fp', type='existing_filepath', help='path to file listing sample ids to keep [default: %default]')
-    ParameterMapping['valid_states'] = make_option('-s', '--valid_states', type='string', help="string describing valid states (e.g. 'Treatment:Fasting') [default: %default]")
-    ParameterMapping['min_count'] = make_option('-n', '--min_count', type='int', default=0, help="the minimum total observation count in a sample for that sample to be retained [default: %default]")
-    ParameterMapping['max_count'] = make_option('-x', '--max_count', type='int', default=inf, help="the maximum total observation count in a sample for that sample to be retained [default: infinity]")
+    ParameterMapping = {'biom-table':{'short-name':'i','long-name':'input_fp','cl-type':'existing_filepath'},
+                        'min-count':{'short-name':'n','long-name':'min_count','cl-type':float},
+                        'max-count':{'short-name':'x','long-name':'max_count','cl-type':float}}
+    
+    # Parameters in CLCommand
+    CLParameters = [] 
+    
+    def __init__(self):
+        """ """
+        parameters = []
+        for p in self.Parameters:
+            name = p.Name
+            parameters.append(CLParameter.fromParameter(p,
+                                                               self.ParameterMapping[name]['long-name'],
+                                                               self.ParameterMapping[name]['cl-type'],
+                                                               self.ParameterMapping[name]['short-name']))
+        parameters.append(CLParameter(Type='biom-table',
+                                            Help='the output otu table',
+                                            Name='biom-table',
+                                            LongName='output_fp',
+                                            CLType='new_filepath',
+                                            ShortName='o'))
+        self.Parameters = parameters
 
 
     def getOutputFilepaths(results, **kwargs):
@@ -349,3 +428,13 @@ class CLFilterSamplesFromOTUTable(FilterSamplesFromOTUTable, CLCommand):
             mapping[k] = output_fp
 
         return mapping
+
+
+# ParameterMapping['biom_table'] = make_option('-i','--input_fp',type="existing_filepath", help='the input otu table filepath in biom format')
+# ParameterMapping['output_fp'] = make_option('-o','--output_fp',type="new_filepath", help='the output filepath in biom format')
+# ParameterMapping['mapping_fp'] = make_option('-m', '--mapping_fp', type='existing_filepath', help='path to the map file [default: %default]')
+# ParameterMapping['output_mapping_fp'] = make_option('--output_mapping_fp', type='new_filepath', help='path to write filtered mapping file [default: filtered mapping file is not written]')
+# ParameterMapping['sample_id_fp'] = make_option('--sample_id_fp', type='existing_filepath', help='path to file listing sample ids to keep [default: %default]')
+# ParameterMapping['valid_states'] = make_option('-s', '--valid_states', type='string', help="string describing valid states (e.g. 'Treatment:Fasting') [default: %default]")
+# ParameterMapping['min_count'] = make_option('-n', '--min_count', type='int', default=0, help="the minimum total observation count in a sample for that sample to be retained [default: %default]")
+# ParameterMapping['max_count'] = make_option('-x', '--max_count', type='int', default=inf, help="the maximum total observation count in a sample for that sample to be retained [default: infinity]")
