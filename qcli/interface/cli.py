@@ -197,8 +197,8 @@ def cli(command_constructor, usage_examples, param_conversions, added_options):
     added_options - any additional options that are not defined by the 
         ``command_constructor``.
     """
-    return general(command_constructor, usage_examples, param_conversions,
-                   added_options, CLInterface)
+    return general_factory(command_constructor, usage_examples, param_conversions,
+                           added_options, CLInterface)
 
 def clmain(cmd_constructor, local_argv):
     logger = logger_constructor()
