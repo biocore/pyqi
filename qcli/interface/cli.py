@@ -16,6 +16,9 @@ from qcli.command.core import Parameter
 from qcli.option_parsing import (OptionParser, OptionGroup, Option, 
                                  OptionValueError, OptionError)
 
+CLTypes = set(['float','int','string','existing_filepath', float, int, str, None])
+CLActions = set(['store','store_true','store_false', 'append'])
+
 class CLOption(Parameter):
     def __init__(self, Type, Help, Name, LongName, CLType, CLAction='store',
                  Required=False, Default=None, DefaultDescription=None,
@@ -25,10 +28,13 @@ class CLOption(Parameter):
         self.CLAction = CLAction
         self.ShortName = ShortName
         
-        super(CLOption,self).__init__(Type=Type,Help=Help,Name=Name,Required=Required,Default=Default,DefaultDescription=DefaultDescription)
+        super(CLOption,self).__init__(Type=Type,Help=Help,Name=Name,
+                                      Required=Required,Default=Default,
+                                      DefaultDescription=DefaultDescription)
         
         if LongName != self.Name:
-            self.DepWarn = "parameter %s will be renamed %s in QIIME 2.0.0" % (self.LongName, self.Name)
+            self.DepWarn = "parameter %s will be renamed %s in QIIME 2.0.0" % \
+                                                    (self.LongName, self.Name)
         else:
             self.DepWarn = ""
 
@@ -49,9 +55,6 @@ class CLOption(Parameter):
                      DefaultDescription=parameter.DefaultDescription,
                      ShortName=ShortName)
         return result
-
-CLTypes = set(['float','int','string','existing_filepath', float, int, str, None])
-CLActions = set(['store','store_true','store_false', 'append'])
 
 class UsageExample(object):
     def __init__(self, ShortDesc=None, LongDesc=None, Ex=None):
@@ -322,21 +325,12 @@ def cli(command_constructor, usage_examples, param_conversions, added_options):
     return general_factory(command_constructor, usage_examples, param_conversions,
                            added_options, CLInterface)
 
-def clmain(cmd_constructor, local_argv):
-    logger = logger_constructor()
-    cmd = cmd_constructor()
+def clmain(interface_object, local_argv):
+    cli_cmd = interface_object()
+    
     try:
-        result = cmd(local_argv[1:])
+        result = cli_cmd(local_argv[1:])
     except Exception, e:
-        # Possibly do *something*
         raise e
-    #else:
-    #    output_mapping = cmd.getOutputFilepaths(result, kwargs)
-#
-#        for k, v in result.items():
-#            v.write(output_mapping[k])
-#
-    return 0
 
-# def argv_to_kwargs(cmd, argv):
-#     pass
+    return 0
