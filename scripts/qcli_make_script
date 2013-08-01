@@ -9,7 +9,7 @@ and make them executable.
 __author__ = "Greg Caporaso"
 __copyright__ = "Copyright 2013, The BiPy Project"
 __credits__ = ["Greg Caporaso"]
-__license__ = "GPL"
+__license__ = "BSD"
 __version__ = "0.1.0-dev"
 __maintainer__ = "Greg Caporaso"
 __email__ = "gregcaporaso@gmail.com"
@@ -60,7 +60,7 @@ from __future__ import division
 __author__ = "AUTHOR_NAME"
 __copyright__ = "COPYRIGHT"
 __credits__ = ["AUTHOR_NAME"]
-__license__ = "GPL"
+__license__ = "BSD"
 __version__ = "0.1.0-dev"
 __maintainer__ = "AUTHOR_NAME"
 __email__ = "AUTHOR_EMAIL"

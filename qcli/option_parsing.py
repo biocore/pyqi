@@ -25,7 +25,7 @@ __credits__ = ["Greg Caporaso",
                "Gavin Huttley",
                "Rob Knight",
                "Jose Antonio Navas Molina"]
-__license__ = "GPL"
+__license__ = "BSD"
 __version__ = "0.1.0-dev"
 __maintainer__ = "Greg Caporaso"
 __email__ = "gregcaporaso@gmail.com"
