@@ -134,7 +134,6 @@ class CLInterface(Interface):
     def _option_factory(self, parameter):
         name = parameter.Name
         if name not in self.ParameterConversionInfo:
-            print name
             raise IncompetentDeveloperError("YOU IIIIIDDIOT!")
 
         return CLOption.fromParameter(parameter, 
