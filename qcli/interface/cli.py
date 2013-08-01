@@ -9,6 +9,7 @@ __version__ = "0.1.0-dev"
 __maintainer__ = "Greg Caporaso"
 __email__ = "gregcaporaso@gmail.com"
 
+from .core import Interface
 from qcli.interface.factory import general_factory
 from qcli.exceptions import IncompetentDeveloperError
 
