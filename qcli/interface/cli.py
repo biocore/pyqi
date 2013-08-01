@@ -11,7 +11,7 @@ __email__ = "gregcaporaso@gmail.com"
 
 from .core import Interface
 from qcli.interface.factory import general_factory
-from qcli.exceptions import IncompetentDeveloperError
+from qcli.exception import IncompetentDeveloperError
 
 class CLInterface(Interface):
     DisallowPositionalArguments = True
