@@ -51,11 +51,11 @@ class FilterSamplesFromOTUTable(Command):
                 min_count != 0 or 
                 not isinf(max_count) or
                 sample_id_fp != None):
-            option_parser.error("No filtering requested. Must provide either "
+            self._logger.fatal("No filtering requested. Must provide either "
                          "mapping_fp and valid states, min counts, "
                          "max counts, or sample_id_fp (or some combination of those).")
         if output_mapping_fp and not mapping_fp:
-            option_parser.error("Must provide input mapping file to generate"
+            self._logger.fatal("Must provide input mapping file to generate"
                                 " output mapping file.")
 
         otu_table = parse_biom_table(open(input_fp,'U'))
