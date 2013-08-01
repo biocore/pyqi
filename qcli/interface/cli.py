@@ -100,16 +100,20 @@ class CLInterface(Interface):
     def __init__(self, **kwargs):
         self.UsageExamples = []
         self.UsageExamples.extend(self._get_usage_examples())
-        
+
+        if len(self.UsageExamples) < 1:
+            raise IncompetentDeveloperError("How the fuck do I use this "
+                                            "command?")
+
         self.ParameterConversionInfo = {
                 'verbose':ParameterConversion(ShortName='v',
                                               LongName='verbose',
                                               CLType=None,
                                               CLAction='store_true')
-                }
+        }
 
         self.ParameterConversionInfo.update(self._get_param_conv_info())
-    
+
         super(CLInterface, self).__init__(**kwargs)
         
         self.Options.extend(self._get_additional_options())
@@ -179,7 +183,7 @@ class CLInterface(Interface):
         optional_opts = [opt for opt in self.Options if not opt.Required]
         
         # Build the usage and version strings
-        usage = build_usage_lines(required_opts)
+        usage = self._build_usage_lines(required_opts)
         version = 'Version: %prog ' + __version__
 
         # Instantiate the command line parser object
@@ -187,7 +191,7 @@ class CLInterface(Interface):
 
         # What does this do?
         #parser.exit = set_parameter('exit_func',kwargs,parser.exit)
-        
+
         # If no arguments were provided, print the help string (unless the
         # caller specified not to)
 
@@ -198,56 +202,92 @@ class CLInterface(Interface):
             return parser.exit(-1)
 
         # Process the required options
-        if required_params:
+        if required_opts:
             # Define an option group so all required options are
             # grouped together, and under a common header
             required = OptionGroup(parser, "REQUIRED options",
-                "The following options must be provided under all circumstances.")
-            for rp in required_params:
-                # if the option doesn't already end with [REQUIRED], 
-                # add it.
-                if not rp.Help.strip().endswith('[REQUIRED]'):
-                    rp.Help += ' [REQUIRED]'
+                                   "The following options must be provided "
+                                   "under all circumstances.")
+            for ro in required_opts:
+                # if the option doesn't already end with [REQUIRED], add it.
+                if not ro.Help.strip().endswith('[REQUIRED]'):
+                    ro.Help += ' [REQUIRED]'
 
-                option = make_option('-' + rp.ShortName, '--' + rp.LongName, type=rp.CLType, help=rp.Help)
+                option = make_option('-' + ro.ShortName, '--' + ro.LongName,
+                                     type=ro.CLType, help=ro.Help)
                 required.add_option(option)
             parser.add_option_group(required)
 
         # Add the optional options
-        for op in optional_params:
-            help_text = '%s [default: %s]' % (op.Help, op.DefaultDescription)
-            option = make_option('-' + op.ShortName, '--' + op.LongName, type=op.CLType,
-                    help=help_text, default=op.Default)
+        for oo in optional_opts:
+            help_text = '%s [default: %s]' % (oo.Help, oo.DefaultDescription)
+            option = make_option('-' + oo.ShortName, '--' + oo.LongName,
+                                 type=oo.CLType, help=help_text,
+                                 default=oo.Default)
             parser.add_option(option)
-        
+
         # Parse the command line
         # command_line_text will None except in test cases, in which 
         # case sys.argv[1:] will be parsed
 
         # Need to figure out what to do with command_line_args
         #opts,args = parser.parse_args(command_line_args)
-        opts,args = parser.parse_args(in_)
-        
-        # If positional arguments are not allowed, and any were provided,
-        # raise an error.
+        opts, args = parser.parse_args(in_)
+
+        # If positional arguments are not allowed, and any were provided, raise
+        # an error.
         if self.DisallowPositionalArguments and len(args) != 0:
-            parser.error("Positional argument detected: %s\n" % str(args[0]) +\
-             " Be sure all parameters are identified by their option name.\n" +\
+            parser.error("Positional argument detected: %s\n" % str(args[0]) +
+             " Be sure all parameters are identified by their option name.\n" +
              " (e.g.: include the '-i' in '-i INPUT_DIR')")
 
         # Test that all required options were provided.
-        if required_params:
+        if required_opts:
             required_option_ids = [o.dest for o in required.option_list]
             for required_option_id in required_option_ids:
                 if getattr(opts,required_option_id) == None:
-                    return parser.error('Required option --%s omitted.' \
-                                 % required_option_id)
-                
+                    return parser.error('Required option --%s omitted.' %
+                                        required_option_id)
+
         # Return the parser, the options, and the arguments. The parser is returned
         # so users have access to any additional functionality they may want at 
         # this stage -- most commonly, it will be used for doing custom tests of 
         # parameter values.
         return parser, opts, args
+
+    def _build_usage_lines(self, required_options):
+        """ Build the usage string from components """
+        line1 = 'usage: %prog [options] ' + \
+                '{%s}' % ' '.join(['%s %s' % (str(rp),rp.Name.upper())
+                                   for rp in required_options])
+
+        formatted_usage_examples = []
+        for title, description, command in self.UsageExamples:
+            title = title.strip(':').strip()
+            description = description.strip(':').strip()
+            command = command.strip()
+            if title:
+                formatted_usage_examples.append('%s: %s\n %s' % 
+                                                (title,description,command))
+            else:
+                formatted_usage_examples.append('%s\n %s' %
+                                                (description,command))
+        
+        formatted_usage_examples = '\n\n'.join(formatted_usage_examples)
+        
+        lines = (line1,
+                 '', # Blank line
+                 self.OptionalInputLine,
+                 self.RequiredInputLine,
+                 '', # Blank line
+                 self.CmdInstance.LongDescription,
+                 '', # Blank line
+                 'Example usage: ',
+                 'Print help message and exit',
+                 ' %prog -h\n',
+                 formatted_usage_examples)
+
+        return '\n'.join(lines)
 
     def _output_handler(self, results):
         print results
@@ -265,56 +305,6 @@ class CLInterface(Interface):
             mapping[k] = output_fp
 
         return mapping
-
-# Fix this shit:
-class CLCommandParser(object):
-    DisallowPositionalArguments = True
-    HelpOnNoArguments = True
-    OptionalInputLine = '[] indicates optional input (order unimportant)'
-    RequiredInputLine = '{} indicates required input (order unimportant)'
-
-    def __init__(self):
-        if len(self.UsageExamples) < 1:
-            raise IncompetentDeveloperError("How the fuck do I use this "
-                                            "command?")
-
-    def getOutputFilepaths(results, **kwargs):
-        raise NotImplementedError("All subclasses must implement "
-                                  "getOutputFilepaths.")
-
-def build_usage_lines(required_params, usage_examples, optional_input_line, 
-                      required_input_line, long_description):
-    """ Build the usage string from components """
-    line1 = 'usage: %prog [options] ' + '{%s}' %\
-     ' '.join(['%s %s' % (str(rp),rp.Name.upper())\
-               for rp in required_params])
-    
-    formatted_usage_examples = []
-    for title, description, command in usage_examples:
-        title = title.strip(':').strip()
-        description = description.strip(':').strip()
-        command = command.strip()
-        if title:
-            formatted_usage_examples.append('%s: %s\n %s' %\
-             (title,description,command))
-        else:
-            formatted_usage_examples.append('%s\n %s' % (description,command))
-    
-    formatted_usage_examples = '\n\n'.join(formatted_usage_examples)
-    
-    lines = (line1,
-             '', # Blank line
-             optional_input_line,
-             required_input_line,
-             '', # Blank line
-             long_description,
-             '', # Blank line
-             'Example usage: ',\
-             'Print help message and exit',
-             ' %prog -h\n',
-             formatted_usage_examples)
-    
-    return '\n'.join(lines)
 
 def cli(command_constructor, usage_examples, param_conversions, added_options):
     """Command line interface factory
