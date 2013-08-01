@@ -33,7 +33,12 @@ class FilterSamplesFromOTUTable(Command):
         return [
                 Parameter(Type='biom-table',Help='the input otu table',Name='biom-table', Required=True),
                 Parameter(Type=float,Help='the minimum total observation count in a sample for that sample to be retained',Name='min-count', Default=0),
-                Parameter(Type=float,Help='the maximum total observation count in a sample for that sample to be retained',Name='max-count', Default=inf,DefaultDescription='infinity')]
+                Parameter(Type=float,Help='the maximum total observation count in a sample for that sample to be retained',Name='max-count', Default=inf,DefaultDescription='infinity'),
+                Parameter(Type='sample-metadata',Help='the sample metadata',Name='sample-metadata', Default=None),
+                Parameter(Type='sample-metadata',Help='the filtered sample metadata',Name='filtered-sample-metadata', Default=None,DefaultDescription='filtered mapping file is not written'),
+                Parameter(Type=list,Help='list of sample ids to keep',Name='samples-to-keep', Default=None),
+                Parameter(Type=str,Help='string describing valid states',Name='metadata-description', Default=None)
+               ]
     
     def run(self,
             input_fp,

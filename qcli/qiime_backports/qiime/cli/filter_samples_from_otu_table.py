@@ -37,9 +37,12 @@ param_conversions = {
         'metadata-description':ParameterConversion(ShortName='s',
                                                    LongName='valid_states',
                                                    CLType=str),
-         'sample-list':ParameterConversion(ShortName=None,
+        'samples-to-keep':ParameterConversion(ShortName=None,
                                            LongName='sample_id_fp',
-                                           CLType='existing_filepath')
+                                           CLType='existing_filepath'),
+        'filtered-sample-metadata':ParameterConversion(ShortName=None,
+                                                       LongName='output_mapping_fp',
+                                                       CLType='new_filepath')
         }
 
 additional_options = [
@@ -50,11 +53,4 @@ additional_options = [
                  LongName='output_fp',
                  CLType='new_filepath',
                  ShortName='o'),
-        CLOption(Type='sample-metadata',
-                 Help='filtered mapping file',
-                 Name='filtered-sample-metadata',
-                 Required=False,
-                 LongName='output_mapping_fp',
-                 CLType='new_filepath',
-                 ShortName=None),
         ]
