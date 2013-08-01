@@ -29,11 +29,11 @@ class Interface(object):
         for parameter in self.CmdInstance.Parameters:
             option = self._option_factory(parameter)
             self.Options.append(option)
-    
+
     def __call__(self, in_, *args, **kwargs):
         self._the_in_validator(in_)
-        parameter_instances = self._input_handler(in_, *args, **kwargs)
-        return self._output_handler(self.CmdInstance(parameter_instances))
+        cmd_input = self._input_handler(in_, *args, **kwargs)
+        return self._output_handler(self.CmdInstance(cmd_input=cmd_input))
 
     def _the_in_validator(self, in_):
         """The job securator"""
