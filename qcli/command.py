@@ -19,9 +19,9 @@ from optparse import (OptionParser, OptionGroup, Option,
 from qcli.option_parsing import make_option
 from qcli.log import StdErrLogger
 
-def clmain(cmd_constructor, local_argv, logger_constructor=StdErrLogger):
+def clmain(cmd_constructor, local_argv):
     logger = logger_constructor()
-    cmd = cmd_constructor(logger=logger)
+    cmd = cmd_constructor()
     try:
         result = cmd(local_argv[1:])
     except Exception, e:
@@ -57,19 +57,28 @@ class Parameter(object):
         if self.Required and self.Default is not None:
             raise IncompetentDeveloperError("Required parameters cannot have defaults, idiot!!!")
 
-class CLParameter(Parameter):
+class CLOption(Parameter):
     
-    LongName = None
-    ShortName = None
-    CLType = None
-    DepWarn = None
-    
+    def __init__(self, Type, Help, Name, LongName, CLType, CLAction='store',
+                 Required=False, Default=None, DefaultDescription=None,
+                 ShortName=None):
+        self.LongName = LongName
+        self.CLType = CLType
+        self.CLAction = CLAction
+        self.ShortName = ShortName
+        
+        super(CLOption,self).__init__(Type=Type,Help=Help,Name=Name,Required=Required,Default=Default,DefaultDescription=DefaultDescription)
+        
+        if LongName != self.Name:
+            self.DepWarn = "parameter %s will be renamed %s in QIIME 2.0.0" % (self.LongName, self.Name)
+        else:
+            self.DepWarn = ""
+
+    def __str__(self):
+        return '-%s/--%s' % (self.ShortName, self.LongName)
+        
     @classmethod
-    def fromParameter(cls,
-                      parameter,
-                      LongName,
-                      CLType,
-                      CLAction='store',
+    def fromParameter(cls, parameter, LongName, CLType, CLAction='store',
                       ShortName=None):
         result = cls(Type=parameter.Type,
                      Help=parameter.Help,
@@ -82,34 +91,7 @@ class CLParameter(Parameter):
                      DefaultDescription=parameter.DefaultDescription,
                      ShortName=ShortName)
         return result
-    
-    def __init__(self,
-                 Type,
-                 Help,
-                 Name,
-                 LongName,
-                 CLType,
-                 CLAction='store',
-                 Required=False,
-                 Default=None,
-                 DefaultDescription=None,
-                 ShortName=None):
-        
-        self.LongName = LongName
-        self.CLType = CLType
-        self.CLAction = CLAction
-        self.ShortName = ShortName
-        
-        super(CLParameter,self).__init__(Type=Type,Help=Help,Name=Name,Required=Required,Default=Default,DefaultDescription=DefaultDescription)
-        
-        if LongName != self.Name:
-            self.DepWarn = "parameter %s will be renamed %s in QIIME 2.0.0" % (self.LongName, self.Name)
-        else:
-            self.DepWarn = ""
 
-    def __str__(self):
-        return '-%s/--%s' % (self.ShortName, self.LongName)
-        
 class CommandError(Exception):
     pass
 
@@ -122,23 +104,16 @@ class InvalidReturnTypeError(IncompetentDeveloperError):
 class Command(object):
     """ Base class for abstracted command
     """
-
+    _logger = None
     BriefDescription = ''
     LongDescription = ''
-    Parameters = []
-    Parameters.append(Parameter(Type=bool,
-                                  Help='Print information during execution -- useful for debugging'
-                                  Name='verbose',
-                                  Required=False,
-                                  Default=False))
 
-    def __init__(self, logger, **kwargs):
-        """
-        """
-        if logger is None:
-            raise InvalidLoggerError("A logger was not provided.")
-
-        self._logger = logger
+    def __init__(self, **kwargs):
+        """ """
+        self._logger = StdErrLogger
+        self.Parameters = []
+        self.Parameters.extend(self._get_default_parameters())
+        self.Parameters.extend(self._get_parameters())
 
     def __call__(self, **kwargs):
         """
@@ -161,21 +136,34 @@ class Command(object):
 
     def run(self, **kwargs):
         raise NotImplementedError("All subclasses must implement run.")
+    
+    def _get_default_parameters(self):
+        return [Parameter(Type=bool,
+                          Help='Print information during execution -- useful for debugging',
+                          Name='verbose',
+                          Required=False,
+                          Default=False)]
+
+    def _get_parameters(self):
+        raise NotImplementedError("All subclasses must implement _get_parameters")
 
 class FilterSamplesFromOTUTable(Command):
     BriefDescription = "Filters samples from an OTU table on the basis of the number of observations in that sample, or on the basis of sample metadata. Mapping file can also be filtered to the resulting set of sample ids."
     LongDescription = ''
-    Parameters.append(Parameter(Type='biom-table',Help='the input otu table',Name='biom-table', Required=True))
-    Parameters.append(Parameter(Type=float,Help='the minimum total observation count in a sample for that sample to be retained',Name='min-count', Default=0))
-    Parameters.append(Parameter(Type=float,Help='the maximum total observation count in a sample for that sample to be retained',Name='max-count', Default=inf,DefaultDescription='infinity'))
 
+    def __init__(self, **kwargs):
+        super(FilterSamplesFromOTUTable, self).__init__(**kwargs)
+
+    def _get_parameters(self):
+        return [
+                Parameter(Type='biom-table',Help='the input otu table',Name='biom-table', Required=True),
+                Parameter(Type=float,Help='the minimum total observation count in a sample for that sample to be retained',Name='min-count', Default=0),
+                Parameter(Type=float,Help='the maximum total observation count in a sample for that sample to be retained',Name='max-count', Default=inf,DefaultDescription='infinity')]
+    
     def run(self, **kwargs):
         print self.Parameters
 
 class CLCommandParser(object):
-    StandardParameters = []
-    # Need to figure out logging...
-    SuppressVerbose = False
     DisallowPositionalArguments = True
     HelpOnNoArguments = True
     OptionalInputLine = '[] indicates optional input (order unimportant)'
@@ -190,7 +178,122 @@ class CLCommandParser(object):
         raise NotImplementedError("All subclasses must implement "
                                   "getOutputFilepaths.")
 
-    def parseCommandLineParameters(self, local_argv):
+def build_usage_lines(required_params, usage_examples, optional_input_line, 
+                      required_input_line, long_description):
+    """ Build the usage string from components """
+    line1 = 'usage: %prog [options] ' + '{%s}' %\
+     ' '.join(['%s %s' % (str(rp),rp.Name.upper())\
+               for rp in required_params])
+    
+    formatted_usage_examples = []
+    for title, description, command in usage_examples:
+        title = title.strip(':').strip()
+        description = description.strip(':').strip()
+        command = command.strip()
+        if title:
+            formatted_usage_examples.append('%s: %s\n %s' %\
+             (title,description,command))
+        else:
+            formatted_usage_examples.append('%s\n %s' % (description,command))
+    
+    formatted_usage_examples = '\n\n'.join(formatted_usage_examples)
+    
+    lines = (line1,
+             '', # Blank line
+             optional_input_line,
+             required_input_line,
+             '', # Blank line
+             long_description,
+             '', # Blank line
+             'Example usage: ',\
+             'Print help message and exit',
+             ' %prog -h\n',
+             formatted_usage_examples)
+    
+    return '\n'.join(lines)
+
+class Interface(object):
+    CommandConstructor = None
+
+    def __init__(self, **kwargs):
+        """ """
+        self.Options = []
+        self.CmdInstance = None
+
+        if self.CommandConstructor is None:
+            raise IncompetentDeveloperError("I don't have a command constructor, idiot!!!")
+        
+        self.CmdInstance = self.CommandConstructor(**kwargs)
+        for parameter in self.CmdInstance.Parameters:
+            option = self._option_factory(parameter)
+            self.Options.append(option)
+    
+    def __call__(self, in_, *args, **kwargs):
+        self._the_in_validator(in_)
+        parameter_instances = self._input_handler(in_, *args, **kwargs)
+        return self._output_handler(self.CmdInstance(parameter_instances))
+
+    def _the_in_validator(self, in_):
+        """The job securator"""
+        raise NotImplementedError("DO IT!")
+
+    def _option_factory(self):
+        raise NotImplementedError("DO IT!")
+
+    def _input_handler(self, in_, *args, **kwargs):
+        raise NotImplementedError("DO IT!")
+
+    def _output_handler(self, results):
+        raise NotImplementedError("DO IT!")
+
+# an option is interface dependent
+# a parameter is interface independent
+
+class CLInterface(Interface):
+    DisallowPositionalArguments = True
+    HelpOnNoArguments = True 
+    OptionalInputLine = '[] indicates optional input (order unimportant)'
+    RequiredInputLine = '{} indicates required input (order unimportant)'
+    
+    def __init__(self, **kwargs):
+        self.UsageExamples = []
+        self.UsageExamples.extend(self._get_usage_examples())
+        
+        self.ParameterConversionInfo = {'verbose':{'short-name':'v',
+                                                   'long-name':'verbose',
+                                                   'cl-type':None,
+                                                   'cl-action':'store_true'}}
+        
+        self.ParameterConversionInfo.update(self._get_param_conv_info())
+    
+        super(CLInterface, self).__init__(**kwargs)
+        
+        self.Options.extend(self._get_additional_options())
+
+    def _get_param_conv_info(self):
+        raise NotImplementedError("Must define _get_param_conv_info")
+    
+    def _get_usage_examples(self):
+        raise NotImplementedError("Must define _get_usage_examples")
+    
+    def _get_additional_options(self):
+        raise NotImplementedError("Must define _get_additional_options")
+
+    def _the_in_validator(self, in_):
+        if not isinstance(in_, list):
+            raise IncompetentDeveloperError("The in_ validator is very upset.")
+
+    def _option_factory(self, parameter):
+        name = parameter.Name
+        if name not in self.ParameterConversionInfo:
+            raise IncompetentDeveloperError("YOU IIIIIDDIOT!")
+
+        return CLOption.fromParameter(parameter, 
+                     self.ParameterConversionInfo[name]['long-name'],
+                     self.ParameterConversionInfo[name]['cl-type'],
+                     self.ParameterConversionInfo[name]['short-name'])
+
+    def _input_handler(self, in_, *args, **kwargs):
         """ Constructs the OptionParser object and parses command line arguments
         
             parse_command_line_parameters takes a dict of objects via kwargs which
@@ -228,11 +331,11 @@ class CLCommandParser(object):
         # Do we need this? Was used for testing
         #command_line_args = set_parameter('command_line_args',kwargs,None)
 
-        required_params = [param for param in self.Parameters if param.Required]
-        optional_params = [param for param in self.Parameters if not param.Required]
+        required_opts = [opt for opt in self.Options if opt.Required]
+        optional_opts = [opt for opt in self.Options if not opt.Required]
         
         # Build the usage and version strings
-        usage = self._build_usage_lines(required_params)
+        usage = build_usage_lines(required_opts)
         version = 'Version: %prog ' + __version__
 
         # Instantiate the command line parser object
@@ -246,7 +349,7 @@ class CLCommandParser(object):
 
         # Need to figure out what to do with command_line_args
         #if self.HelpOnNoArguments and (not command_line_args) and len(argv) == 1:
-        if self.HelpOnNoArguments and len(local_argv) == 1:
+        if self.HelpOnNoArguments and len(in_) == 1:
             parser.print_usage()
             return parser.exit(-1)
 
@@ -255,7 +358,7 @@ class CLCommandParser(object):
             # Define an option group so all required options are
             # grouped together, and under a common header
             required = OptionGroup(parser, "REQUIRED options",
-             "The following options must be provided under all circumstances.")
+                "The following options must be provided under all circumstances.")
             for rp in required_params:
                 # if the option doesn't already end with [REQUIRED], 
                 # add it.
@@ -279,7 +382,7 @@ class CLCommandParser(object):
 
         # Need to figure out what to do with command_line_args
         #opts,args = parser.parse_args(command_line_args)
-        opts,args = parser.parse_args(local_argv)
+        opts,args = parser.parse_args(in_)
         
         # If positional arguments are not allowed, and any were provided,
         # raise an error.
@@ -302,58 +405,8 @@ class CLCommandParser(object):
         # parameter values.
         return parser, opts, args
 
-    def _build_usage_lines(self, required_params):
-        """ Build the usage string from components 
-        """
-        line1 = 'usage: %prog [options] ' + '{%s}' %\
-         ' '.join(['%s %s' % (str(rp),rp.Name.upper())\
-                   for rp in required_params])
-        usage_examples = []
-        for title, description, command in self.UsageExamples:
-            title = title.strip(':').strip()
-            description = description.strip(':').strip()
-            command = command.strip()
-            if title:
-                usage_examples.append('%s: %s\n %s' %\
-                 (title,description,command))
-            else:
-                usage_examples.append('%s\n %s' % (description,command))
-        usage_examples = '\n\n'.join(usage_examples)
-        lines = (line1,
-                 '', # Blank line
-                 self.OptionalInputLine,
-                 self.RequiredInputLine,
-                 '', # Blank line
-                 self.LongDescription,
-                 '', # Blank line
-                 'Example usage: ',\
-                 'Print help message and exit',
-                 ' %prog -h\n',
-                 usage_examples)
-        return '\n'.join(lines)
-
-class CLCommand(object):
-    CommandConstructor = None
-    CLParameters = []
-    UsageExamples = []
-
-    ParameterMapping = {'verbose':{'short-name':'v','long-name':'verbose','cl-type':}}
-
-    def __init__(self, **kwargs):
-        """ """
-        if self.CommandConstructor is None:
-            raise IncompetentDeveloperError("I don't have a command constructor, idiot!!!")
-
-        cmd = self.CommandConstructor()
-        parameters = []
-        for p in cmd.Parameters:
-            name = p.Name
-            parameters.append(CLParameter.fromParameter(p,
-                                                        self.ParameterMapping[name]['long-name'],
-                                                        self.ParameterMapping[name]['cl-type'],
-                                                        self.ParameterMapping[name]['short-name']))
-        cmd.Parameters = parameters
-        cmd.Parameters.extend(self.CLParameters)
+    def _output_handler(self, results):
+        print results
 
     def getOutputFilepaths(results, **kwargs):
         mapping = {}
@@ -369,32 +422,35 @@ class CLCommand(object):
 
         return mapping
 
-
-
-class CLFilterSamplesFromOTUTable(CLCommand):
+class CLFilterSamplesFromOTUTable(CLInterface):
     CommandConstructor = FilterSamplesFromOTUTable
-    UsageExamples.append(("Abundance filtering (low coverage)","Filter samples with fewer than 150 observations from the otu table.","%prog -i otu_table.biom -o otu_table_no_low_coverage_samples.biom -n 150"))
-    UsageExamples.append(("Abundance filtering (high coverage)","Filter samples with greater than 149 observations from the otu table.","%prog -i otu_table.biom -o otu_table_no_high_coverage_samples.biom -x 149"))
-    UsageExamples.append(("Metadata-based filtering (positive)","Filter samples from the table, keeping samples where the value for 'Treatment' in the mapping file is 'Control'","%prog -i otu_table.biom -o otu_table_control_only.biom -m map.txt -s 'Treatment:Control'"))
-    UsageExamples.append(("Metadata-based filtering (negative)","Filter samples from the table, keeping samples where the value for 'Treatment' in the mapping file is not 'Control'","%prog -i otu_table.biom -o otu_table_not_control.biom -m map.txt -s 'Treatment:*,!Control'"))
-    UsageExamples.append(("List-based filtering","Filter samples where the id is listed in samples_to_keep.txt","%prog -i otu_table.biom -o otu_table_samples_to_keep.biom --sample_id_fp samples_to_keep.txt"))
 
-    ParameterMapping = {'biom-table':{'short-name':'i','long-name':'input_fp','cl-type':'existing_filepath'},
-                        'min-count':{'short-name':'n','long-name':'min_count','cl-type':float},
-                        'max-count':{'short-name':'x','long-name':'max_count','cl-type':float}}
+    def _get_usage_examples(self):
+        return [("Abundance filtering (low coverage)","Filter samples with fewer than 150 observations from the otu table.","%prog -i otu_table.biom -o otu_table_no_low_coverage_samples.biom -n 150"),
+                ("Abundance filtering (high coverage)","Filter samples with greater than 149 observations from the otu table.","%prog -i otu_table.biom -o otu_table_no_high_coverage_samples.biom -x 149"),
+                ("Metadata-based filtering (positive)","Filter samples from the table, keeping samples where the value for 'Treatment' in the mapping file is 'Control'","%prog -i otu_table.biom -o otu_table_control_only.biom -m map.txt -s 'Treatment:Control'"),
+                ("Metadata-based filtering (negative)","Filter samples from the table, keeping samples where the value for 'Treatment' in the mapping file is not 'Control'","%prog -i otu_table.biom -o otu_table_not_control.biom -m map.txt -s 'Treatment:*,!Control'"),
+                ("List-based filtering","Filter samples where the id is listed in samples_to_keep.txt","%prog -i otu_table.biom -o otu_table_samples_to_keep.biom --sample_id_fp samples_to_keep.txt")]
 
-    CLParameters.append(CLParameter(Type='biom-table',
+    def _get_param_conv_info(self):
+        return {'biom-table':{'short-name':'i',
+                              'long-name':'input_fp',
+                              'cl-type':'existing_filepath'},
+                'min-count':{'short-name':'n',
+                             'long-name':'min_count',
+                             'cl-type':float},
+                'max-count':{'short-name':'x',
+                             'long-name':'max_count',
+                             'cl-type':float}}
+   
+    def _get_additional_options(self):
+        return [CLOption(Type='biom-table',
                                         Help='the output otu table',
                                         Name='biom-table',
                                         Required=True,
                                         LongName='output_fp',
                                         CLType='new_filepath',
-                                        ShortName='o'))
-    
-
-
-
-
+                                        ShortName='o')]
 
 # ParameterMapping['biom_table'] = make_option('-i','--input_fp',type="existing_filepath", help='the input otu table filepath in biom format')
 # ParameterMapping['output_fp'] = make_option('-o','--output_fp',type="new_filepath", help='the output filepath in biom format')
