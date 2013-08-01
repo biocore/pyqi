@@ -13,6 +13,8 @@ from qcli.interface.core import Interface
 from qcli.interface.factory import general_factory
 from qcli.exception import IncompetentDeveloperError
 from qcli.command.core import Parameter
+from qcli.option_parsing import (OptionParser, OptionGroup, Option, 
+                                 OptionValueError, OptionError)
 
 class CLOption(Parameter):
     def __init__(self, Type, Help, Name, LongName, CLType, CLAction='store',
@@ -48,7 +50,7 @@ class CLOption(Parameter):
                      ShortName=ShortName)
         return result
 
-CLTypes = set(['float','int','string','existing_filepath', float, int, str])
+CLTypes = set(['float','int','string','existing_filepath', float, int, str, None])
 CLActions = set(['store','store_true','store_false', 'append'])
 
 class UsageExample(object):
@@ -76,9 +78,9 @@ class ParameterConversion(object):
         if LongName is None:
             raise IncompetentDeveloperError("No long name provided!")
         if CLType not in CLTypes:
-            raise IncompetentDeveloperError("Invalid CLType specified!")
+            raise IncompetentDeveloperError("Invalid CLType specified: %s" % CLType)
         if CLAction is not None and CLAction not in CLActions:
-            raise IncompetentDeveloperError("Invalid CLAction specified!")
+            raise IncompetentDeveloperError("Invalid CLAction specified: %s" % CLAction)
 
         self.ShortName = ShortName
         self.LongName = LongName
@@ -134,12 +136,12 @@ class CLInterface(Interface):
     def _option_factory(self, parameter):
         name = parameter.Name
         if name not in self.ParameterConversionInfo:
-            raise IncompetentDeveloperError("YOU IIIIIDDIOT!")
+            raise IncompetentDeveloperError("%s does not have parameter conversion info (parameter conversions are available for %s)" % (name, ' '.join(self.ParameterConversionInfo.keys())))
 
         return CLOption.fromParameter(parameter, 
-                     self.ParameterConversionInfo[name]['long-name'],
-                     self.ParameterConversionInfo[name]['cl-type'],
-                     self.ParameterConversionInfo[name]['short-name'])
+                     self.ParameterConversionInfo[name].LongName,
+                     self.ParameterConversionInfo[name].CLType,
+                     self.ParameterConversionInfo[name].ShortName)
 
     def _input_handler(self, in_, *args, **kwargs):
         """ Constructs the OptionParser object and parses command line arguments
@@ -262,16 +264,16 @@ class CLInterface(Interface):
                                    for rp in required_options])
 
         formatted_usage_examples = []
-        for title, description, command in self.UsageExamples:
-            title = title.strip(':').strip()
-            description = description.strip(':').strip()
-            command = command.strip()
-            if title:
+        for usage_example in self.UsageExamples:
+            short_description = usage_example.ShortDesc.strip(':').strip()
+            long_description = usage_example.LongDesc.strip(':').strip()
+            example = usage_example.Ex.strip()
+            if short_description:
                 formatted_usage_examples.append('%s: %s\n %s' % 
-                                                (title,description,command))
+                                                (short_description,long_description,example))
             else:
                 formatted_usage_examples.append('%s\n %s' %
-                                                (description,command))
+                                                (long_description,example))
         
         formatted_usage_examples = '\n\n'.join(formatted_usage_examples)
         
