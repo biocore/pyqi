@@ -41,7 +41,7 @@ class Command(object):
 
     def __init__(self, **kwargs):
         """ """
-        self._logger = StdErrLogger
+        self._logger = StdErrLogger()
         self.Parameters = []
         self.Parameters.extend(self._get_default_parameters())
         self.Parameters.extend(self._get_parameters())
