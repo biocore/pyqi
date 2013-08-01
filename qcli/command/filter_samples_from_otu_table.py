@@ -11,7 +11,7 @@ __maintainer__ = "Greg Caporaso"
 __email__ = "gregcaporaso@gmail.com"
 
 from numpy import inf
-from qcli.command.core import Command
+from qcli.command.core import Command, Parameter
 
 class FilterSamplesFromOTUTable(Command):
     BriefDescription = "Filters samples from an OTU table on the basis of the number of observations in that sample, or on the basis of sample metadata. Mapping file can also be filtered to the resulting set of sample ids."
