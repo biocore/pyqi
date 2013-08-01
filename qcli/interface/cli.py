@@ -76,8 +76,6 @@ class UsageExample(object):
 class ParameterConversion(object):
     def __init__(self, ShortName=None, LongName=None, CLType=None, 
                  CLAction=None):
-        if ShortName is None:
-            raise IncompetentDeveloperError("No short name provided!")
         if LongName is None:
             raise IncompetentDeveloperError("No long name provided!")
         if CLType not in CLTypes:
@@ -217,17 +215,26 @@ class CLInterface(Interface):
                 # if the option doesn't already end with [REQUIRED], add it.
                 if not ro.Help.strip().endswith('[REQUIRED]'):
                     ro.Help += ' [REQUIRED]'
-                option = make_option('-' + ro.ShortName, '--' + ro.LongName,
-                                     type=ro.CLType, help=ro.Help)
+                if ro.ShortName is None:
+                    option = make_option('--' + ro.LongName,
+                                         type=ro.CLType, help=ro.Help)
+                else:
+                    option = make_option('-' + ro.ShortName, '--' + ro.LongName,
+                                         type=ro.CLType, help=ro.Help)
                 required.add_option(option)
             parser.add_option_group(required)
         
         # Add the optional options
         for oo in optional_opts:
             help_text = '%s [default: %s]' % (oo.Help, oo.DefaultDescription)
-            option = make_option('-' + oo.ShortName, '--' + oo.LongName,
-                                 type=oo.CLType, help=help_text,
-                                 default=oo.Default)
+            if oo.ShortName is None:
+                option = make_option('--' + oo.LongName,
+                     type=oo.CLType, help=help_text,
+                     default=oo.Default)
+            else:
+                option = make_option('-' + oo.ShortName, '--' + oo.LongName,
+                                     type=oo.CLType, help=help_text,
+                                     default=oo.Default)
             parser.add_option(option)
 
         # Parse the command line
