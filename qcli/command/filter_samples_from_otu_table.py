@@ -33,33 +33,39 @@ class FilterSamplesFromOTUTable(Command):
         return [
                 Parameter(Type='biom-table',Help='the input otu table',Name='biom-table', Required=True),
                 Parameter(Type=float,Help='the minimum total observation count in a sample for that sample to be retained',Name='min-count', Default=0),
-                Parameter(Type=float,Help='the maximum total observation count in a sample for that sample to be retained',Name='max-count', Default=inf,DefaultDescription='infinity')]
+                Parameter(Type=float,Help='the maximum total observation count in a sample for that sample to be retained',Name='max-count', Default=inf,DefaultDescription='infinity'),
+                Parameter(Type='sample-metadata',Help='the sample metadata',Name='sample-metadata', Default=None),
+                Parameter(Type='sample-metadata',Help='the filtered sample metadata',Name='filtered-sample-metadata', Default=None,DefaultDescription='filtered mapping file is not written'),
+                Parameter(Type=list,Help='list of sample ids to keep',Name='samples-to-keep', Default=None),
+                Parameter(Type=str,Help='string describing valid states',Name='metadata-description', Default=None)
+               ]
     
-    def run(self, **kwargs):
-        
-        # cmd_input is coming in, expected values are
-        # input_fp
-        # output_fp
-        # mapping_fp
-        # output_mapping_fp
-        # valid_states
-        # min_count
-        # max_count
-        # sample_id_fp
-    
+    def run(self,
+            input_fp,
+            output_fp,
+            mapping_fp=None,
+            output_mapping_fp=None,
+            valid_states=None,
+            min_count=None,
+            max_count=None,
+            sample_id_fp=None,
+            **kwargs):
+        result = {}
         if not ((mapping_fp and valid_states) or 
                 min_count != 0 or 
                 not isinf(max_count) or
                 sample_id_fp != None):
-            option_parser.error("No filtering requested. Must provide either "
+            self._logger.fatal("No filtering requested. Must provide either "
                          "mapping_fp and valid states, min counts, "
                          "max counts, or sample_id_fp (or some combination of those).")
         if output_mapping_fp and not mapping_fp:
-            option_parser.error("Must provide input mapping file to generate"
+            self._logger.fatal("Must provide input mapping file to generate"
                                 " output mapping file.")
 
         otu_table = parse_biom_table(open(input_fp,'U'))
         output_f = open(output_fp,'w')
+        
+        result['output-biom-table'] = output_fp
     
         if (mapping_fp and valid_states):
             sample_ids_to_keep = sample_ids_from_metadata_description(
@@ -84,3 +90,5 @@ class FilterSamplesFromOTUTable(Command):
             mapping_headers, mapping_data = \
              filter_mapping_file(mapping_data, mapping_headers, filtered_otu_table.SampleIds)
             open(output_mapping_fp,'w').write(format_mapping_file(mapping_headers,mapping_data))
+        
+        return result 

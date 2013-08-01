@@ -11,7 +11,7 @@ __maintainer__ = "Greg Caporaso"
 __email__ = "gregcaporaso@gmail.com"
 
 from qcli.log import StdErrLogger
-from qcli.exception import IncompetentDeveloperError
+from qcli.exception import IncompetentDeveloperError, InvalidReturnTypeError
 
 class Parameter(object):
     

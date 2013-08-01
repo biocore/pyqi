@@ -13,8 +13,11 @@ from qcli.interface.core import Interface
 from qcli.interface.factory import general_factory
 from qcli.exception import IncompetentDeveloperError
 from qcli.command.core import Parameter
+from qcli.option_parsing import (OptionParser, OptionGroup, Option, 
+                                 OptionValueError, OptionError, make_option)
 
-CLTypes = set(['float','int','string','existing_filepath', float, int, str])
+CLTypes = set(['float','int','string','existing_filepath', float, int, str, None,
+               'new_filepath','new_dirpath','existing_dirpath'])
 CLActions = set(['store','store_true','store_false', 'append'])
 
 class CLOption(Parameter):
@@ -74,14 +77,12 @@ class UsageExample(object):
 class ParameterConversion(object):
     def __init__(self, ShortName=None, LongName=None, CLType=None, 
                  CLAction=None):
-        if ShortName is None:
-            raise IncompetentDeveloperError("No short name provided!")
         if LongName is None:
             raise IncompetentDeveloperError("No long name provided!")
         if CLType not in CLTypes:
-            raise IncompetentDeveloperError("Invalid CLType specified!")
+            raise IncompetentDeveloperError("Invalid CLType specified: %s" % CLType)
         if CLAction is not None and CLAction not in CLActions:
-            raise IncompetentDeveloperError("Invalid CLAction specified!")
+            raise IncompetentDeveloperError("Invalid CLAction specified: %s" % CLAction)
 
         self.ShortName = ShortName
         self.LongName = LongName
@@ -137,12 +138,12 @@ class CLInterface(Interface):
     def _option_factory(self, parameter):
         name = parameter.Name
         if name not in self.ParameterConversionInfo:
-            raise IncompetentDeveloperError("YOU IIIIIDDIOT!")
+            raise IncompetentDeveloperError("%s does not have parameter conversion info (parameter conversions are available for %s)" % (name, ' '.join(self.ParameterConversionInfo.keys())))
 
         return CLOption.fromParameter(parameter, 
-                     self.ParameterConversionInfo[name]['long-name'],
-                     self.ParameterConversionInfo[name]['cl-type'],
-                     self.ParameterConversionInfo[name]['short-name'])
+                     self.ParameterConversionInfo[name].LongName,
+                     self.ParameterConversionInfo[name].CLType,
+                     ShortName=self.ParameterConversionInfo[name].ShortName)
 
     def _input_handler(self, in_, *args, **kwargs):
         """ Constructs the OptionParser object and parses command line arguments
@@ -200,7 +201,7 @@ class CLInterface(Interface):
 
         # Need to figure out what to do with command_line_args
         #if self.HelpOnNoArguments and (not command_line_args) and len(argv) == 1:
-        if self.HelpOnNoArguments and len(in_) == 1:
+        if self.HelpOnNoArguments and len(in_) == 0:
             parser.print_usage()
             return parser.exit(-1)
 
@@ -215,18 +216,26 @@ class CLInterface(Interface):
                 # if the option doesn't already end with [REQUIRED], add it.
                 if not ro.Help.strip().endswith('[REQUIRED]'):
                     ro.Help += ' [REQUIRED]'
-
-                option = make_option('-' + ro.ShortName, '--' + ro.LongName,
-                                     type=ro.CLType, help=ro.Help)
+                if ro.ShortName is None:
+                    option = make_option('--' + ro.LongName,
+                                         type=ro.CLType, help=ro.Help)
+                else:
+                    option = make_option('-' + ro.ShortName, '--' + ro.LongName,
+                                         type=ro.CLType, help=ro.Help)
                 required.add_option(option)
             parser.add_option_group(required)
-
+        
         # Add the optional options
         for oo in optional_opts:
             help_text = '%s [default: %s]' % (oo.Help, oo.DefaultDescription)
-            option = make_option('-' + oo.ShortName, '--' + oo.LongName,
-                                 type=oo.CLType, help=help_text,
-                                 default=oo.Default)
+            if oo.ShortName is None:
+                option = make_option('--' + oo.LongName,
+                     type=oo.CLType, help=help_text,
+                     default=oo.Default)
+            else:
+                option = make_option('-' + oo.ShortName, '--' + oo.LongName,
+                                     type=oo.CLType, help=help_text,
+                                     default=oo.Default)
             parser.add_option(option)
 
         # Parse the command line
@@ -256,7 +265,8 @@ class CLInterface(Interface):
         # so users have access to any additional functionality they may want at 
         # this stage -- most commonly, it will be used for doing custom tests of 
         # parameter values.
-        return parser, opts, args
+        hated_functionality = eval(str(opts))
+        return hated_functionality
 
     def _build_usage_lines(self, required_options):
         """ Build the usage string from components """
@@ -265,16 +275,16 @@ class CLInterface(Interface):
                                    for rp in required_options])
 
         formatted_usage_examples = []
-        for title, description, command in self.UsageExamples:
-            title = title.strip(':').strip()
-            description = description.strip(':').strip()
-            command = command.strip()
-            if title:
+        for usage_example in self.UsageExamples:
+            short_description = usage_example.ShortDesc.strip(':').strip()
+            long_description = usage_example.LongDesc.strip(':').strip()
+            example = usage_example.Ex.strip()
+            if short_description:
                 formatted_usage_examples.append('%s: %s\n %s' % 
-                                                (title,description,command))
+                                                (short_description,long_description,example))
             else:
                 formatted_usage_examples.append('%s\n %s' %
-                                                (description,command))
+                                                (long_description,example))
         
         formatted_usage_examples = '\n\n'.join(formatted_usage_examples)
         
@@ -293,7 +303,7 @@ class CLInterface(Interface):
         return '\n'.join(lines)
 
     def _output_handler(self, results):
-        print results
+        pass
 
     def getOutputFilepaths(results, **kwargs):
         mapping = {}
@@ -326,9 +336,6 @@ def cli(command_constructor, usage_examples, param_conversions, added_options):
 def clmain(interface_object, local_argv):
     cli_cmd = interface_object()
     
-    try:
-        result = cli_cmd(local_argv[1:])
-    except Exception, e:
-        raise e
-
+    result = cli_cmd(local_argv[1:])
+    
     return 0

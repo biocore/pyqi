@@ -33,7 +33,7 @@ class Interface(object):
     def __call__(self, in_, *args, **kwargs):
         self._the_in_validator(in_)
         cmd_input = self._input_handler(in_, *args, **kwargs)
-        return self._output_handler(self.CmdInstance(cmd_input=cmd_input))
+        return self._output_handler(self.CmdInstance(**cmd_input))
 
     def _the_in_validator(self, in_):
         """The job securator"""
