@@ -35,18 +35,17 @@ class FilterSamplesFromOTUTable(Command):
                 Parameter(Type=float,Help='the minimum total observation count in a sample for that sample to be retained',Name='min-count', Default=0),
                 Parameter(Type=float,Help='the maximum total observation count in a sample for that sample to be retained',Name='max-count', Default=inf,DefaultDescription='infinity')]
     
-    def run(self, **kwargs):
-        
-        # cmd_input is coming in, expected values are
-        # input_fp
-        # output_fp
-        # mapping_fp
-        # output_mapping_fp
-        # valid_states
-        # min_count
-        # max_count
-        # sample_id_fp
-    
+    def run(self,
+            input_fp,
+            output_fp,
+            mapping_fp=None,
+            output_mapping_fp=None,
+            valid_states=None,
+            min_count=None,
+            max_count=None,
+            sample_id_fp=None,
+            **kwargs):
+        result = {}
         if not ((mapping_fp and valid_states) or 
                 min_count != 0 or 
                 not isinf(max_count) or
@@ -60,6 +59,8 @@ class FilterSamplesFromOTUTable(Command):
 
         otu_table = parse_biom_table(open(input_fp,'U'))
         output_f = open(output_fp,'w')
+        
+        result['output-biom-table'] = output_fp
     
         if (mapping_fp and valid_states):
             sample_ids_to_keep = sample_ids_from_metadata_description(
@@ -84,3 +85,5 @@ class FilterSamplesFromOTUTable(Command):
             mapping_headers, mapping_data = \
              filter_mapping_file(mapping_data, mapping_headers, filtered_otu_table.SampleIds)
             open(output_mapping_fp,'w').write(format_mapping_file(mapping_headers,mapping_data))
+        
+        return result 

@@ -217,8 +217,6 @@ class CLInterface(Interface):
                 # if the option doesn't already end with [REQUIRED], add it.
                 if not ro.Help.strip().endswith('[REQUIRED]'):
                     ro.Help += ' [REQUIRED]'
-                print ro.ShortName
-                print ro.LongName
                 option = make_option('-' + ro.ShortName, '--' + ro.LongName,
                                      type=ro.CLType, help=ro.Help)
                 required.add_option(option)
@@ -259,7 +257,8 @@ class CLInterface(Interface):
         # so users have access to any additional functionality they may want at 
         # this stage -- most commonly, it will be used for doing custom tests of 
         # parameter values.
-        return parser, opts, args
+        hated_functionality = eval(str(opts))
+        return hated_functionality
 
     def _build_usage_lines(self, required_options):
         """ Build the usage string from components """
@@ -296,7 +295,7 @@ class CLInterface(Interface):
         return '\n'.join(lines)
 
     def _output_handler(self, results):
-        print results
+        pass
 
     def getOutputFilepaths(results, **kwargs):
         mapping = {}
@@ -329,9 +328,6 @@ def cli(command_constructor, usage_examples, param_conversions, added_options):
 def clmain(interface_object, local_argv):
     cli_cmd = interface_object()
     
-    try:
-        result = cli_cmd(local_argv[1:])
-    except Exception, e:
-        raise e
-
+    result = cli_cmd(local_argv[1:])
+    
     return 0
