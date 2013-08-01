@@ -1,5 +1,13 @@
 #!/usr/bin/env python
 
+#-----------------------------------------------------------------------------
+# Copyright (c) 2013, The BiPy Development Team.
+#
+# Distributed under the terms of the Modified BSD License.
+#
+# The full license is in the file COPYING.txt, distributed with this software.
+#-----------------------------------------------------------------------------
+
 def general_factory(command_constructor, usage_examples, param_conversions, 
             added_options, interface=None):
     """Generalized interface factory"""
