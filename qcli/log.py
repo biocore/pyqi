@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 from __future__ import division
 
+from sys import stderr
+from datetime import datetime
+
 __author__ = "Greg Caporaso"
 __copyright__ = "Copyright 2013, The QIIME Project"
 __credits__ = ["Greg Caporaso", "Daniel McDonald", "Doug Wendel",
