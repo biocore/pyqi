@@ -9,7 +9,7 @@ __version__ = "0.1.0-dev"
 __maintainer__ = "Greg Caporaso"
 __email__ = "gregcaporaso@gmail.com"
 
-from .core import Interface
+from qcli.interface.core import Interface
 from qcli.interface.factory import general_factory
 from qcli.exception import IncompetentDeveloperError
 from qcli.command.core import Parameter
@@ -48,6 +48,49 @@ class CLOption(Parameter):
                      ShortName=ShortName)
         return result
 
+CLTypes = set(['float','int','string','existing_filepath', float, int, str])
+CLActions = set(['store','store_true','store_false', 'append'])
+
+class UsageExample(object):
+    def __init__(self, ShortDesc=None, LongDesc=None, Ex=None):
+        if ShortDesc is None:
+            raise IncompetentDeveloperError("No short description provided!")
+        if LongDesc is None:
+            raise IncompetentDeveloperError("No long description provided!")
+        if Ex is None:
+            raise IncompetentDeveloperError("No example provided!")
+
+        self.ShortDesc = ShortDesc
+        self.LongDesc = LongDesc
+        self.Ex = Ex
+
+    def to_tuple(self):
+        """Returns (short, long, ex)"""
+        return (self.ShortDesc, self.LongDesc, self.Ex)
+
+class ParameterConversion(object):
+    def __init__(self, ShortName=None, LongName=None, CLType=None, 
+                 CLAction=None):
+        if ShortName is None:
+            raise IncompetentDeveloperError("No short name provided!")
+        if LongName is None:
+            raise IncompetentDeveloperError("No long name provided!")
+        if CLType not in CLTypes:
+            raise IncompetentDeveloperError("Invalid CLType specified!")
+        if CLAction is not None and CLAction not in CLActions:
+            raise IncompetentDeveloperError("Invalid CLAction specified!")
+
+        self.ShortName = ShortName
+        self.LongName = LongName
+        self.CLType = CLType
+        self.CLAction = CLAction
+
+    def to_dict(self):
+        return {'short-name':self.ShortName,
+                'long-name':self.LongName,
+                'cl-type':self.CLType,
+                'cl-action':self.CLAction}
+
 class CLInterface(Interface):
     DisallowPositionalArguments = True
     HelpOnNoArguments = True 
@@ -58,11 +101,13 @@ class CLInterface(Interface):
         self.UsageExamples = []
         self.UsageExamples.extend(self._get_usage_examples())
         
-        self.ParameterConversionInfo = {'verbose':{'short-name':'v',
-                                                   'long-name':'verbose',
-                                                   'cl-type':None,
-                                                   'cl-action':'store_true'}}
-        
+        self.ParameterConversionInfo = {
+                'verbose':ParameterConversion(ShortName='v',
+                                              LongName='verbose',
+                                              CLType=None,
+                                              CLAction='store_true')
+                }
+
         self.ParameterConversionInfo.update(self._get_param_conv_info())
     
         super(CLInterface, self).__init__(**kwargs)
