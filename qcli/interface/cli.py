@@ -14,7 +14,7 @@ from qcli.interface.factory import general_factory
 from qcli.exception import IncompetentDeveloperError
 from qcli.command.core import Parameter
 from qcli.option_parsing import (OptionParser, OptionGroup, Option, 
-                                 OptionValueError, OptionError)
+                                 OptionValueError, OptionError, make_option)
 
 CLTypes = set(['float','int','string','existing_filepath', float, int, str, None])
 CLActions = set(['store','store_true','store_false', 'append'])
@@ -144,7 +144,7 @@ class CLInterface(Interface):
         return CLOption.fromParameter(parameter, 
                      self.ParameterConversionInfo[name].LongName,
                      self.ParameterConversionInfo[name].CLType,
-                     self.ParameterConversionInfo[name].ShortName)
+                     ShortName=self.ParameterConversionInfo[name].ShortName)
 
     def _input_handler(self, in_, *args, **kwargs):
         """ Constructs the OptionParser object and parses command line arguments
@@ -202,7 +202,7 @@ class CLInterface(Interface):
 
         # Need to figure out what to do with command_line_args
         #if self.HelpOnNoArguments and (not command_line_args) and len(argv) == 1:
-        if self.HelpOnNoArguments and len(in_) == 1:
+        if self.HelpOnNoArguments and len(in_) == 0:
             parser.print_usage()
             return parser.exit(-1)
 
@@ -217,12 +217,13 @@ class CLInterface(Interface):
                 # if the option doesn't already end with [REQUIRED], add it.
                 if not ro.Help.strip().endswith('[REQUIRED]'):
                     ro.Help += ' [REQUIRED]'
-
+                print ro.ShortName
+                print ro.LongName
                 option = make_option('-' + ro.ShortName, '--' + ro.LongName,
                                      type=ro.CLType, help=ro.Help)
                 required.add_option(option)
             parser.add_option_group(required)
-
+        
         # Add the optional options
         for oo in optional_opts:
             help_text = '%s [default: %s]' % (oo.Help, oo.DefaultDescription)
