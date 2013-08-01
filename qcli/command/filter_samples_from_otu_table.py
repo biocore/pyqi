@@ -37,17 +37,15 @@ class FilterSamplesFromOTUTable(Command):
     
     def run(self, **kwargs):
         
-        option_parser, opts, args = cmd_input
-        
-        input_fp = opts.input_fp
-        output_fp = opts.output_fp
-    
-        mapping_fp = opts.mapping_fp
-        output_mapping_fp = opts.output_mapping_fp
-        valid_states = opts.valid_states
-        min_count = opts.min_count
-        max_count = opts.max_count
-        sample_id_fp = opts.sample_id_fp
+        # cmd_input is coming in, expected values are
+        # input_fp
+        # output_fp
+        # mapping_fp
+        # output_mapping_fp
+        # valid_states
+        # min_count
+        # max_count
+        # sample_id_fp
     
         if not ((mapping_fp and valid_states) or 
                 min_count != 0 or 
@@ -60,8 +58,8 @@ class FilterSamplesFromOTUTable(Command):
             option_parser.error("Must provide input mapping file to generate"
                                 " output mapping file.")
 
-        otu_table = parse_biom_table(open(opts.input_fp,'U'))
-        output_f = open(opts.output_fp,'w')
+        otu_table = parse_biom_table(open(input_fp,'U'))
+        output_f = open(output_fp,'w')
     
         if (mapping_fp and valid_states):
             sample_ids_to_keep = sample_ids_from_metadata_description(
