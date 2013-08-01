@@ -12,6 +12,41 @@ __email__ = "gregcaporaso@gmail.com"
 from .core import Interface
 from qcli.interface.factory import general_factory
 from qcli.exception import IncompetentDeveloperError
+from qcli.command.core import Parameter
+
+class CLOption(Parameter):
+    def __init__(self, Type, Help, Name, LongName, CLType, CLAction='store',
+                 Required=False, Default=None, DefaultDescription=None,
+                 ShortName=None):
+        self.LongName = LongName
+        self.CLType = CLType
+        self.CLAction = CLAction
+        self.ShortName = ShortName
+        
+        super(CLOption,self).__init__(Type=Type,Help=Help,Name=Name,Required=Required,Default=Default,DefaultDescription=DefaultDescription)
+        
+        if LongName != self.Name:
+            self.DepWarn = "parameter %s will be renamed %s in QIIME 2.0.0" % (self.LongName, self.Name)
+        else:
+            self.DepWarn = ""
+
+    def __str__(self):
+        return '-%s/--%s' % (self.ShortName, self.LongName)
+        
+    @classmethod
+    def fromParameter(cls, parameter, LongName, CLType, CLAction='store',
+                      ShortName=None):
+        result = cls(Type=parameter.Type,
+                     Help=parameter.Help,
+                     Name=parameter.Name,
+                     Required=parameter.Required,
+                     LongName=LongName,
+                     CLType=CLType,
+                     CLAction=CLAction,
+                     Default=parameter.Default,
+                     DefaultDescription=parameter.DefaultDescription,
+                     ShortName=ShortName)
+        return result
 
 class CLInterface(Interface):
     DisallowPositionalArguments = True
@@ -186,6 +221,56 @@ class CLInterface(Interface):
 
         return mapping
 
+# Fix this shit:
+class CLCommandParser(object):
+    DisallowPositionalArguments = True
+    HelpOnNoArguments = True
+    OptionalInputLine = '[] indicates optional input (order unimportant)'
+    RequiredInputLine = '{} indicates required input (order unimportant)'
+
+    def __init__(self):
+        if len(self.UsageExamples) < 1:
+            raise IncompetentDeveloperError("How the fuck do I use this "
+                                            "command?")
+
+    def getOutputFilepaths(results, **kwargs):
+        raise NotImplementedError("All subclasses must implement "
+                                  "getOutputFilepaths.")
+
+def build_usage_lines(required_params, usage_examples, optional_input_line, 
+                      required_input_line, long_description):
+    """ Build the usage string from components """
+    line1 = 'usage: %prog [options] ' + '{%s}' %\
+     ' '.join(['%s %s' % (str(rp),rp.Name.upper())\
+               for rp in required_params])
+    
+    formatted_usage_examples = []
+    for title, description, command in usage_examples:
+        title = title.strip(':').strip()
+        description = description.strip(':').strip()
+        command = command.strip()
+        if title:
+            formatted_usage_examples.append('%s: %s\n %s' %\
+             (title,description,command))
+        else:
+            formatted_usage_examples.append('%s\n %s' % (description,command))
+    
+    formatted_usage_examples = '\n\n'.join(formatted_usage_examples)
+    
+    lines = (line1,
+             '', # Blank line
+             optional_input_line,
+             required_input_line,
+             '', # Blank line
+             long_description,
+             '', # Blank line
+             'Example usage: ',\
+             'Print help message and exit',
+             ' %prog -h\n',
+             formatted_usage_examples)
+    
+    return '\n'.join(lines)
+
 def cli(command_constructor, usage_examples, param_conversions, added_options):
     """Command line interface factory
     
@@ -197,8 +282,8 @@ def cli(command_constructor, usage_examples, param_conversions, added_options):
     added_options - any additional options that are not defined by the 
         ``command_constructor``.
     """
-    return general(command_constructor, usage_examples, param_conversions,
-                   added_options, CLInterface)
+    return general_factory(command_constructor, usage_examples, param_conversions,
+                           added_options, CLInterface)
 
 def clmain(cmd_constructor, local_argv):
     logger = logger_constructor()

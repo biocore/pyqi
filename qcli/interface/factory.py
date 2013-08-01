@@ -6,7 +6,7 @@ def general_factory(command_constructor, usage_examples, param_conversions,
     class IObject(interface):
         """Dynamic interface object"""
         CommandConstructor = command_constructor
-        def _get_param_conf_info(self):
+        def _get_param_conv_info(self):
             return param_conversions
         def _get_additional_options(self):
             return added_options
