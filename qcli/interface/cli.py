@@ -16,7 +16,8 @@ from qcli.command.core import Parameter
 from qcli.option_parsing import (OptionParser, OptionGroup, Option, 
                                  OptionValueError, OptionError, make_option)
 
-CLTypes = set(['float','int','string','existing_filepath', float, int, str, None])
+CLTypes = set(['float','int','string','existing_filepath', float, int, str, None,
+               'new_filepath','new_dirpath','existing_dirpath'])
 CLActions = set(['store','store_true','store_false', 'append'])
 
 class CLOption(Parameter):
