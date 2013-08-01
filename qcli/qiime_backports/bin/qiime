@@ -1,0 +1,44 @@
+#!/usr/bin/env python
+
+from sys import argv, exit, stderr
+from qcli.interface.cli import clmain, cli
+import qcli.qiime_backports.qiime.cli as qiime_cli
+import importlib
+
+__author__ = "Daniel McDonald"
+__copyright__ = "Copyright 2013, The QIIME Project"
+__credits__ = ["Greg Caporaso", "Daniel McDonald", "Doug Wendel",
+                               "Jai Ram Rideout"]
+__license__ = "GPL"
+__version__ = "0.1.0-dev"
+__maintainer__ = "Daniel McDonald"
+__email__ = "mcdonadt@colorado.edu"
+
+CLI_CFG_BASE = 'qcli.qiime_backports.qiime.cli'
+def usage():
+    print "usage: qiime <command> [<args>]"
+    exit(0)
+
+def unknown_command(cmd):
+    stderr.write("Unknown QIIME command: %s\n" % cmd)
+    exit(1)
+
+if __name__ == '__main__':
+    if len(argv) == 1:
+        usage()
+    else:
+        qiime_cmd = argv[1]
+
+    if qiime_cmd not in qiime_cli.__all_lookup__:
+        unknown_command(qiime_cmd)
+    
+    try:
+        cmd_cfg = importlib.import_module('.'.join([CLI_CFG_BASE, qiime_cmd]))
+    except ImportError, e:
+        stderr.write("Unable to import the command configuration!\n")
+        exit(1)
+
+    cmd_obj = cli(cmd_cfg.CommandConstructor, cmd_cfg.usage_examples, 
+                  cmd_cfg.param_conversions, cmd_cfg.additional_options)
+    
+    clmain(cmd_obj, argv[1:])
