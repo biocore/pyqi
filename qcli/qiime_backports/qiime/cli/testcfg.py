@@ -1,5 +1,7 @@
+#!/usr/bin/env python
+
 from qcli.interface.cli import CLOption, UsageExample, ParameterConversion
-from qcli.command.filter_samples_from_otu_table import FilterSamplesFromOTUTable as \
+from qcli.qiime_backports.command.filter_samples_from_otu_table import FilterSamplesFromOTUTable as \
         CommandConstructor
 
 usage_examples = [

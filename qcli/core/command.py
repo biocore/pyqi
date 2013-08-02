@@ -18,8 +18,9 @@ __version__ = "0.1.0-dev"
 __maintainer__ = "Greg Caporaso"
 __email__ = "gregcaporaso@gmail.com"
 
-from qcli.log import StdErrLogger
-from qcli.exception import IncompetentDeveloperError, InvalidReturnTypeError
+from qcli.core.log import NullLogger
+from qcli.core.exception import (IncompetentDeveloperError,
+                                 InvalidReturnTypeError)
 
 class Parameter(object):
     """A ``Command`` variable
@@ -51,7 +52,7 @@ class Command(object):
 
     def __init__(self, **kwargs):
         """ """
-        self._logger = StdErrLogger()
+        self._logger = NullLogger()
         self.Parameters = []
         self.Parameters.extend(self._get_default_parameters())
         self.Parameters.extend(self._get_parameters())

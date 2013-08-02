@@ -1,4 +1,4 @@
-#!/usr/bin/env
+#!/usr/bin/env python
 
 from qcli.interface.cli import CLOption, UsageExample, ParameterConversion
 from qcli.qcli_command.make_cli import CommandConstructor
