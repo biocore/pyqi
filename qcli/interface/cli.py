@@ -250,6 +250,10 @@ class CLInterface(Interface):
         # command_line_text will None except in test cases, in which 
         # case sys.argv[1:] will be parsed
 
+        #####
+        # THIS IS THE NATURAL BREAKING POINT FOR THIS FUNCTIONALITY
+        #####
+
         # Need to figure out what to do with command_line_args
         #opts,args = parser.parse_args(command_line_args)
         opts, args = parser.parse_args(in_)
