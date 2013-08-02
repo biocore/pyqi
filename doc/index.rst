@@ -27,7 +27,7 @@ Documentation index
 Getting involved in development
 -------------------------------
 
-qcli is open source software, available under GPL.
+qcli is open source software, available under the BSD license.
 
 Development is currently occurring primarily in the `Caporaso <http://www.caporaso.us>`_ and `Knight <https://knightlab.colorado.edu/>`_ labs (at Northern Arizona University and University of Colorado, respectively), but the goal is for qcli to be a very open development effort. 
 
