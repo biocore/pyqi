@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 from sys import argv, exit, stderr
-import importlib
 import BaseHTTPServer
 import CGIHTTPServer
 
@@ -40,7 +39,7 @@ if __name__ == '__main__':
     server = BaseHTTPServer.HTTPServer
     handler = CGIHTTPServer.CGIHTTPRequestHandler
     server_address = ('', port)
-    handler.cgi_directories = ['/']
+    #handler.cgi_directories = ['/']
     httpd = server(server_address, handler)
 
     print "Serving at port", port
