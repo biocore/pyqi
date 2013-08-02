@@ -42,9 +42,9 @@ command_format = """class %s(Command):
     def _get_parameters(self):
         # EXAMPLE:
         # return [Parameter(Name='foo',Required=True,Type=str,
-        #                   Help='some required parameter),
+        #                   Help='some required parameter'),
         #         Parameter(Name='bar',Required=False,Type=int,
-        #                   Help='some optional parameter,Default=1)]
+        #                   Help='some optional parameter',Default=1)]
         raise NotImplementedError("You must define this method")
 
 CommandConstructor = %s
@@ -57,7 +57,11 @@ class CLIStub(Command):
     def run(self, **kwargs):
         # build a string formatting dictionary for the file header
         head = dict([(k,v) for k,v in kwargs.items() if k not in ['name']])
-      
+        
+        if 'credits' in head:
+            f = lambda x: '"%s"' % x
+            head['credits'] = ', '.join(map(f, head['credits'].split(',')))
+
         result_lines = [header % head]
         result_lines.append(command_format % (kwargs['name'], kwargs['name']))
 

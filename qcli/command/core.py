@@ -22,13 +22,12 @@ from qcli.log import StdErrLogger
 from qcli.exception import IncompetentDeveloperError, InvalidReturnTypeError
 
 class Parameter(object):
-    
-    def __init__(self,
-                 Type,
-                 Help,
-                 Name,
-                 Required=False,
-                 Default=None,
+    """A ``Command`` variable
+
+    A ``Command`` variable is interface agnostic and are analogous to a 
+    function argument.
+    """
+    def __init__(self, Type, Help, Name, Required=False, Default=None,
                  DefaultDescription=None):
         self.Type = Type
         self.Help = Help
@@ -38,14 +37,17 @@ class Parameter(object):
         self.DefaultDescription = DefaultDescription
 
         if self.Required and self.Default is not None:
-            raise IncompetentDeveloperError("Required parameters cannot have defaults, idiot!!!")
+            raise IncompetentDeveloperError("Required parameters cannot have defaults.")
 
 class Command(object):
-    """ Base class for abstracted command
+    """Base class for ``Command``
+
+    A ``Command`` is interface agnostic, knows how to run itself and knows 
+    about the arguments that it can take (via ``Parameters``).
     """
     _logger = None
-    BriefDescription = ''
-    LongDescription = ''
+    BriefDescription = "" # 1 sentence description
+    LongDescription = """""" # longer, more detailed description
 
     def __init__(self, **kwargs):
         """ """
@@ -55,10 +57,10 @@ class Command(object):
         self.Parameters.extend(self._get_parameters())
 
     def __call__(self, **kwargs):
-        """
-        """
+        """Safely execute a ``Command``"""
         self_str = str(self.__class__)
         self._logger.info('Starting command: %s' % self_str)
+        
         try:
             result = self.run(**kwargs)
         except Exception, e:
@@ -66,7 +68,8 @@ class Command(object):
             raise e
         else:
             self._logger.info('Completed command: %s' % self_str)
-        
+       
+        # check if the result is sane
         if not isinstance(result, dict):
             self._logger.fatal('Shit went wrong: %s' % self_str)
             raise InvalidReturnTypeError("Unexpected return type!")
@@ -74,6 +77,11 @@ class Command(object):
         return result
 
     def run(self, **kwargs):
+        """Exexcute a ``Command``
+        
+        A ``Command`` must accept **kwargs to run, and must return a ``dict``
+        as a result.
+        """
         raise NotImplementedError("All subclasses must implement run.")
     
     def _get_default_parameters(self):
