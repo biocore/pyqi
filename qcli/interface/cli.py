@@ -31,7 +31,7 @@ CLActions = set(['store','store_true','store_false', 'append'])
 
 def new_filepath(data, path):
     if os.path.exists(path):
-        raise IOError("Output path %s already exists! % path")
+        raise IOError("Output path %s already exists!" % path)
     f = open(path, 'w')
     f.write(data)
     f.close()
