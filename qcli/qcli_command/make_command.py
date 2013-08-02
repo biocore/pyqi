@@ -29,7 +29,7 @@ __status__ = "Development"
 
 """
 
-command_format = """%s(Command):
+command_format = """class %s(Command):
     BriefDescription = "FILL IN A 1 SENTENCE DESCRIPTION"
     LongDescription = "GO INTO MORE DETAIL"
 
