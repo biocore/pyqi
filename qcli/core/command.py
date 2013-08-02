@@ -18,8 +18,9 @@ __version__ = "0.1.0-dev"
 __maintainer__ = "Greg Caporaso"
 __email__ = "gregcaporaso@gmail.com"
 
-from qcli.log import StdErrLogger
-from qcli.exception import IncompetentDeveloperError, InvalidReturnTypeError
+from qcli.core.log import StdErrLogger
+from qcli.core.exception import (IncompetentDeveloperError,
+                                 InvalidReturnTypeError)
 
 class Parameter(object):
     """A ``Command`` variable

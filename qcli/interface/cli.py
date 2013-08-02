@@ -19,8 +19,8 @@ __email__ = "gregcaporaso@gmail.com"
 
 from qcli.interface.core import Interface
 from qcli.interface.factory import general_factory
-from qcli.exception import IncompetentDeveloperError
-from qcli.command.core import Parameter
+from qcli.core.exception import IncompetentDeveloperError
+from qcli.core.command import Parameter
 from qcli.option_parsing import (OptionParser, OptionGroup, Option, 
                                  OptionValueError, OptionError, make_option)
 import os
