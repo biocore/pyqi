@@ -23,20 +23,32 @@ from qcli.exception import IncompetentDeveloperError
 from qcli.command.core import Parameter
 from qcli.option_parsing import (OptionParser, OptionGroup, Option, 
                                  OptionValueError, OptionError, make_option)
-
+import os
 CLTypes = set(['float','int','string','existing_filepath', float, int, str, None,
                'new_filepath','new_dirpath','existing_dirpath'])
 CLActions = set(['store','store_true','store_false', 'append'])
 
+def new_filepath(data, path):
+    if os.path.exists(path):
+        raise IOError("Output path %s already exists! % path")
+    f = open(path, 'w')
+    f.write(data)
+    f.close()
+
 class CLOption(Parameter):
+    _cl_types = {'new_filepath': new_filepath}
     def __init__(self, Type, Help, Name, LongName, CLType, CLAction='store',
                  Required=False, Default=None, DefaultDescription=None,
-                 ShortName=None):
+                 ShortName=None, ResultName=None):
         self.LongName = LongName
         self.CLType = CLType
         self.CLAction = CLAction
         self.ShortName = ShortName
-        
+        self.ResultName = ResultName
+
+        if CLType in self._cl_types:
+            self._cl_type_action = self._cl_types['new_filepath']
+
         super(CLOption,self).__init__(Type=Type,Help=Help,Name=Name,
                                       Required=Required,Default=Default,
                                       DefaultDescription=DefaultDescription)
@@ -46,6 +58,9 @@ class CLOption(Parameter):
                                                     (self.LongName, self.Name)
         else:
             self.DepWarn = ""
+
+    def _get_realized_action(self, name):
+        return self._realized_actions[name]
 
     def __str__(self):
         return '-%s/--%s' % (self.ShortName, self.LongName)
@@ -110,6 +125,7 @@ class CLInterface(Interface):
     RequiredInputLine = '{} indicates required input (order unimportant)'
     
     def __init__(self, **kwargs):
+        self.HatedFunctionality = {}
         self.UsageExamples = []
         self.UsageExamples.extend(self._get_usage_examples())
 
@@ -278,6 +294,7 @@ class CLInterface(Interface):
         # this stage -- most commonly, it will be used for doing custom tests of 
         # parameter values.
         hated_functionality = eval(str(opts))
+        self.HatedFunctionality = hated_functionality
         return hated_functionality
 
     def _build_usage_lines(self, required_options):
@@ -315,7 +332,10 @@ class CLInterface(Interface):
         return '\n'.join(lines)
 
     def _output_handler(self, results):
-        pass
+        for o in self._get_additional_options():
+            if o.ResultName in results:
+                o._cl_type_action(results[o.ResultName], 
+                                  self.HatedFunctionality[o.Name])
 
     def getOutputFilepaths(results, **kwargs):
         mapping = {}
