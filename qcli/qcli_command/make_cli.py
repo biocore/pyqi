@@ -26,15 +26,25 @@ header = """#!/usr/bin/env python
 from qcli.interface.cli import CLOption, UsageExample, ParameterConversion
 from %(mod)s import CommandConstructor
 
+# How you can use the command from the command line
 usage_examples = [
     ]
 
+# Parameter conversions tell the interface how to describe command line 
+# options
 param_conversions = {
     %(param_conversions)s
     }
 
+# The output map associated keys in the results returned from Command.run
+# without output handlers
+output_map = {
+    }
+
+# In case there are interface specific bits such as output files
 additional_options = [
     ]
+
 """
 
 param_fmt = """\t\t'%(name)s':ParameterConversion(ShortName="MUST BE DEFINED",
@@ -59,7 +69,4 @@ class MakeCLI(Command):
                 Parameter(Name='mod',Required=True,Type=str,
                           Help='the command source module')]
     
-    def _get_output_labels(self):
-        return ['result']
-
 CommandConstructor = MakeCLI
