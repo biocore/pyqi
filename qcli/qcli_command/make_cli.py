@@ -13,7 +13,7 @@ __maintainer__ = "Daniel McDonald"
 __email__ = "mcdonadt@colorado.edu"
 __status__ = "Development"
 
-header = """#!/usr/bin/env
+header = """#!/usr/bin/env python
 
 from qcli.interface.cli import CLOption, UsageExample, ParameterConversion
 from %(mod)s import CommandConstructor
@@ -39,6 +39,7 @@ class MakeCLI(Command):
     LongDescription = """Construct and stub out the basic CLI configuration for a given Command"""
 
     def run(self, **kwargs):
+        print kwargs
         prms = kwargs['command']._get_parameters()
         pc = ''.join([param_fmt % {'name':p.Name, 'type':p.Type} for p in prms])
         header_format = {'mod':kwargs['mod'], 'param_conversions': pc}
@@ -47,7 +48,7 @@ class MakeCLI(Command):
 
     def _get_parameters(self):
         return [Parameter(Name='command',Required=True,Type=Command,
-                          Help='some required parameter'),
+                          Help='An existing Command'),
                 Parameter(Name='mod',Required=True,Type=str,
                           Help='the command source module')]
 
