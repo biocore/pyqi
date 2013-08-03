@@ -66,8 +66,6 @@ class UsageExampleTests(TestCase):
         self.assertEqual(obj.LongDesc, 'b')
         self.assertEqual(obj.Ex, 'c')
 
-        self.assertRaises(IncompetentDeveloperError, UsageExample, 'a', 'b')
-
 class ParameterConversionTests(TestCase):
     def test_init(self):
         obj = ParameterConversion('a',str,CLAction='store')
