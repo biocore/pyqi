@@ -4,7 +4,7 @@ from __future__ import division
 from sys import argv, stdout, stderr
 from os.path import split, splitext
 from qcli.util import qcli_system_call
-from qcli.log import StdErrLogger
+from qcli.core.log import StdErrLogger
 
 def old_to_new_qiime_command(local_argv):
     logger = StdErrLogger()

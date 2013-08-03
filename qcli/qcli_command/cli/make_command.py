@@ -1,10 +1,20 @@
+#!/usr/bin/env python
+
+#-----------------------------------------------------------------------------
+# Copyright (c) 2013, The BiPy Development Team.
+#
+# Distributed under the terms of the Modified BSD License.
+#
+# The full license is in the file COPYING.txt, distributed with this software.
+#-----------------------------------------------------------------------------
+
 from qcli.interface.cli import CLOption, UsageExample, ParameterConversion
 from qcli.qcli_command.make_command import CommandConstructor
 
 usage_examples = [
         UsageExample(ShortDesc="Basic function",
                      LongDesc="Create a basic function with appropriate attribution",
-                     Ex='%prog -n example -a "some author" -c "Copyright 2013, The QCLI Project" -e "foo@bar.com" -l BSD --version "0.1" --credits "someone else","and another person" -o example.py')
+                     Ex='%prog -n example -a "some author" -c "Copyright 2013, The QCLI Project" -e "foo@bar.com" -l BSD --func_version "0.1" --credits "someone else","and another person" -o example.py')
         ]
 
 param_conversions = {

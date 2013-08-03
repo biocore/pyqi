@@ -1,5 +1,13 @@
 #!/usr/bin/env python
 
+#-----------------------------------------------------------------------------
+# Copyright (c) 2013, The BiPy Development Team.
+#
+# Distributed under the terms of the Modified BSD License.
+#
+# The full license is in the file COPYING.txt, distributed with this software.
+#-----------------------------------------------------------------------------
+
 __author__ = "Daniel McDonald"
 __copyright__ = "Copyright 2013, The QCLI Project"
 __credits__ = ["Daniel McDonald", "Greg Caporaso", "Doug Wendel",
@@ -10,8 +18,8 @@ __maintainer__ = "Daniel McDonald"
 __email__ = "mcdonadt@colorado.edu"
 __status__ = "Development"
 
-from qcli.container import WithIO
-from qcli.command.core import Command, Parameter
+from qcli.core.container import WithIO
+from qcli.core.command import Command, Parameter
 
 header = """#!/usr/bin/env python
 
@@ -29,7 +37,7 @@ __status__ = "Development"
 
 """
 
-command_format = """%s(Command):
+command_format = """class %s(Command):
     BriefDescription = "FILL IN A 1 SENTENCE DESCRIPTION"
     LongDescription = "GO INTO MORE DETAIL"
 
@@ -42,9 +50,9 @@ command_format = """%s(Command):
     def _get_parameters(self):
         # EXAMPLE:
         # return [Parameter(Name='foo',Required=True,Type=str,
-        #                   Help='some required parameter),
+        #                   Help='some required parameter'),
         #         Parameter(Name='bar',Required=False,Type=int,
-        #                   Help='some optional parameter,Default=1)]
+        #                   Help='some optional parameter',Default=1)]
         raise NotImplementedError("You must define this method")
 
 CommandConstructor = %s
@@ -57,7 +65,11 @@ class CLIStub(Command):
     def run(self, **kwargs):
         # build a string formatting dictionary for the file header
         head = dict([(k,v) for k,v in kwargs.items() if k not in ['name']])
-      
+        
+        if 'credits' in head:
+            f = lambda x: '"%s"' % x
+            head['credits'] = ', '.join(map(f, head['credits'].split(',')))
+
         result_lines = [header % head]
         result_lines.append(command_format % (kwargs['name'], kwargs['name']))
 
