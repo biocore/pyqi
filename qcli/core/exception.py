@@ -25,6 +25,3 @@ class IncompetentDeveloperError(CommandError):
 
 class InvalidReturnTypeError(IncompetentDeveloperError):
     pass
-
-class IncompetentUserError(Exception):
-    pass

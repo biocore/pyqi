@@ -22,7 +22,6 @@ __license__ = "BSD"
 __version__ = "0.1-dev"
 __maintainer__ = "Daniel McDonald"
 __email__ = "mcdonadt@colorado.edu"
-__status__ = "Development"
 
 def command_handler(option_value):
     """Dynamically load a Python object from a module and return an instance"""

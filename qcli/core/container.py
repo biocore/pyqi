@@ -37,7 +37,7 @@ class Passthrough(object):
             super(Passthrough, self).__setattr__('Info',  kwargs['Info'])
  
     def _load_if_needed(self):
-        raise NotImplementedError("Passthrough cannot issue IO")
+        raise NotImplementedError("Passthrough cannot issue I/O.")
  
     def __getattr__(self, attr):
         """Pass through to contained class if the attribute is not recognized"""
@@ -96,13 +96,13 @@ class PassthroughIO(Passthrough):
             if self.InPath is not None:
                 self._object = self._reader(self, self.InPath)
             else:
-                raise CannotReadError("No object and InPath is None!")
+                raise CannotReadError("No object and InPath is None.")
     
     def read(self):
         """Attempt to read"""
         if self._object is None:
             if self.InPath is None:
-                raise CannotReadError("InPath is None!")
+                raise CannotReadError("InPath is None.")
             self._object = self._reader(self, self.InPath)
 
     def write(self):
@@ -111,7 +111,7 @@ class PassthroughIO(Passthrough):
             self._read()
         if self._object is not None:
             if self.OutPath is None:
-                raise CannotWriteError("OutPath is None!")
+                raise CannotWriteError("OutPath is None.")
             self._writer(self, self.OutPath)
             self._object = None
 
@@ -120,7 +120,7 @@ class PassthroughRead(PassthroughIO):
         if 'reader' in kwargs:
             super(PassthroughRead, self).__setattr__('_reader', kwargs['reader'])
         else:
-            raise ContainerError("A reader is required!")
+            raise ContainerError("A reader is required.")
         super(PassthroughRead, self).__init__(*args, **kwargs)
 
 class PassthroughWrite(PassthroughIO):
@@ -128,7 +128,7 @@ class PassthroughWrite(PassthroughIO):
         if 'writer' in kwargs:
             super(PassthroughWrite, self).__setattr__('_reader', kwargs['writer'])
         else:
-            raise ContainerError("A writer is required!")
+            raise ContainerError("A writer is required.")
         super(PassthroughWrite, self).__init__(*args, **kwargs)
 
 class DelayRead(PassthroughRead):
@@ -138,7 +138,7 @@ class DelayRead(PassthroughRead):
 class DelayWrite(PassthroughWrite):
     """Contain an object and issue IO with the container is no more"""
     TypeName = "DelayWrite"
-     
+
     def __del__(self):
         self.write()
 
@@ -184,7 +184,7 @@ IOLookup = {str:(default_read_str, default_write_str)}
 
 def WithIO(obj, IO_type=None, IO_lookup=None, **kwargs):
     if IO_type is None:
-        raise ContainerError("IO_type is required!")
+        raise ContainerError("IO_type is required.")
     
     if IO_type not in IOType:
         raise ContainerError("Unknown IO_type: %s" % IO_type)

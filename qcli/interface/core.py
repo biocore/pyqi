@@ -31,8 +31,9 @@ class Interface(object):
         self.CmdInstance = None
 
         if self.CommandConstructor is None:
-            raise IncompetentDeveloperError("I don't have a command constructor, idiot!!!")
-    
+            raise IncompetentDeveloperError("Cannot construct an Interface "
+                                            "without a CommandConstructor.")
+
         self.CmdInstance = self.CommandConstructor(**kwargs)
         for parameter in self.CmdInstance.Parameters:
             option = self._option_factory(parameter)
@@ -45,13 +46,17 @@ class Interface(object):
 
     def _the_in_validator(self, in_):
         """The job securator"""
-        raise NotImplementedError("DO IT!")
+        raise NotImplementedError("All subclasses must implement "
+                                  "_the_in_validator.")
 
     def _option_factory(self):
-        raise NotImplementedError("DO IT!")
+        raise NotImplementedError("All subclasses must implement "
+                                  "_option_factory.")
 
     def _input_handler(self, in_, *args, **kwargs):
-        raise NotImplementedError("DO IT!")
+        raise NotImplementedError("All subclasses must implement "
+                                  "_input_handler.")
 
     def _output_handler(self, results):
-        raise NotImplementedError("DO IT!")
+        raise NotImplementedError("All subclasses must implement "
+                                  "_output_handler.")
