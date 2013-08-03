@@ -299,7 +299,6 @@ class CLInterface(Interface):
             if v.InHandler is not None:
                 long_name = v.LongName
                 value = self.HatedFunctionality[long_name]
-                print value
                 self.HatedFunctionality[long_name] = v.InHandler(value)
             else:
                 pass
