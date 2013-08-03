@@ -26,7 +26,7 @@ from qcli.option_parsing import (OptionParser, OptionGroup, Option,
 import os
 
 CLTypes = set(['float','int','string','existing_filepath', float, int, str, None,
-               'new_filepath','new_dirpath','existing_dirpath'])
+            'new_filepath','new_dirpath','existing_dirpath'])
 CLActions = set(['store','store_true','store_false', 'append'])
 
 def new_filepath(data, path):
@@ -100,10 +100,8 @@ class UsageExample(object):
 
 class ParameterConversion(object):
     """Validation and structure for converting from a parameter to an option"""
-    def __init__(self, ShortName=None, LongName=None, CLType=None, 
-                 CLAction=None):
-        if LongName is None:
-            raise IncompetentDeveloperError("No long name provided!")
+    def __init__(self, LongName, CLType, CLAction=None, InHandler=None, 
+                 ShortName=None):
         if CLType not in CLTypes:
             raise IncompetentDeveloperError("Invalid CLType specified: %s" % CLType)
         if CLAction is not None and CLAction not in CLActions:
@@ -113,12 +111,7 @@ class ParameterConversion(object):
         self.LongName = LongName
         self.CLType = CLType
         self.CLAction = CLAction
-
-    def to_dict(self):
-        return {'short-name':self.ShortName,
-                'long-name':self.LongName,
-                'cl-type':self.CLType,
-                'cl-action':self.CLAction}
+        self.InHandler = InHandler
 
 class CLInterface(Interface):
     """A command line interface"""
@@ -302,7 +295,14 @@ class CLInterface(Interface):
         # parameter values.
         hated_functionality = eval(str(opts))
         self.HatedFunctionality = hated_functionality
-        return hated_functionality
+        for k, v in self.ParameterConversionInfo.items():
+            if v.InHandler is not None:
+                long_name = v.LongName
+                value = self.HatedFunctionality[long_name]
+                self.HatedFunctionality[long_name] = v.InHandler(value)
+            else:
+                pass
+        return self.HatedFunctionality
 
     def _build_usage_lines(self, required_options):
         """ Build the usage string from components """
