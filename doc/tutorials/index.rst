@@ -1,15 +1,15 @@
 .. _tutorial_index:
-.. qcli tutorials
+.. pyqi tutorials
 
 .. index:: Tutorials
 
 ==================
-qcli tutorials
+pyqi tutorials
 ==================
-These pages provide details on working with qcli.
+These pages provide details on working with pyqi.
 
 .. toctree::
    :maxdepth: 2
    
-   creating_a_qcli_based_script.rst
+   creating_a_pyqi_based_script.rst
    script_interface_testing.rst

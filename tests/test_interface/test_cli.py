@@ -18,10 +18,10 @@ __maintainer__ = "Daniel McDonald"
 __email__ = "mcdonadt@colorado.edu"
 
 from unittest import TestCase, main
-from qcli.interface.cli import OutputHandler, CLOption, UsageExample, \
+from pyqi.interface.cli import OutputHandler, CLOption, UsageExample, \
         ParameterConversion, CLInterface
-from qcli.core.exception import IncompetentDeveloperError
-from qcli.core.command import Command, Parameter
+from pyqi.core.exception import IncompetentDeveloperError
+from pyqi.core.command import Command, Parameter
 
 class OutputHandlerTests(TestCase):
     def test_init(self):
@@ -51,7 +51,7 @@ class CLOptionTests(TestCase):
         self.assertEqual(obs, exp)
 
     def test_fromParameter(self):
-        from qcli.core.command import Parameter
+        from pyqi.core.command import Parameter
         p = Parameter(Type='a',Help='b',Name='c',Required=False)
         obj = CLOption.fromParameter(p, LongName='d',CLType=str)
         self.assertEqual(obj.Type,'a')

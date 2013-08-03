@@ -1,0 +1,84 @@
+#!/usr/bin/env python
+
+__author__ = "Daniel McDonald"
+__copyright__ = "Copyright 2013, The QIIME Project"
+__credits__ = ["Greg Caporaso", "Daniel McDonald", "Doug Wendel",
+               "Jai Ram Rideout"]
+__license__ = "GPL"
+__version__ = "0.1.0-dev"
+__maintainer__ = "Daniel McDonald"
+__email__ = "mcdonadt@colorado.edu"
+
+from sys import argv, exit, stderr
+from pyqi.interface.cli import clmain, cli
+import pyqi.qiime_backports.qiime.cli as qiime_cli
+import importlib
+
+CLI_CFG_BASE = 'pyqi.qiime_backports.qiime.cli'
+def usage():
+    """Modeled after git..."""
+    print "usage: qiime <command> [<args>]"
+    print
+    print "The currently available commands are:"
+    
+    for c in sorted(qiime_cli.__all__):
+        cmd_cfg = get_cmd_cfg(c)
+        desc = cmd_cfg.CommandConstructor.BriefDescription
+        if len(desc) > 70:
+            print ''.join(['   ', c, '\t', desc[:70], '...'])
+        else:
+            print ''.join(['   ', c, '\t', desc])
+
+    print
+    print "See 'qiime help <command>' for more information on a specific command."
+    exit(0)
+
+def unknown_command(cmd):
+    stderr.write("Unknown QIIME command: %s\n" % cmd)
+    exit(1)
+
+def cmd_exists(cmd):
+    if cmd in qiime_cli.__all_lookup__:
+        return True
+    else:
+        return False
+
+def get_cmd_cfg(cmd):
+    try:
+        cmd_cfg = importlib.import_module('.'.join([CLI_CFG_BASE, cmd]))
+    except ImportError, e:
+        stderr.write("Unable to import the command configuration.\n")
+        exit(1)
+    return cmd_cfg
+
+def get_cmd_obj(cmd):
+    cmd_cfg = get_cmd_cfg(cmd)
+    return cli(cmd_cfg.CommandConstructor, cmd_cfg.usage_examples,
+               cmd_cfg.param_conversions, cmd_cfg.additional_options,
+               cmd_cfg.output_map)
+
+def qiime_help(cmd):
+    cmd_obj = get_cmd_obj(cmd)
+    clmain(cmd_obj, ['help','-h'])
+
+if __name__ == '__main__':
+    if len(argv) == 1:
+        usage()
+    else:
+        qiime_cmd = argv[1]
+
+    if qiime_cmd in ['help','HELP','-?','-h']:
+        if not len(argv) > 2:
+            usage()
+        qiime_help_cmd = argv[2]    
+        if cmd_exists(qiime_help_cmd):
+            qiime_help(qiime_help_cmd)
+        else:
+            unknown_command(qiime_help_cmd)
+
+    if not cmd_exists(qiime_cmd):
+        unknown_command(qiime_cmd)
+
+    cmd_obj = get_cmd_obj(qiime_cmd)
+    
+    clmain(cmd_obj, argv[1:])

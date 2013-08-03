@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# qcli documentation build configuration file, created by
+# pyqi documentation build configuration file, created by
 # sphinx-quickstart on Mon Jun 17 14:01:20 2013.
 #
 # This file is execfile()d with the current directory set to its containing dir.
@@ -40,7 +40,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'qcli'
+project = u'pyqi'
 copyright = u'2013, The BiPy Development Team'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -103,10 +103,10 @@ html_theme = 'haiku'
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".
-html_title = "qcli: QIIME's Command Line Interface framework"
+html_title = "pyqi: expose your interface"
 
 # A shorter title for the navigation bar.  Default is the same as html_title.
-html_short_title = "qcli: Qiime's Command Line Interface framework"
+html_short_title = "pyqi: expose your interface"
 
 # The name of an image file (relative to this directory) to place at the top
 # of the sidebar.
@@ -164,7 +164,7 @@ html_show_sourcelink = False
 #html_file_suffix = None
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'qclidoc'
+htmlhelp_basename = 'pyqidoc'
 
 
 # -- Options for LaTeX output --------------------------------------------------
@@ -183,7 +183,7 @@ latex_elements = {
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'qcli.tex', u'qcli Documentation',
+  ('index', 'pyqi.tex', u'pyqi Documentation',
    u'The BiPy Development Team', 'manual'),
 ]
 
@@ -213,7 +213,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'qcli', u'qcli Documentation',
+    ('index', 'pyqi', u'pyqi Documentation',
      [u'The BiPy Development Team'], 1)
 ]
 
@@ -227,8 +227,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  ('index', 'qcli', u'qcli Documentation',
-   u'The BiPy Development Team', 'qcli', 'One line description of project.',
+  ('index', 'pyqi', u'pyqi Documentation',
+   u'The BiPy Development Team', 'pyqi', 'One line description of project.',
    'Miscellaneous'),
 ]
 
