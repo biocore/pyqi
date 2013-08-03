@@ -58,5 +58,8 @@ class MakeCLI(Command):
                           Help='An existing Command'),
                 Parameter(Name='mod',Required=True,Type=str,
                           Help='the command source module')]
+    
+    def _get_output_labels(self):
+        return ['result']
 
 CommandConstructor = MakeCLI

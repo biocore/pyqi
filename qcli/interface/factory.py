@@ -9,7 +9,7 @@
 #-----------------------------------------------------------------------------
 
 def general_factory(command_constructor, usage_examples, param_conversions, 
-            added_options, interface=None):
+            added_options, output_map, interface=None):
     """Generalized interface factory"""
     class IObject(interface):
         """Dynamic interface object"""
@@ -20,4 +20,7 @@ def general_factory(command_constructor, usage_examples, param_conversions,
             return added_options
         def _get_usage_examples(self):
             return usage_examples
+        def _get_output_map(self):
+            return output_map
+
     return IObject

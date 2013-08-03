@@ -1,16 +1,23 @@
 #!/usr/bin/env python
 
-from qcli.interface.cli import CLOption, UsageExample, ParameterConversion
+from qcli.interface.cli import CLOption, UsageExample, ParameterConversion, \
+    OutputHandler
 from qcli.qcli_command.make_cli import CommandConstructor
+from qcli.interface.input_handler.cli import command_handler
+from qcli.interface.output_handler.cli import write_string
+import os
 
-def command_handler(x):
-    module, klass = x.rsplit('.',1)
-    mod = __import__(module, fromlist=[klass])
-    return getattr(mod, klass)()
+
+def write_string(result_key, data, path):
+    if os.path.exists(path):
+        raise IOError("Output path %s already exists!" % path)
+    f = open(path, 'w')
+    f.write(data)
+    f.close()
 
 usage_examples = [UsageExample(ShortDesc='Stub out a CLI configuration',
                                LongDesc="""Consume an existing Command object and produce the base CLI configuration""",
-                               Ex="%prog -c MakeCLI -m qcli.qcli_command -o make_cli.py")
+                               Ex="%prog -c qcli.qcli_command.make_cli.MakeCLI -m qcli.qcli_command -o make_cli.py")
     ]
 
 param_conversions = {
@@ -30,6 +37,8 @@ additional_options = [
                  Required=True,
                  LongName='output-fp',
                  CLType='new_filepath',
-                 ShortName='o',
-                 ResultName='result')
+                 ShortName='o')
     ]
+
+output_map = {'result':OutputHandler(OptionName='output_fp',
+                                     Function=write_string)}
