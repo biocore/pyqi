@@ -67,12 +67,6 @@ class CLOption(Parameter):
                                       Required=Required,Default=Default,
                                       DefaultDescription=DefaultDescription)
         
-        if LongName != self.Name:
-            self.DepWarn = "parameter %s will be renamed %s in QIIME 2.0.0" % \
-                                                    (self.LongName, self.Name)
-        else:
-            self.DepWarn = ""
-
     def __str__(self):
         return '-%s/--%s' % (self.ShortName, self.LongName)
         
