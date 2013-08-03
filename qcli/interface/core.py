@@ -49,7 +49,7 @@ class Interface(object):
         raise NotImplementedError("All subclasses must implement "
                                   "_the_in_validator.")
 
-    def _option_factory(self):
+    def _option_factory(self, parameter):
         raise NotImplementedError("All subclasses must implement "
                                   "_option_factory.")
 
