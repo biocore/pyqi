@@ -72,7 +72,37 @@ class CLOption(Parameter):
             return '--%s' % self.LongName
         else:
             return '-%s/--%s' % (self.ShortName, self.LongName)
-        
+
+    def getOptparseOption(self):
+        if self.Required:
+            # If the option doesn't already end with [REQUIRED], add it.
+            help_text = self.Help
+            if not help_text.strip().endswith('[REQUIRED]'):
+                help_text += ' [REQUIRED]'
+
+            if self.ShortName is None:
+                option = make_option('--' + self.LongName, type=self.CLType,
+                                     help=help_text)
+            else:
+                option = make_option('-' + self.ShortName,
+                                     '--' + self.LongName, type=self.CLType,
+                                     help=help_text)
+        else:
+            if self.DefaultDescription is None:
+                help_text = '%s [default: %default]' % self.Help
+            else:
+                help_text = '%s [default: %s]' % (self.Help,
+                                                  self.DefaultDescription)
+
+            if self.ShortName is None:
+                option = make_option('--' + self.LongName, type=self.CLType,
+                                     help=help_text, default=self.Default)
+            else:
+                option = make_option('-' + self.ShortName,
+                                     '--' + self.LongName, type=self.CLType,
+                                     help=help_text, default=self.Default)
+        return option
+
     @classmethod
     def fromParameter(cls, parameter, LongName, CLType, CLAction='store',
                       ShortName=None):
@@ -178,12 +208,6 @@ class CLInterface(Interface):
 
     def _input_handler(self, in_, *args, **kwargs):
         """Parses command-line input."""
-        # command_line_text will usually be nothing, but can be passed for
-        # testing purposes
-
-        # Do we need this? Was used for testing
-        #command_line_args = set_parameter('command_line_args',kwargs,None)
-
         required_opts = [opt for opt in self.Options if opt.Required]
         optional_opts = [opt for opt in self.Options if not opt.Required]
 
@@ -194,61 +218,31 @@ class CLInterface(Interface):
         # Instantiate the command line parser object
         parser = OptionParser(usage=usage, version=version)
 
-        # What does this do?
-        #parser.exit = set_parameter('exit_func',kwargs,parser.exit)
-
         # If no arguments were provided, print the help string (unless the
-        # caller specified not to)
-
-        # Need to figure out what to do with command_line_args
-        #if self.HelpOnNoArguments and (not command_line_args) and len(argv) == 1:
+        # caller specified not to).
         if self.HelpOnNoArguments and len(in_) == 0:
             parser.print_usage()
             return parser.exit(-1)
 
-        # Process the required options
         if required_opts:
-            # Define an option group so all required options are
-            # grouped together, and under a common header
+            # Define an option group so all required options are grouped
+            # together and under a common header.
             required = OptionGroup(parser, "REQUIRED options",
                                    "The following options must be provided "
                                    "under all circumstances.")
             for ro in required_opts:
-                # if the option doesn't already end with [REQUIRED], add it.
-                if not ro.Help.strip().endswith('[REQUIRED]'):
-                    ro.Help += ' [REQUIRED]'
-                if ro.ShortName is None:
-                    option = make_option('--' + ro.LongName,
-                                         type=ro.CLType, help=ro.Help)
-                else:
-                    option = make_option('-' + ro.ShortName, '--' + ro.LongName,
-                                         type=ro.CLType, help=ro.Help)
-                required.add_option(option)
+                required.add_option(ro.getOptparseOption())
             parser.add_option_group(required)
-        
-        # Add the optional options
-        for oo in optional_opts:
-            help_text = '%s [default: %s]' % (oo.Help, oo.DefaultDescription)
-            if oo.ShortName is None:
-                option = make_option('--' + oo.LongName,
-                     type=oo.CLType, help=help_text,
-                     default=oo.Default)
-            else:
-                option = make_option('-' + oo.ShortName, '--' + oo.LongName,
-                                     type=oo.CLType, help=help_text,
-                                     default=oo.Default)
-            parser.add_option(option)
 
-        # Parse the command line
-        # command_line_text will None except in test cases, in which 
-        # case sys.argv[1:] will be parsed
+        # Add the optional options.
+        for oo in optional_opts:
+            parser.add_option(oo.getOptparseOption())
 
         #####
         # THIS IS THE NATURAL BREAKING POINT FOR THIS FUNCTIONALITY
         #####
 
-        # Need to figure out what to do with command_line_args
-        #opts,args = parser.parse_args(command_line_args)
+        # Parse our input.
         opts, args = parser.parse_args(in_)
 
         # If positional arguments are not allowed, and any were provided, raise
@@ -263,13 +257,9 @@ class CLInterface(Interface):
             required_option_ids = [o.dest for o in required.option_list]
             for required_option_id in required_option_ids:
                 if getattr(opts,required_option_id) == None:
-                    return parser.error('Required option --%s omitted.' %
-                                        required_option_id)
+                    parser.error('Required option --%s omitted.' %
+                                 required_option_id)
 
-        # Return the parser, the options, and the arguments. The parser is returned
-        # so users have access to any additional functionality they may want at 
-        # this stage -- most commonly, it will be used for doing custom tests of 
-        # parameter values.
         beloved_functionality = opts.__dict__
         self.BelovedFunctionality = beloved_functionality
         for k, v in self.ParameterConversionInfo.items():
@@ -292,9 +282,11 @@ class CLInterface(Interface):
             short_description = usage_example.ShortDesc.strip(':').strip()
             long_description = usage_example.LongDesc.strip(':').strip()
             example = usage_example.Ex.strip()
+
             if short_description:
                 formatted_usage_examples.append('%s: %s\n %s' % 
-                                                (short_description,long_description,example))
+                                                (short_description,
+                                                 long_description, example))
             else:
                 formatted_usage_examples.append('%s\n %s' %
                                                 (long_description,example))
@@ -327,20 +319,6 @@ class CLInterface(Interface):
             else:
                 opt_value = self.BelovedFunctionality[handler.OptionName]
                 handler.Function(k, results[k], opt_value)
-
-    def getOutputFilepaths(results, **kwargs):
-        mapping = {}
-
-        for k,v in results.items():
-            if isinstance(v, FilePath):
-                output_fp = str(v)
-            else:
-                # figure out filepath
-                pass
-
-            mapping[k] = output_fp
-
-        return mapping
 
 def cli(command_constructor, usage_examples, param_conversions, added_options,
         output_map):
