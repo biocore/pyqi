@@ -1,5 +1,11 @@
 #!/usr/bin/env python
 
+"""Command line interface input handlers
+
+All input handlers must conform to the following function definittion
+
+function(option_value)
+"""
 #-----------------------------------------------------------------------------
 # Copyright (c) 2013, The BiPy Development Team.
 #
@@ -18,8 +24,8 @@ __maintainer__ = "Daniel McDonald"
 __email__ = "mcdonadt@colorado.edu"
 __status__ = "Development"
 
-def command_handler(python_object_path):
+def command_handler(option_value):
     """Dynamically load a Python object from a module and return an instance"""
-    module, klass = python_object_path.rsplit('.',1)
+    module, klass = value.rsplit('.',1)
     mod = __import__(module, fromlist=[klass])
     return getattr(mod, klass)()
