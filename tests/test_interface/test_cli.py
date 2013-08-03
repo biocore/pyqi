@@ -19,8 +19,9 @@ __email__ = "mcdonadt@colorado.edu"
 
 from unittest import TestCase, main
 from qcli.interface.cli import OutputHandler, CLOption, UsageExample, \
-        ParameterConversion
+        ParameterConversion, CLInterface
 from qcli.core.exception import IncompetentDeveloperError
+from qcli.core.command import Command, Parameter
 
 class OutputHandlerTests(TestCase):
     def test_init(self):
@@ -76,6 +77,29 @@ class ParameterConversionTests(TestCase):
 
         self.assertRaises(IncompetentDeveloperError, ParameterConversion, 'a',
                           'not valid')
+
+class CLInterfaceTests(TestCase):
+    def setUp(self):
+        class ghetto(Command):
+            def _get_parameters(self):
+                return [Parameter('a','b','c')]
+            def run(self, **kwargs):
+                return {}
+        
+        class fabulous(CLInterface):
+            CommandConstructor = ghetto
+            def _get_param_conv_info(self):
+                return {'c':ParameterConversion('a',str)}
+            def _get_usage_examples(self):
+                return [UsageExample('a','b','c')]
+            def _get_additional_options(self):
+                return []
+            def _get_output_map(self):
+                return {}
+        self.interface = fabulous()
+    
+    def test_init(self):
+        self.assertRaises(NotImplementedError, CLInterface)
 
 if __name__ == '__main__':
     main()
