@@ -39,9 +39,13 @@ script_fmt = """_%(driver)s_complete()
   cur=${COMP_WORDS[COMP_CWORD]}
   prev=${COMP_WORDS[COMP_CWORD-1]}
 
+  if [ $COMP_CWORD -gt 1 ]; then
+    prev=${COMP_WORDS[1]}
+  fi  
+
   if [ $COMP_CWORD -eq 1 ]; then
     COMPREPLY=( $(compgen -W "%(command_list)s" -- $cur) )
-  elif [ $COMP_CWORD -eq 2 ]; then
+  elif [ $COMP_CWORD -gt 1 ]; then
     case "$prev" in
       %(commands)s
       *)
