@@ -88,8 +88,11 @@ class CLOption(Parameter):
                                      '--' + self.LongName, type=self.CLType,
                                      help=help_text)
         else:
-            help_text = '%s [default: %s]' % (self.Help,
-                                              self.DefaultDescription)
+            if self.DefaultDescription is None:
+                help_text = '%s [default: %default]' % self.Help
+            else:
+                help_text = '%s [default: %s]' % (self.Help,
+                                                  self.DefaultDescription)
 
             if self.ShortName is None:
                 option = make_option('--' + self.LongName, type=self.CLType,
@@ -234,6 +237,10 @@ class CLInterface(Interface):
         # Add the optional options.
         for oo in optional_opts:
             parser.add_option(oo.getOptparseOption())
+
+        #####
+        # THIS IS THE NATURAL BREAKING POINT FOR THIS FUNCTIONALITY
+        #####
 
         # Parse our input.
         opts, args = parser.parse_args(in_)
