@@ -12,6 +12,7 @@ __email__ = "jai.rideout@gmail.com"
 import cgi
 import importlib
 from qcli.interface.cli import cli
+from sys import stderr
 
 CLI_CFG_BASE = 'qcli.qiime_backports.qiime.cli'
 
@@ -25,8 +26,9 @@ def get_cmd_cfg(cmd):
 
 def get_cmd_obj(cmd):
     cmd_cfg = get_cmd_cfg(cmd)
-    return cli(cmd_cfg.CommandConstructor, cmd_cfg.usage_examples, 
-                  cmd_cfg.param_conversions, cmd_cfg.additional_options)
+    return cli(cmd_cfg.CommandConstructor, cmd_cfg.usage_examples,
+               cmd_cfg.param_conversions, cmd_cfg.additional_options,
+               cmd_cfg.output_map)
 
 def format_page_header():
     return """Content-type: text/html
