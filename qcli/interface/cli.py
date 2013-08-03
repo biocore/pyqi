@@ -89,7 +89,7 @@ class CLOption(Parameter):
                                      help=help_text)
         else:
             if self.DefaultDescription is None:
-                help_text = '%s [default: %default]' % self.Help
+                help_text = '%s [default: %%default]' % self.Help
             else:
                 help_text = '%s [default: %s]' % (self.Help,
                                                   self.DefaultDescription)
