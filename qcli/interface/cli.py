@@ -31,7 +31,7 @@ CLActions = set(['store','store_true','store_false', 'append'])
 
 def new_filepath(data, path):
     if os.path.exists(path):
-        raise IOError("Output path %s already exists!" % path)
+        raise IOError("Output path %s already exists." % path)
     f = open(path, 'w')
     f.write(data)
     f.close()
@@ -56,14 +56,14 @@ class CLOption(Parameter):
                                       DefaultDescription=DefaultDescription)
         
         if LongName != self.Name:
-            self.DepWarn = "parameter %s will be renamed %s in QIIME 2.0.0" % \
-                                                    (self.LongName, self.Name)
+            self.DepWarn = ("Option '%s' will be renamed '%s' in QIIME 2.0.0" %
+                            (self.LongName, self.Name))
         else:
             self.DepWarn = ""
 
     def __str__(self):
         return '-%s/--%s' % (self.ShortName, self.LongName)
-        
+
     @classmethod
     def fromParameter(cls, parameter, LongName, CLType, CLAction='store',
                       ShortName=None):
@@ -81,15 +81,8 @@ class CLOption(Parameter):
         return result
 
 class UsageExample(object):
-    """Provide validation and structure to a usage example"""
-    def __init__(self, ShortDesc=None, LongDesc=None, Ex=None):
-        if ShortDesc is None:
-            raise IncompetentDeveloperError("No short description provided!")
-        if LongDesc is None:
-            raise IncompetentDeveloperError("No long description provided!")
-        if Ex is None:
-            raise IncompetentDeveloperError("No example provided!")
-
+    """Provide structure to a usage example"""
+    def __init__(self, ShortDesc, LongDesc, Ex):
         self.ShortDesc = ShortDesc
         self.LongDesc = LongDesc
         self.Ex = Ex
