@@ -54,5 +54,5 @@ additional_options = [
                  ResultName='result')
         ]
 
-output_map = {'result':OutputHandler(OptionName='result',
+output_map = {'result':OutputHandler(OptionName='output_fp',
                                      Function=write_string)}

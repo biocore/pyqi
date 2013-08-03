@@ -26,6 +26,6 @@ __status__ = "Development"
 
 def command_handler(option_value):
     """Dynamically load a Python object from a module and return an instance"""
-    module, klass = value.rsplit('.',1)
+    module, klass = option_value.rsplit('.',1)
     mod = __import__(module, fromlist=[klass])
     return getattr(mod, klass)()
