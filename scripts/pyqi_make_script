@@ -9,7 +9,7 @@
 #-----------------------------------------------------------------------------
 
 """
-This is a script which will add headers and footers to new qcli scripts
+This is a script which will add headers and footers to new pyqi scripts
 and make them executable. 
 """
 
@@ -26,16 +26,16 @@ from os import popen
 from os.path import exists
 from time import strftime
 from optparse import OptionParser
-from qcli import (parse_command_line_parameters, 
+from pyqi import (parse_command_line_parameters, 
                         make_option)
 
 script_info={}
-script_info['brief_description']="""Create a template qcli script.""" 
-script_info['script_description']="""This script will create a template qcli script and make it executable.""" 
+script_info['brief_description']="""Create a template pyqi script.""" 
+script_info['script_description']="""This script will create a template pyqi script and make it executable.""" 
 script_info['script_usage']=[] 
 script_info['script_usage'].append(("""Example usage""","""Create a new script""","""%prog -a "Greg Caporaso" -e gregcaporaso@gmail.com -o my_script.py"""))  
 script_info['script_usage_output_to_remove'] = ['my_script.py']
-script_info['output_description']="""The result of this script is a qcli template script."""
+script_info['output_description']="""The result of this script is a pyqi template script."""
 
 script_info['required_options']=[\
     make_option('-o','--output_fp',help="The output filepath.")
@@ -74,7 +74,7 @@ __email__ = "AUTHOR_EMAIL"
 """ % strftime('%d %b %Y')
 
     script_block = """
-from qcli import (parse_command_line_parameters, 
+from pyqi import (parse_command_line_parameters, 
                   make_option)
 
 script_info = {}

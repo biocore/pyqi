@@ -18,10 +18,10 @@ __maintainer__ = "Daniel McDonald"
 __email__ = "mcdonadt@colorado.edu"
 
 from sys import argv, exit, stderr
-from qcli.interface.cli import clmain, cli
-import qcli.qcli_command.cli as cli_cfg
+from pyqi.interface.cli import clmain, cli
+import pyqi.pyqi_command.cli as cli_cfg
 import importlib
-CFG_BASE = 'qcli.qcli_command.cli'
+CFG_BASE = 'pyqi.pyqi_command.cli'
 
 def usage(opts):
     """Modeled after git..."""
