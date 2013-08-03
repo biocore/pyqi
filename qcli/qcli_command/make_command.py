@@ -24,7 +24,7 @@ from qcli.core.command import Command, Parameter
 header = """#!/usr/bin/env python
 
 from __future__ import division
-from qcli.command.core import Command, Parameter
+from qcli.core.command import Command, Parameter
 
 __author__ = "%(author)s"
 __copyright__ = "%(copyright)s"
@@ -33,7 +33,6 @@ __license__ = "%(license)s"
 __version__ = "%(func_version)s"
 __maintainer__ = "%(author)s"
 __email__ = "%(email)s"
-__status__ = "Development"
 
 """
 
