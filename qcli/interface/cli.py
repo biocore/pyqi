@@ -67,14 +67,11 @@ class CLOption(Parameter):
                                       Required=Required,Default=Default,
                                       DefaultDescription=DefaultDescription)
         
-        if LongName != self.Name:
-            self.DepWarn = ("Option '%s' will be renamed '%s' in QIIME 2.0.0" %
-                            (self.LongName, self.Name))
-        else:
-            self.DepWarn = ""
-
     def __str__(self):
-        return '-%s/--%s' % (self.ShortName, self.LongName)
+        if self.ShortName is None:
+            return '--%s' % self.LongName
+        else:
+            return '-%s/--%s' % (self.ShortName, self.LongName)
 
     def getOptparseOption(self):
         if self.Required:
@@ -126,10 +123,6 @@ class UsageExample(object):
         self.LongDesc = LongDesc
         self.Ex = Ex
 
-    def to_tuple(self):
-        """Returns (short, long, ex)"""
-        return (self.ShortDesc, self.LongDesc, self.Ex)
-
 class ParameterConversion(object):
     """Validation and structure for converting from a parameter to an option"""
     def __init__(self, LongName, CLType, CLAction=None, InHandler=None, 
@@ -169,7 +162,7 @@ class CLInterface(Interface):
                 }
 
         self.ParameterConversionInfo.update(self._get_param_conv_info())
-
+       
         super(CLInterface, self).__init__(**kwargs)
 
         self.Options.extend(self._get_additional_options())
