@@ -27,7 +27,7 @@ def usage(opts):
     """Modeled after git..."""
     print "usage: %s <command> [<args>]" % argv[0]
     print
-    print "The current available commands are:"
+    print "The currently available commands are:"
     
     for c in sorted(cli_cfg.__all__):
         cmd_cfg = get_cmd_cfg(c, opts)
@@ -55,7 +55,7 @@ def get_cmd_cfg(cmd, opts):
     try:
         cmd_cfg = importlib.import_module('.'.join([CFG_BASE, cmd]))
     except ImportError, e:
-        stderr.write("Unable to import the command configuration for %s!\n" % cmd)
+        stderr.write("Unable to import the command configuration for %s.\n" % cmd)
         if opts['--verbose']:
             stderr.write(str(e))
             stderr.write('\n')

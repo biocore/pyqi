@@ -16,10 +16,9 @@ __copyright__ = "Copyright 2013, the QCLI project"
 __credits__ = ["Daniel McDonald", "Jai Ram Rideout", "Greg Caporaso",
                "Doug Wendel"]
 __license__ = "BSD"
-__version__ = "0.1"
+__version__ = "0.1.0-dev"
 __maintainer__ = "Daniel McDonald"
 __email__ = "mcdonadt@colorado.edu"
-__status__ = "Development"
 
 header = """#!/usr/bin/env python
 

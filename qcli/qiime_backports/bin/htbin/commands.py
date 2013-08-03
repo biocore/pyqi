@@ -1,8 +1,19 @@
 #!/usr/bin/env python
 
+__author__ = "Jai Ram Rideout"
+__copyright__ = "Copyright 2013, The QIIME Project"
+__credits__ = ["Greg Caporaso", "Daniel McDonald", "Doug Wendel",
+               "Jai Ram Rideout"]
+__license__ = "GPL"
+__version__ = "0.1.0-dev"
+__maintainer__ = "Jai Ram Rideout"
+__email__ = "jai.rideout@gmail.com"
+
 from qcli.interface.cli import clmain, cli
 import qcli.qiime_backports.qiime.cli as qiime_cli
-from qcli.qiime_backports.bin.htbin.util import get_cmd_cfg, format_page_header, format_page_footer
+from qcli.qiime_backports.bin.htbin.util import (get_cmd_cfg,
+                                                 format_page_header,
+                                                 format_page_footer)
 
 print format_page_header()
 print "<p>I know about these QIIME commands:</p>"

@@ -1,7 +1,16 @@
 #!/usr/bin/env python
+
+__author__ = "Jai Ram Rideout"
+__copyright__ = "Copyright 2013, The QIIME Project"
+__credits__ = ["Greg Caporaso", "Daniel McDonald", "Doug Wendel",
+               "Jai Ram Rideout"]
+__license__ = "GPL"
+__version__ = "0.1.0-dev"
+__maintainer__ = "Jai Ram Rideout"
+__email__ = "jai.rideout@gmail.com"
+
 import cgi
 import importlib
-
 from qcli.interface.cli import cli
 
 CLI_CFG_BASE = 'qcli.qiime_backports.qiime.cli'
@@ -10,7 +19,7 @@ def get_cmd_cfg(cmd):
     try:
         cmd_cfg = importlib.import_module('.'.join([CLI_CFG_BASE, cmd]))
     except ImportError, e:
-        stderr.write("Unable to import the command configuration!\n")
+        stderr.write("Unable to import the command configuration.\n")
         exit(1)
     return cmd_cfg
 

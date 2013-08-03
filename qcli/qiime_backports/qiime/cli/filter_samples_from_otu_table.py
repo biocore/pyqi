@@ -1,4 +1,14 @@
 #!/usr/bin/env python
+
+__author__ = "Greg Caporaso"
+__copyright__ = "Copyright 2013, The QIIME Project"
+__credits__ = ["Greg Caporaso", "Daniel McDonald", "Doug Wendel",
+               "Jai Ram Rideout"]
+__license__ = "GPL"
+__version__ = "0.1.0-dev"
+__maintainer__ = "Greg Caporaso"
+__email__ = "gregcaporaso@gmail.com"
+
 from qcli.interface.cli import CLOption, UsageExample, ParameterConversion
 from qcli.qiime_backports.command.filter_samples_from_otu_table import FilterSamplesFromOTUTable as \
         CommandConstructor

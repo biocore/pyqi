@@ -28,7 +28,6 @@ __license__ = "BSD"
 __version__ = "0.1-dev"
 __maintainer__ = "Daniel McDonald"
 __email__ = "mcdonadt@colorado.edu"
-__status__ = "Development"
 
 from qcli.core.exception import IncompetentDeveloperError
 import os
@@ -36,10 +35,11 @@ import os
 def write_string(result_key, data, option_value=None):
     """Write a string to a file"""
     if option_value is None:
-        raise IncompetentDeveloperError("Cannot write without a path!")
+        raise IncompetentDeveloperError("Cannot write output without a "
+                                        "filepath.")
 
     if os.path.exists(option_value):
-        raise IOError("Output path %s already exists!" % option_value)
+        raise IOError("Output path '%s' already exists." % option_value)
     f = open(option_value, 'w')
     f.write(data)
     f.close()

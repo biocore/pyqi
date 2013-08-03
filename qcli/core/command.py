@@ -38,7 +38,9 @@ class Parameter(object):
         self.DefaultDescription = DefaultDescription
 
         if self.Required and self.Default is not None:
-            raise IncompetentDeveloperError("Required parameters cannot have defaults.")
+            raise IncompetentDeveloperError("Found required parameter '%s' "
+                    "with default value '%s'. Required parameters cannot have "
+                    "default values." % (self.Name, self.Default))
 
 class Command(object):
     """Base class for ``Command``
@@ -46,7 +48,6 @@ class Command(object):
     A ``Command`` is interface agnostic, knows how to run itself and knows 
     about the arguments that it can take (via ``Parameters``).
     """
-    _logger = None
     BriefDescription = "" # 1 sentence description
     LongDescription = """""" # longer, more detailed description
 
@@ -65,16 +66,18 @@ class Command(object):
         try:
             result = self.run(**kwargs)
         except Exception, e:
-            self._logger.fatal('Shit went down: %s' % self_str)
+            self._logger.fatal('Error executing command: %s' % self_str)
             raise e
         else:
             self._logger.info('Completed command: %s' % self_str)
-      
+
         # verify the result type
         if not isinstance(result, dict):
-            self._logger.fatal('Shit went wrong: %s' % self_str)
-            raise InvalidReturnTypeError("Unexpected return type!")
-
+            self._logger.fatal('Unsupported result return type for command: '
+                               '%s' % self_str)
+            raise InvalidReturnTypeError("Unsupported result return type. "
+                                         "Results must be stored in a "
+                                         "dictionary.")
         return result
 
     def run(self, **kwargs):
@@ -87,11 +90,13 @@ class Command(object):
 
     def _get_default_parameters(self):
         return [Parameter(Type=bool,
-                          Help='Print information during execution -- useful for debugging',
+                          Help='Print information during execution -- useful '
+                               'for debugging',
                           Name='verbose',
                           Required=False,
                           Default=False)]
 
     def _get_parameters(self):
         """Return a list of Parameters for the Command"""
-        raise NotImplementedError("All subclasses must implement _get_parameters")
+        raise NotImplementedError("All subclasses must implement "
+                                  "_get_parameters.")
