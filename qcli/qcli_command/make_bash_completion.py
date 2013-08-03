@@ -55,7 +55,7 @@ script_fmt = """_%(driver)s_complete()
 
   return 0
 } &&
-complete -F _%(driver)s_complete %(driver)s
+complete -F _%(driver)s_complete -f %(driver)s
 """
 
 command_fmt = """       "%(command)s")
