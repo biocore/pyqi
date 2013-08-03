@@ -93,4 +93,5 @@ class Command(object):
                           Default=False)]
 
     def _get_parameters(self):
+        """Return a list of Parameters for the Command"""
         raise NotImplementedError("All subclasses must implement _get_parameters")
