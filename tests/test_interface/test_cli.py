@@ -18,7 +18,8 @@ __maintainer__ = "Daniel McDonald"
 __email__ = "mcdonadt@colorado.edu"
 
 from unittest import TestCase, main
-from qcli.interface.cli import OutputHandler, CLOption
+from qcli.interface.cli import OutputHandler, CLOption, UsageExample
+from qcli.core.exception import IncompetentDeveloperError
 
 class OutputHandlerTests(TestCase):
     def test_init(self):
@@ -56,5 +57,13 @@ class CLOptionTests(TestCase):
         self.assertEqual(obj.Name,'c')
         self.assertEqual(obj.Required,False)
 
+class UsageExampleTests(TestCase):
+    def test_init(self):
+        obj = UsageExample(ShortDesc='a', LongDesc='b', Ex='c')
+        self.assertEqual(obj.ShortDesc, 'a')
+        self.assertEqual(obj.LongDesc, 'b')
+        self.assertEqual(obj.Ex, 'c')
+
+        self.assertRaises(IncompetentDeveloperError, UsageExample, 'a', 'b')
 if __name__ == '__main__':
     main()
