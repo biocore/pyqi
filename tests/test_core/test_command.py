@@ -23,7 +23,8 @@ from qcli.core.command import Parameter, Command
 from qcli.core.exception import IncompetentDeveloperError
 
 class CommandTests(TestCase):
-    pass
+    def test_init(self):
+        self.assertRaises(NotImplementedError, Command)
 
 class ParameterTests(TestCase):
     def test_init(self):
