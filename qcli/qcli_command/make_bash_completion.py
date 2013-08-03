@@ -1,12 +1,20 @@
 #!/usr/bin/env python
 
+#-----------------------------------------------------------------------------
+# Copyright (c) 2013, The BiPy Development Team.
+#
+# Distributed under the terms of the Modified BSD License.
+#
+# The full license is in the file COPYING.txt, distributed with this software.
+#-----------------------------------------------------------------------------
+
 from __future__ import division
 from qcli.core.command import Command, Parameter
 
 __author__ = "Daniel McDonald"
 __copyright__ = "Copyright 2013, The QCLI Project"
 __credits__ = ["Daniel McDonald", "Jai Ram Rideout", "Doug Wendel", "Greg Caporaso"]
-__license__ = "BSB"
+__license__ = "BSD"
 __version__ = "0.1.0-dev"
 __maintainer__ = "Daniel McDonald"
 __email__ = "mcdonadt@colorado.edu"
