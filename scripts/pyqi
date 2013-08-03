@@ -19,9 +19,24 @@ __email__ = "mcdonadt@colorado.edu"
 
 from sys import argv, exit, stderr
 from pyqi.interface.cli import clmain, cli
-import pyqi.pyqi_command.cli as cli_cfg
 import importlib
-CFG_BASE = 'pyqi.pyqi_command.cli'
+from os.path import basename, expanduser
+from ConfigParser import SafeConfigParser
+
+argv[0] = basename(argv[0])
+c = SafeConfigParser()
+try:
+    c.readfp(open(expanduser('~/.pyqi/%s' % argv[0])))
+except IOError:
+    CFG_BASE = 'pyqi.pyqi_command.cli'
+else:
+    CFG_BASE = c.get('driver', 'cfg_base')
+
+try:
+    cli_cfg = importlib.import_module(CFG_BASE)
+except ImportError:
+    stderr.write("Unable to read CFG_BASE: %s\n" % CFG_BASE)
+    exit(1)
 
 def usage(opts):
     """Modeled after git..."""
