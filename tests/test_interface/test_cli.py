@@ -18,7 +18,8 @@ __maintainer__ = "Daniel McDonald"
 __email__ = "mcdonadt@colorado.edu"
 
 from unittest import TestCase, main
-from qcli.interface.cli import OutputHandler, CLOption, UsageExample
+from qcli.interface.cli import OutputHandler, CLOption, UsageExample, \
+        ParameterConversion
 from qcli.core.exception import IncompetentDeveloperError
 
 class OutputHandlerTests(TestCase):
@@ -65,5 +66,16 @@ class UsageExampleTests(TestCase):
         self.assertEqual(obj.Ex, 'c')
 
         self.assertRaises(IncompetentDeveloperError, UsageExample, 'a', 'b')
+
+class ParameterConversionTests(TestCase):
+    def test_init(self):
+        obj = ParameterConversion('a',str,CLAction='store')
+        self.assertEqual(obj.LongName, 'a')
+        self.assertEqual(obj.CLType, str)
+        self.assertEqual(obj.CLAction, 'store')
+
+        self.assertRaises(IncompetentDeveloperError, ParameterConversion, 'a',
+                          'not valid')
+
 if __name__ == '__main__':
     main()
