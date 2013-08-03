@@ -17,10 +17,10 @@ __version__ = "0.1.0-dev"
 __maintainer__ = "Daniel McDonald"
 __email__ = "mcdonadt@colorado.edu"
 
-from qcli.interface.cli import CLOption, UsageExample, ParameterConversion, \
+from pyqi.interface.cli import CLOption, UsageExample, ParameterConversion, \
         OutputHandler
-from qcli.qcli_command.make_command import CommandConstructor
-from qcli.interface.output_handler.cli import write_string
+from pyqi.pyqi_command.make_command import CommandConstructor
+from pyqi.interface.output_handler.cli import write_string
 
 usage_examples = [
         UsageExample(ShortDesc="Basic function",

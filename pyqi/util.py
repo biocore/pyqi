@@ -10,7 +10,7 @@
 """ Utilities for parsing command line options and arguments
 
 This code was derived from QIIME (www.qiime.org), where it was initally
-developed. It has been ported to qcli to support accessing this functionality 
+developed. It has been ported to pyqi to support accessing this functionality 
 without those dependencies.
 
 """
@@ -26,7 +26,7 @@ __email__ = "gregcaporaso@gmail.com"
 from os import remove
 from subprocess import Popen, PIPE, STDOUT
 
-def qcli_system_call(cmd, shell=True):
+def pyqi_system_call(cmd, shell=True):
     """Call cmd and return (stdout, stderr, return_value).
 
     cmd can be either a string containing the command to be run, or a sequence

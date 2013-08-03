@@ -29,7 +29,7 @@ __version__ = "0.1-dev"
 __maintainer__ = "Daniel McDonald"
 __email__ = "mcdonadt@colorado.edu"
 
-from qcli.core.exception import IncompetentDeveloperError
+from pyqi.core.exception import IncompetentDeveloperError
 import os
 
 def write_string(result_key, data, option_value=None):

@@ -10,6 +10,6 @@ __maintainer__ = "Greg Caporaso"
 __email__ = "gregcaporaso@gmail.com"
 
 from sys import argv
-from qcli.qiime_backports.qiime.util import old_to_new_qiime_command
+from pyqi.qiime_backports.qiime.util import old_to_new_qiime_command
 
 old_to_new_qiime_command(argv)

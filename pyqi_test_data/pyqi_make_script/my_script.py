@@ -11,7 +11,7 @@ __maintainer__ = "Greg Caporaso"
 __email__ = "gregcaporaso@gmail.com"
 
 
-from qcli import (parse_command_line_parameters, 
+from pyqi import (parse_command_line_parameters, 
                   make_option)
 
 script_info = {}

@@ -9,7 +9,7 @@
 #-----------------------------------------------------------------------------
 
 from __future__ import division
-from qcli.core.command import Command, Parameter
+from pyqi.core.command import Command, Parameter
 
 __author__ = "Daniel McDonald"
 __copyright__ = "Copyright 2013, The QCLI Project"

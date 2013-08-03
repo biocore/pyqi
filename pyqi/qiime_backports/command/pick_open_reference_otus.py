@@ -22,7 +22,7 @@ from qiime.workflow.pick_open_reference_otus import (
                         pick_subsampled_open_reference_otus,
                         iterative_pick_subsampled_open_reference_otus)
 
-from qcli.core.command import Command, Parameter
+from pyqi.core.command import Command, Parameter
 
 class PickOpenReferenceOTUs(Command):
     BriefDescription = "Assign OTUs using an open-reference OTU picking protocol"

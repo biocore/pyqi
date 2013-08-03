@@ -8,9 +8,9 @@
 # The full license is in the file COPYING.txt, distributed with this software.
 #-----------------------------------------------------------------------------
 
-from qcli.interface.cli import CLOption, UsageExample, ParameterConversion, OutputHandler
-from qcli.qcli_command.make_bash_completion import CommandConstructor
-from qcli.interface.output_handler.cli import write_string
+from pyqi.interface.cli import CLOption, UsageExample, ParameterConversion, OutputHandler
+from pyqi.pyqi_command.make_bash_completion import CommandConstructor
+from pyqi.interface.output_handler.cli import write_string
 
 __author__ = "Daniel McDonald"
 __copyright__ = "Copyright 2013, The QCLI Project"
@@ -23,7 +23,7 @@ __email__ = "mcdonadt@colorado.edu"
 # How you can use the command from the command line
 usage_examples = [UsageExample(ShortDesc="Create a bash completion script",
                                LongDesc="Create a bash completion script for use with a QCLI driver",
-                               Ex="%prog --command_cfg_directory qcli.qcli_command.qcli --driver_name qcli -o ~/.bash_completion.d/qcli")
+                               Ex="%prog --command_cfg_directory pyqi.pyqi_command.pyqi --driver_name pyqi -o ~/.bash_completion.d/pyqi")
     ]
 
 # Parameter conversions tell the interface how to describe command line 

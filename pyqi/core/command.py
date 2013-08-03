@@ -18,8 +18,8 @@ __version__ = "0.1.0-dev"
 __maintainer__ = "Greg Caporaso"
 __email__ = "gregcaporaso@gmail.com"
 
-from qcli.core.log import NullLogger
-from qcli.core.exception import (IncompetentDeveloperError,
+from pyqi.core.log import NullLogger
+from pyqi.core.exception import (IncompetentDeveloperError,
                                  InvalidReturnTypeError)
 
 class Parameter(object):

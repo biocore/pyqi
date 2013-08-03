@@ -9,9 +9,9 @@ __version__ = "0.1.0-dev"
 __maintainer__ = "Jai Ram Rideout"
 __email__ = "jai.rideout@gmail.com"
 
-from qcli.interface.cli import clmain, cli
-import qcli.qiime_backports.qiime.cli as qiime_cli
-from qcli.qiime_backports.bin.htbin.util import (get_cmd_cfg,
+from pyqi.interface.cli import clmain, cli
+import pyqi.qiime_backports.qiime.cli as qiime_cli
+from pyqi.qiime_backports.bin.htbin.util import (get_cmd_cfg,
                                                  format_page_header,
                                                  format_page_footer)
 

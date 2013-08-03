@@ -11,10 +11,10 @@ __email__ = "jai.rideout@gmail.com"
 
 import cgi
 import importlib
-from qcli.interface.cli import cli
+from pyqi.interface.cli import cli
 from sys import stderr
 
-CLI_CFG_BASE = 'qcli.qiime_backports.qiime.cli'
+CLI_CFG_BASE = 'pyqi.qiime_backports.qiime.cli'
 
 def get_cmd_cfg(cmd):
     try:

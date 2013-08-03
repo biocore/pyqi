@@ -1,37 +1,37 @@
 .. _creating:
 
 ============================
-Creating a qcli-based script
+Creating a pyqi-based script
 ============================
 
-This document covers how to create a new qcli script, and all of the options that you have for customizing how your qcli script works.
+This document covers how to create a new pyqi script, and all of the options that you have for customizing how your pyqi script works.
 
-The primary object that defines a qcli script is the ``script_info`` dictionary. This is where all of the parameters and help text are defined, as well as various options you have for configuring how the script works. The easiest way to start a new qcli script is using the ``qcli_make_script`` script that is included with qcli. This document will start there, and then provide details on how to customize your script.
+The primary object that defines a pyqi script is the ``script_info`` dictionary. This is where all of the parameters and help text are defined, as well as various options you have for configuring how the script works. The easiest way to start a new pyqi script is using the ``pyqi_make_script`` script that is included with pyqi. This document will start there, and then provide details on how to customize your script.
 
-This page will help you develop your command line interfaces, but you should still familiarize yourself with Python's ``optparse`` module. qcli provides some convenient wrappers for ``optparse``, but will not be a replacement to a general understanding of how to interact with ``optparse`` (see the `optparse documentation <http://docs.python.org/library/optparse.html>`_). 
+This page will help you develop your command line interfaces, but you should still familiarize yourself with Python's ``optparse`` module. pyqi provides some convenient wrappers for ``optparse``, but will not be a replacement to a general understanding of how to interact with ``optparse`` (see the `optparse documentation <http://docs.python.org/library/optparse.html>`_). 
 
-.. note:: As support for ``optparse`` will not continue into Python 3.0, we will transition to using ``argparse`` behind the scenes in the very near future. Our goal is to make these changes fully backward compatible so qcli users won't need to change anything or do anything differently following the transition.
+.. note:: As support for ``optparse`` will not continue into Python 3.0, we will transition to using ``argparse`` behind the scenes in the very near future. Our goal is to make these changes fully backward compatible so pyqi users won't need to change anything or do anything differently following the transition.
 
 Creating script templates
 =========================
-qcli provides a script, ``make_qcli_script`` for creating template qcli-based scripts. The output of ``make_qcli_script`` is a fully functional qcli script (though it doesn't do very much). To create a qcli script, you can do the following::
+pyqi provides a script, ``make_pyqi_script`` for creating template pyqi-based scripts. The output of ``make_pyqi_script`` is a fully functional pyqi script (though it doesn't do very much). To create a pyqi script, you can do the following::
 	
-	qcli_make_script -o my_script.py
+	pyqi_make_script -o my_script.py
 
-This will create a new qcli-based script called ``my_script.py``, and give it execute permission. To run this script in help mode from the directory where it was created, you could then call::
+This will create a new pyqi-based script called ``my_script.py``, and give it execute permission. To run this script in help mode from the directory where it was created, you could then call::
 	
 	./my_script.py -h
 
 You should see help text printed to the terminal.
 
-`See here for an example <https://github.com/bipy/qcli/blob/master/qcli_test_data/qcli_make_script/my_script.py>`_ of a script created with ``qcli_make_script``. 
+`See here for an example <https://github.com/bipy/pyqi/blob/master/pyqi_test_data/pyqi_make_script/my_script.py>`_ of a script created with ``pyqi_make_script``. 
 
 Your next steps are to customize your template script to do what you want your script to do.
 
 Customizing your script with script_info
 ========================================
 
-To customize your script, you'll edit the values for entries in the ``script_info`` dictionary to define the options, help text, and behavior of your script. These are the core values defined in the ``script_info`` dictionary and used by qcli. You must provide values for those tagged as ``REQUIRED``, and can optionally provide values for all of the others.
+To customize your script, you'll edit the values for entries in the ``script_info`` dictionary to define the options, help text, and behavior of your script. These are the core values defined in the ``script_info`` dictionary and used by pyqi. You must provide values for those tagged as ``REQUIRED``, and can optionally provide values for all of the others.
 
 +-------------------------------+-------------------------------------------------------------------------------------------------------+--------------+
 |        key                    |  Description                                                                                          |    Default   |
@@ -57,7 +57,7 @@ To customize your script, you'll edit the values for entries in the ``script_inf
 | script_usage_output_to_remove | a list of output dirs/files that must be cleaned up if running script_usage examples multiple times   |   []         |
 +-------------------------------+-------------------------------------------------------------------------------------------------------+--------------+
 
-It's also possible to add your own values to the ``script_info`` dictionary, if you'd like to use others in your code base. These following values are known to be used by tools outside of the qcli code base in ``script_info`` objects. It's best to not name new values with these names to avoid conflicts. 
+It's also possible to add your own values to the ``script_info`` dictionary, if you'd like to use others in your code base. These following values are known to be used by tools outside of the pyqi code base in ``script_info`` objects. It's best to not name new values with these names to avoid conflicts. 
 
 +-------------------------------+-------------------------------------------------------------------------------------------------------+--------------+
 |        key                    |  Description                                                                                          |    Used by   |
@@ -93,9 +93,9 @@ The ``script_info`` object is simply a python dictionary, so the standard method
 Creating options
 ================
 
-Typically the first thing you'll want to do is define the options that your script will take. The following covers how to create your own options, which you would include in the ``script_info['required_options']`` or ``script_info['optional_options']`` lists. Some of this is general to ``optparse`` and some is specific to qcli.
+Typically the first thing you'll want to do is define the options that your script will take. The following covers how to create your own options, which you would include in the ``script_info['required_options']`` or ``script_info['optional_options']`` lists. Some of this is general to ``optparse`` and some is specific to pyqi.
 
-Options to your script are created with ``qcli.option_parsing.make_option``, which is a wrapper for ``optparse.make_option`` that includes support for additional option types. See the `optparse make_option documentation <http://docs.python.org/library/optparse.html#populating-the-parser>`_) for detailed information on how to create options. In your qcli-based script you can create either required options, which must be passed every time your script is called, or optional options, which do not need to be passed every time the script is called (e.g., because there is a default value in place, or they are only applicable under certain circumstances). You'll define your options by assigning lists of calls to ``make_option`` to ``script_info['required_options']`` and ``script_info['optional_options']``, respectively.
+Options to your script are created with ``pyqi.option_parsing.make_option``, which is a wrapper for ``optparse.make_option`` that includes support for additional option types. See the `optparse make_option documentation <http://docs.python.org/library/optparse.html#populating-the-parser>`_) for detailed information on how to create options. In your pyqi-based script you can create either required options, which must be passed every time your script is called, or optional options, which do not need to be passed every time the script is called (e.g., because there is a default value in place, or they are only applicable under certain circumstances). You'll define your options by assigning lists of calls to ``make_option`` to ``script_info['required_options']`` and ``script_info['optional_options']``, respectively.
 
 Defining one required option and one optional option might look like the following::
 
@@ -111,7 +111,7 @@ Defining one required option and one optional option might look like the followi
 
 Custom option types for files and directories
 ---------------------------------------------
-When defining options for input or output files or directories, you should use the qcli custom option types. These standardize error handling in the case of input files which don't exist or aren't readable, or output files are passed which already exist. These custom option types are:
+When defining options for input or output files or directories, you should use the pyqi custom option types. These standardize error handling in the case of input files which don't exist or aren't readable, or output files are passed which already exist. These custom option types are:
 
 * ``existing_path`` : Specify a path to a directory or file. Path must exist or an error is raised.
 
@@ -148,7 +148,7 @@ Additional useful option types
 Flag options
 ^^^^^^^^^^^^
 
-Flags are boolean options to your script. qcli supports these directly, so you should never have to define an option that explicitly takes ``True`` or ``False`` as a value on the command line.
+Flags are boolean options to your script. pyqi supports these directly, so you should never have to define an option that explicitly takes ``True`` or ``False`` as a value on the command line.
 
 Flags to your script should always be either ``action='store_true'`` or ``action='store_false'``, and do not need to define a type. The names of these options should suggest whether the option enables something (e.g., ``--print_to_stdout``) which would be defined with ``action='store_true'`` (i.e., default is ``False``), or whether the option disables something (e.g., ``--suppress_stdout``) which would be defined with ``action='store_false'`` (i.e., the default is ``True``). A bad name for a flag is ``--stdout`` as it's not clear what this option does.
 
@@ -204,7 +204,7 @@ Documenting your script
 
 Script documentation
 --------------------
-The ``script_documentation`` entry in ``script_info`` should describe the basic functionality of your script. This entry is typically between one and four sentences in length. Don't add line breaks yourself - qcli will take care of this for you, and the formatting will look better than if you try to do it yourself as it will adjust to the size of the user's terminal.
+The ``script_documentation`` entry in ``script_info`` should describe the basic functionality of your script. This entry is typically between one and four sentences in length. Don't add line breaks yourself - pyqi will take care of this for you, and the formatting will look better than if you try to do it yourself as it will adjust to the size of the user's terminal.
 
 Usage examples
 --------------
@@ -227,7 +227,7 @@ Output description
 ------------------
 The ``output_description`` entry in ``script_info`` should describe the output generated by the script. This entry is typically one to several sentences. Again, don't add line breaks yourself.
 
-Example of a simple qcli script
+Example of a simple pyqi script
 ===============================
 
 The following is a complete example of a script for counting the number of nucleotide or protein sequences in a fasta file. 
@@ -238,7 +238,7 @@ The following is a complete example of a script for counting the number of nucle
 	from __future__ import division
 
 	__author__ = "Greg Caporaso"
-	__copyright__ = "Copyright 2013, The qcli project"
+	__copyright__ = "Copyright 2013, The pyqi project"
 	__credits__ = ["Greg Caporaso"]
 	__license__ = "BSD"
 	__version__ = "0.1.0-dev"
@@ -246,7 +246,7 @@ The following is a complete example of a script for counting the number of nucle
 	__email__ = "gregcaporaso@gmail.com"
 	
 	from glob import glob
-	from qcli.option_parsing import (
+	from pyqi.option_parsing import (
 	 parse_command_line_parameters, 
 	 make_option)
 	

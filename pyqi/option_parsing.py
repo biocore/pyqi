@@ -11,7 +11,7 @@
 
 This code was derived from PyCogent (www.pycogent.org) and QIIME
 (www.qiime.org), where it was initally developed. It has been ported 
-to qcli to support accessing this functionality without those 
+to pyqi to support accessing this functionality without those 
 dependencies.
 
 """

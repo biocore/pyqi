@@ -13,7 +13,7 @@ __email__ = "gregcaporaso@gmail.com"
 
 from itertools import izip
 from numpy import inf, isinf
-from qcli.core.command import Command, Parameter
+from pyqi.core.command import Command, Parameter
 
 from biom.parse import parse_biom_table
 

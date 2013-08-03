@@ -10,7 +10,7 @@
 """ Utilities for parsing command line options and arguments
 
 This code was derived from QIIME (www.qiime.org), where it was initally
-developed. It has been ported to qcli to support accessing this functionality 
+developed. It has been ported to pyqi to support accessing this functionality 
 without those dependencies.
 
 """
@@ -21,7 +21,7 @@ from os import chdir, getcwd
 from shutil import copytree, rmtree
 from glob import glob
 from site import addsitedir
-from qcli.util import (qcli_system_call, 
+from pyqi.util import (pyqi_system_call, 
                        remove_files)
 
 
@@ -133,7 +133,7 @@ def run_script_usage_tests(test_data_dir,
             timed_out = False
             initiate_timeout(timeout)
             try:
-                stdout, stderr, return_value = qcli_system_call(cmd)
+                stdout, stderr, return_value = pyqi_system_call(cmd)
             except TimeExceededError:
                 timed_out = True
             else:

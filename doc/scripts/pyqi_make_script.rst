@@ -1,16 +1,16 @@
-.. _qcli_make_script:
+.. _pyqi_make_script:
 
-.. index:: qcli_make_script
+.. index:: pyqi_make_script
 
-*qcli_make_script* -- Create a template qcli script.
+*pyqi_make_script* -- Create a template pyqi script.
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 **Description:**
 
-This script will create a template qcli script and make it executable.
+This script will create a template pyqi script and make it executable.
 
 
-**Usage:** :file:`qcli_make_script [options]`
+**Usage:** :file:`pyqi_make_script [options]`
 
 **Input Arguments:**
 
@@ -34,7 +34,7 @@ This script will create a template qcli script and make it executable.
 
 **Output:**
 
-The result of this script is a qcli template script.
+The result of this script is a pyqi template script.
 
 
 **Example usage:**
@@ -43,6 +43,6 @@ Create a new script
 
 ::
 
-	qcli_make_script -a "Greg Caporaso" -e gregcaporaso@gmail.com -o my_script.py
+	pyqi_make_script -a "Greg Caporaso" -e gregcaporaso@gmail.com -o my_script.py
 
 

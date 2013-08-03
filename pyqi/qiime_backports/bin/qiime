@@ -10,11 +10,11 @@ __maintainer__ = "Daniel McDonald"
 __email__ = "mcdonadt@colorado.edu"
 
 from sys import argv, exit, stderr
-from qcli.interface.cli import clmain, cli
-import qcli.qiime_backports.qiime.cli as qiime_cli
+from pyqi.interface.cli import clmain, cli
+import pyqi.qiime_backports.qiime.cli as qiime_cli
 import importlib
 
-CLI_CFG_BASE = 'qcli.qiime_backports.qiime.cli'
+CLI_CFG_BASE = 'pyqi.qiime_backports.qiime.cli'
 def usage():
     """Modeled after git..."""
     print "usage: qiime <command> [<args>]"

@@ -19,8 +19,8 @@ __email__ = "gregcaporaso@gmail.com"
 from distutils.core import setup
 from glob import glob
 
-setup(name='qcli',
+setup(name='pyqi',
       version='0.1.0-dev',
-      packages=['qcli'],
-      scripts=glob('scripts/qcli*')
+      packages=['pyqi'],
+      scripts=glob('scripts/pyqi*')
       )

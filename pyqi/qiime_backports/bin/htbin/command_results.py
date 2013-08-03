@@ -11,8 +11,8 @@ __email__ = "jai.rideout@gmail.com"
 
 import cgi
 
-from qcli.interface.cli import cli
-from qcli.qiime_backports.bin.htbin.util import (get_cmd_obj,
+from pyqi.interface.cli import cli
+from pyqi.qiime_backports.bin.htbin.util import (get_cmd_obj,
                                                  format_page_header,
                                                  format_page_footer)
 

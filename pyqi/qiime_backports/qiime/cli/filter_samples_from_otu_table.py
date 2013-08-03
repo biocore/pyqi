@@ -9,8 +9,8 @@ __version__ = "0.1.0-dev"
 __maintainer__ = "Greg Caporaso"
 __email__ = "gregcaporaso@gmail.com"
 
-from qcli.interface.cli import CLOption, UsageExample, ParameterConversion
-from qcli.qiime_backports.command.filter_samples_from_otu_table import FilterSamplesFromOTUTable as \
+from pyqi.interface.cli import CLOption, UsageExample, ParameterConversion
+from pyqi.qiime_backports.command.filter_samples_from_otu_table import FilterSamplesFromOTUTable as \
         CommandConstructor
 
 

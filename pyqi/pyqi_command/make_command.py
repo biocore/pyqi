@@ -17,13 +17,13 @@ __version__ = "0.1.0-dev"
 __maintainer__ = "Daniel McDonald"
 __email__ = "mcdonadt@colorado.edu"
 
-from qcli.core.container import WithIO
-from qcli.core.command import Command, Parameter
+from pyqi.core.container import WithIO
+from pyqi.core.command import Command, Parameter
 
 header = """#!/usr/bin/env python
 
 from __future__ import division
-from qcli.core.command import Command, Parameter
+from pyqi.core.command import Command, Parameter
 
 __author__ = "%(author)s"
 __copyright__ = "%(copyright)s"

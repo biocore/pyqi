@@ -9,7 +9,7 @@
 #-----------------------------------------------------------------------------
 
 from __future__ import division
-from qcli.core.command import Command, Parameter
+from pyqi.core.command import Command, Parameter
 
 __author__ = "Daniel McDonald"
 __copyright__ = "Copyright 2013, the QCLI project"
@@ -22,7 +22,7 @@ __email__ = "mcdonadt@colorado.edu"
 
 header = """#!/usr/bin/env python
 
-from qcli.interface.cli import CLOption, UsageExample, ParameterConversion
+from pyqi.interface.cli import CLOption, UsageExample, ParameterConversion
 from %(mod)s import CommandConstructor
 
 # How you can use the command from the command line
