@@ -16,8 +16,6 @@ import CGIHTTPServer
 ## This line enables CGI error reporting
 import cgitb; cgitb.enable()
 
-from qcli.exception import IncompetentUserError
-
 PORT=8000
 
 def usage():
