@@ -24,10 +24,27 @@ from qcli.core.exception import IncompetentDeveloperError
 
 class CommandTests(TestCase):
     def test_init(self):
+        """Jog the init"""
         self.assertRaises(NotImplementedError, Command)
+
+    def test_subclass_init(self):
+        """Exercise the subclassing"""
+        class foo(Command):
+            def run(self, **kwargs):
+                return {}
+            def _get_parameters(self):
+                return [Parameter('a','b','c',True),
+                        Parameter('x','y','z',False)]
+
+        obs = foo()
+
+        self.assertEqual(len(obs.Parameters), 3) # include default verbose
+        self.assertEqual(len(obs._get_parameters()), 2)
+        self.assertEqual(obs.run(bar={'a':10}), {})
 
 class ParameterTests(TestCase):
     def test_init(self):
+        """Jog the init"""
         obj = Parameter('a','b','c',False)
         self.assertEqual(obj.Type, 'a')
         self.assertEqual(obj.Help, 'b')
