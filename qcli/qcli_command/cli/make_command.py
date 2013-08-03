@@ -8,8 +8,10 @@
 # The full license is in the file COPYING.txt, distributed with this software.
 #-----------------------------------------------------------------------------
 
-from qcli.interface.cli import CLOption, UsageExample, ParameterConversion
+from qcli.interface.cli import CLOption, UsageExample, ParameterConversion, \
+        OutputHandler
 from qcli.qcli_command.make_command import CommandConstructor
+from qcli.interface.output_handler.cli import write_string
 
 usage_examples = [
         UsageExample(ShortDesc="Basic function",
@@ -51,3 +53,6 @@ additional_options = [
                  ShortName='o',
                  ResultName='result')
         ]
+
+output_map = {'result':OutputHandler(OptionName='result',
+                                     Function=write_string)}

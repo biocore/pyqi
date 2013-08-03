@@ -69,8 +69,8 @@ class Command(object):
             raise e
         else:
             self._logger.info('Completed command: %s' % self_str)
-       
-        # check if the result is sane
+      
+        # verify the result type
         if not isinstance(result, dict):
             self._logger.fatal('Shit went wrong: %s' % self_str)
             raise InvalidReturnTypeError("Unexpected return type!")
@@ -84,7 +84,7 @@ class Command(object):
         as a result.
         """
         raise NotImplementedError("All subclasses must implement run.")
-    
+
     def _get_default_parameters(self):
         return [Parameter(Type=bool,
                           Help='Print information during execution -- useful for debugging',
