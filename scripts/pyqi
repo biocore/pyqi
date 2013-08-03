@@ -1,0 +1,107 @@
+#!/usr/bin/env python
+
+#-----------------------------------------------------------------------------
+# Copyright (c) 2013, The BiPy Development Team.
+#
+# Distributed under the terms of the Modified BSD License.
+#
+# The full license is in the file COPYING.txt, distributed with this software.
+#-----------------------------------------------------------------------------
+
+__author__ = "Daniel McDonald"
+__copyright__ = "Copyright 2013, The QCLI Project"
+__credits__ = ["Greg Caporaso", "Daniel McDonald", "Doug Wendel",
+               "Jai Ram Rideout"]
+__license__ = "BSD"
+__version__ = "0.1.0-dev"
+__maintainer__ = "Daniel McDonald"
+__email__ = "mcdonadt@colorado.edu"
+
+from sys import argv, exit, stderr
+from pyqi.interface.cli import clmain, cli
+import pyqi.pyqi_command.cli as cli_cfg
+import importlib
+CFG_BASE = 'pyqi.pyqi_command.cli'
+
+def usage(opts):
+    """Modeled after git..."""
+    print "usage: %s <command> [<args>]" % argv[0]
+    print
+    print "The currently available commands are:"
+    
+    for c in sorted(cli_cfg.__all__):
+        cmd_cfg = get_cmd_cfg(c, opts)
+        desc = cmd_cfg.CommandConstructor.BriefDescription
+        if len(desc) > 70:
+            print ''.join(['   ', c, '\t', desc[:70], '...'])
+        else:
+            print ''.join(['   ', c, '\t', desc])
+
+    print
+    print "See '%s help <command>' for more information on a specific command." % argv[0]
+    exit(0)
+
+def unknown_command(cmd):
+    stderr.write("Unknown command: %s\n" % cmd)
+    exit(1)
+
+def cmd_exists(cmd):
+    if cmd in cli_cfg.__all_lookup__:
+        return True
+    else:
+        return False
+
+def get_cmd_cfg(cmd, opts):
+    try:
+        cmd_cfg = importlib.import_module('.'.join([CFG_BASE, cmd]))
+    except ImportError, e:
+        stderr.write("Unable to import the command configuration for %s.\n" % cmd)
+        if opts['--verbose']:
+            stderr.write(str(e))
+            stderr.write('\n')
+        exit(1)
+    return cmd_cfg
+
+def get_cmd_obj(cmd, opts):
+    cmd_cfg = get_cmd_cfg(cmd, opts)
+    return cli(cmd_cfg.CommandConstructor, cmd_cfg.usage_examples, 
+                  cmd_cfg.param_conversions, cmd_cfg.additional_options,
+                  cmd_cfg.output_map)
+
+def help_(cmd, opts):
+    cmd_obj = get_cmd_obj(cmd, opts)
+    clmain(cmd_obj, ['help','-h'])
+
+if __name__ == '__main__':
+    opts = {'--verbose':False}
+    if len(argv) == 1:
+        usage(opts)
+    else:
+        if argv[1] in opts:
+            if len(argv) == 2:
+                opts['--verbose'] = True
+                usage(opts)
+            opts[argv[1]] = True
+            argv.pop(1)
+        cmd = argv[1]
+
+    if cmd in ['help','HELP','-?','-h']:
+        if not len(argv) > 2:
+            usage(opts)
+        help_cmd = argv[2]
+
+        # tears.
+        argv[0] = ' '.join([argv[0], argv[2]])
+        if cmd_exists(help_cmd):
+            help_(help_cmd, opts)
+        else:
+            unknown_command(help_cmd)
+    else:
+        argv[0] = ' '.join([argv[0], argv[1]])
+
+    if not cmd_exists(cmd):
+        unknown_command(cmd)
+
+    cmd_obj = get_cmd_obj(cmd, opts)
+    
+    clmain(cmd_obj, argv[1:])

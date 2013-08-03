@@ -19,8 +19,8 @@ __maintainer__ = "Daniel McDonald"
 __email__ = "wasade@gmail.com"
 
 from unittest import TestCase, main
-from qcli.core.command import Parameter, Command
-from qcli.core.exception import IncompetentDeveloperError
+from pyqi.core.command import Parameter, Command
+from pyqi.core.exception import IncompetentDeveloperError
 
 class CommandTests(TestCase):
     def test_init(self):
