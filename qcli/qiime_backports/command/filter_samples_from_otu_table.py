@@ -40,16 +40,16 @@ class FilterSamplesFromOTUTable(Command):
                 Parameter(Type=str,Help='string describing valid states',Name='metadata-description', Default=None)
                ]
     
-    def run(self,
-            input_fp,
-            output_fp,
-            mapping_fp=None,
-            output_mapping_fp=None,
-            valid_states=None,
-            min_count=None,
-            max_count=None,
-            sample_id_fp=None,
-            **kwargs):
+    def run(self, **kwargs):
+        input_fp = kwargs['input_fp']
+        output_fp = kwargs['output_fp']
+        mapping_fp = kwargs['mapping_fp']
+        output_mapping_fp = kwargs['output_mapping_fp']
+        valid_states = kwargs['valid_states']
+        min_count = kwargs['min_count']
+        max_count = kwargs['max_count']
+        sample_id_fp = kwargs['sample_id_fp']
+
         result = {}
         if not ((mapping_fp and valid_states) or 
                 min_count != 0 or 
