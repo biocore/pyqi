@@ -33,7 +33,6 @@ __license__ = "%(license)s"
 __version__ = "%(func_version)s"
 __maintainer__ = "%(author)s"
 __email__ = "%(email)s"
-__status__ = "Development"
 
 """
 
