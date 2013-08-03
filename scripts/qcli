@@ -92,11 +92,12 @@ if __name__ == '__main__':
 
         # tears.
         argv[0] = ' '.join([argv[0], argv[2]])
-
         if cmd_exists(help_cmd):
             help_(help_cmd, opts)
         else:
             unknown_command(help_cmd)
+    else:
+        argv[0] = ' '.join([argv[0], argv[1]])
 
     if not cmd_exists(cmd):
         unknown_command(cmd)
