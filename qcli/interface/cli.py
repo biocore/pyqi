@@ -293,7 +293,7 @@ class CLInterface(Interface):
         # so users have access to any additional functionality they may want at 
         # this stage -- most commonly, it will be used for doing custom tests of 
         # parameter values.
-        hated_functionality = eval(str(opts))
+        hated_functionality = opts.__dict__
         self.HatedFunctionality = hated_functionality
         for k, v in self.ParameterConversionInfo.items():
             if v.InHandler is not None:
