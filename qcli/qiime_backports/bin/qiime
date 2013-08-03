@@ -1,25 +1,25 @@
 #!/usr/bin/env python
 
+__author__ = "Daniel McDonald"
+__copyright__ = "Copyright 2013, The QIIME Project"
+__credits__ = ["Greg Caporaso", "Daniel McDonald", "Doug Wendel",
+               "Jai Ram Rideout"]
+__license__ = "GPL"
+__version__ = "0.1.0-dev"
+__maintainer__ = "Daniel McDonald"
+__email__ = "mcdonadt@colorado.edu"
+
 from sys import argv, exit, stderr
 from qcli.interface.cli import clmain, cli
 import qcli.qiime_backports.qiime.cli as qiime_cli
 import importlib
-
-__author__ = "Daniel McDonald"
-__copyright__ = "Copyright 2013, The QIIME Project"
-__credits__ = ["Greg Caporaso", "Daniel McDonald", "Doug Wendel",
-                               "Jai Ram Rideout"]
-__license__ = "BSD"
-__version__ = "0.1.0-dev"
-__maintainer__ = "Daniel McDonald"
-__email__ = "mcdonadt@colorado.edu"
 
 CLI_CFG_BASE = 'qcli.qiime_backports.qiime.cli'
 def usage():
     """Modeled after git..."""
     print "usage: qiime <command> [<args>]"
     print
-    print "The current available commands are:"
+    print "The currently available commands are:"
     
     for c in sorted(qiime_cli.__all__):
         cmd_cfg = get_cmd_cfg(c)
@@ -47,14 +47,15 @@ def get_cmd_cfg(cmd):
     try:
         cmd_cfg = importlib.import_module('.'.join([CLI_CFG_BASE, cmd]))
     except ImportError, e:
-        stderr.write("Unable to import the command configuration!\n")
+        stderr.write("Unable to import the command configuration.\n")
         exit(1)
     return cmd_cfg
 
 def get_cmd_obj(cmd):
     cmd_cfg = get_cmd_cfg(cmd)
-    return cli(cmd_cfg.CommandConstructor, cmd_cfg.usage_examples, 
-                  cmd_cfg.param_conversions, cmd_cfg.additional_options)
+    return cli(cmd_cfg.CommandConstructor, cmd_cfg.usage_examples,
+               cmd_cfg.param_conversions, cmd_cfg.additional_options,
+               cmd_cfg.output_map)
 
 def qiime_help(cmd):
     cmd_obj = get_cmd_obj(cmd)

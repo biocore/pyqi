@@ -1,5 +1,13 @@
 #!/usr/bin/env python
 
+__author__ = "Greg Caporaso"
+__copyright__ = "Copyright 2013, The QIIME Project"
+__credits__ = ["Greg Caporaso"]
+__license__ = "GPL"
+__version__ = "0.1.0-dev"
+__maintainer__ = "Greg Caporaso"
+__email__ = "gregcaporaso@gmail.com"
+
 from __future__ import division
 from os import makedirs
 
@@ -15,15 +23,6 @@ from qiime.workflow.pick_open_reference_otus import (
                         iterative_pick_subsampled_open_reference_otus)
 
 from qcli.core.command import Command, Parameter
-
-__author__ = "Greg Caporaso"
-__copyright__ = "Copyright 2013, The QIIME Project"
-__credits__ = ["Greg Caporaso", ]
-__license__ = "GPL"
-__version__ = "1.7.0-dev"
-__maintainer__ = "Greg Caporaso"
-__email__ = "gregcaporaso@gmail.com"
-__status__ = "Development"
 
 class PickOpenReferenceOTUs(Command):
     BriefDescription = "Assign OTUs using an open-reference OTU picking protocol"
@@ -141,6 +140,6 @@ class PickOpenReferenceOTUs(Command):
             #                   Help='some required parameter),
             #         Parameter(Name='bar',Required=False,Type=int,
             #                   Help='some optional parameter,Default=1)]
-            raise NotImplementedError("You must define this method")
+            raise NotImplementedError("Must define _get_parameters.")
 
 CommandConstructor = PickOpenReferenceOTUs

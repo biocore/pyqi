@@ -11,7 +11,7 @@
 __author__ = "Greg Caporaso"
 __copyright__ = "Copyright 2013, The QIIME Project"
 __credits__ = ["Greg Caporaso", "Daniel McDonald", "Doug Wendel",
-                       "Jai Ram Rideout"]
+               "Jai Ram Rideout"]
 __license__ = "BSD"
 __version__ = "0.1.0-dev"
 __maintainer__ = "Greg Caporaso"
@@ -25,13 +25,13 @@ from qcli.option_parsing import (OptionParser, OptionGroup, Option,
                                  OptionValueError, OptionError, make_option)
 import os
 
-CLTypes = set(['float','int','string','existing_filepath', float, int, str, None,
-            'new_filepath','new_dirpath','existing_dirpath'])
+CLTypes = set(['float','int','string','existing_filepath', float, int, str,
+               None, 'new_filepath','new_dirpath','existing_dirpath'])
 CLActions = set(['store','store_true','store_false', 'append'])
 
 def new_filepath(data, path):
     if os.path.exists(path):
-        raise IOError("Output path %s already exists!" % path)
+        raise IOError("Output path %s already exists." % path)
     f = open(path, 'w')
     f.write(data)
     f.close()
@@ -68,14 +68,14 @@ class CLOption(Parameter):
                                       DefaultDescription=DefaultDescription)
         
         if LongName != self.Name:
-            self.DepWarn = "parameter %s will be renamed %s in QIIME 2.0.0" % \
-                                                    (self.LongName, self.Name)
+            self.DepWarn = ("Option '%s' will be renamed '%s' in QIIME 2.0.0" %
+                            (self.LongName, self.Name))
         else:
             self.DepWarn = ""
 
     def __str__(self):
         return '-%s/--%s' % (self.ShortName, self.LongName)
-        
+
     @classmethod
     def fromParameter(cls, parameter, LongName, CLType, CLAction='store',
                       ShortName=None):
@@ -93,15 +93,8 @@ class CLOption(Parameter):
         return result
 
 class UsageExample(object):
-    """Provide validation and structure to a usage example"""
-    def __init__(self, ShortDesc=None, LongDesc=None, Ex=None):
-        if ShortDesc is None:
-            raise IncompetentDeveloperError("No short description provided!")
-        if LongDesc is None:
-            raise IncompetentDeveloperError("No long description provided!")
-        if Ex is None:
-            raise IncompetentDeveloperError("No example provided!")
-
+    """Provide structure to a usage example"""
+    def __init__(self, ShortDesc, LongDesc, Ex):
         self.ShortDesc = ShortDesc
         self.LongDesc = LongDesc
         self.Ex = Ex
@@ -133,13 +126,13 @@ class CLInterface(Interface):
     RequiredInputLine = '{} indicates required input (order unimportant)'
     
     def __init__(self, **kwargs):
-        self.HatedFunctionality = {}
+        self.BelovedFunctionality = {}
         self.UsageExamples = []
         self.UsageExamples.extend(self._get_usage_examples())
 
         if len(self.UsageExamples) < 1:
-            raise IncompetentDeveloperError("How the fuck do I use this "
-                                            "command?")
+            raise IncompetentDeveloperError("There are no usage examples "
+                                            "associated with this command.")
 
         self.ParameterConversionInfo = {
                 'verbose':ParameterConversion(ShortName='v',
@@ -151,17 +144,17 @@ class CLInterface(Interface):
         self.ParameterConversionInfo.update(self._get_param_conv_info())
 
         super(CLInterface, self).__init__(**kwargs)
-        
+
         self.Options.extend(self._get_additional_options())
 
     def _get_param_conv_info(self):
         """Return the ``ParameterConversion`` objects"""
         raise NotImplementedError("Must define _get_param_conv_info")
-    
+
     def _get_usage_examples(self):
         """Return the ``UsageExample`` objects"""
         raise NotImplementedError("Must define _get_usage_examples")
-    
+
     def _get_additional_options(self):
         """Return the ``CLOption`` objects"""
         raise NotImplementedError("Must define _get_additional_options")
@@ -173,50 +166,25 @@ class CLInterface(Interface):
     def _the_in_validator(self, in_):
         """Validate input coming from the command line"""
         if not isinstance(in_, list):
-            raise IncompetentDeveloperError("The in_ validator is very upset.")
+            raise IncompetentDeveloperError("Unsupported input '%r'. Input "
+                                            "must be a list." % in_)
 
     def _option_factory(self, parameter):
         """Promote a parameter to a CLOption"""
         name = parameter.Name
         if name not in self.ParameterConversionInfo:
-            raise IncompetentDeveloperError("%s does not have parameter conversion info (parameter conversions are available for %s)" % (name, ' '.join(self.ParameterConversionInfo.keys())))
+            raise IncompetentDeveloperError("%s does not have parameter "
+                    "conversion info (parameter conversions are available for "
+                    "%s)" % (name,
+                             ' '.join(self.ParameterConversionInfo.keys())))
 
-        return CLOption.fromParameter(parameter, 
+        return CLOption.fromParameter(parameter,
                      self.ParameterConversionInfo[name].LongName,
                      self.ParameterConversionInfo[name].CLType,
                      ShortName=self.ParameterConversionInfo[name].ShortName)
 
     def _input_handler(self, in_, *args, **kwargs):
-        """Constructs the OptionParser object and parses command line arguments
-        
-            parse_command_line_parameters takes a dict of objects via kwargs which
-             it uses to build command line interfaces according to standards 
-             developed in the Knight Lab, and enforced in QIIME. The currently 
-             supported options are listed below with their default values. If no 
-             default is provided, the option is required.
-            
-            script_description
-            script_usage = [("","","")]
-            version
-            required_options=None
-            optional_options=None
-            suppress_verbose=False
-            disallow_positional_arguments=True
-            help_on_no_arguments=True
-            optional_input_line = '[] indicates optional input (order unimportant)'
-            required_input_line = '{} indicates required input (order unimportant)'
-            
-           These values can either be passed directly, as:
-            parse_command_line_parameters(script_description="My script",\
-                                         script_usage=[('Print help','%prog -h','')],\
-                                         version=1.0)
-                                         
-           or they can be passed via a pre-constructed dict, as:
-            d = {'script_description':"My script",\
-                 'script_usage':[('Print help','%prog -h','')],\
-                 'version':1.0}
-            parse_command_line_parameters(**d)
-        """
+        """Parses command-line input."""
         # command_line_text will usually be nothing, but can be passed for
         # testing purposes
 
@@ -225,7 +193,7 @@ class CLInterface(Interface):
 
         required_opts = [opt for opt in self.Options if opt.Required]
         optional_opts = [opt for opt in self.Options if not opt.Required]
-        
+
         # Build the usage and version strings
         usage = self._build_usage_lines(required_opts)
         version = 'Version: %prog ' + __version__
@@ -309,16 +277,16 @@ class CLInterface(Interface):
         # so users have access to any additional functionality they may want at 
         # this stage -- most commonly, it will be used for doing custom tests of 
         # parameter values.
-        hated_functionality = opts.__dict__
-        self.HatedFunctionality = hated_functionality
+        beloved_functionality = opts.__dict__
+        self.BelovedFunctionality = beloved_functionality
         for k, v in self.ParameterConversionInfo.items():
             if v.InHandler is not None:
                 long_name = v.LongName
-                value = self.HatedFunctionality[long_name]
-                self.HatedFunctionality[long_name] = v.InHandler(value)
+                value = self.BelovedFunctionality[long_name]
+                self.BelovedFunctionality[long_name] = v.InHandler(value)
             else:
                 pass
-        return self.HatedFunctionality
+        return self.BelovedFunctionality
 
     def _build_usage_lines(self, required_options):
         """ Build the usage string from components """
@@ -337,9 +305,9 @@ class CLInterface(Interface):
             else:
                 formatted_usage_examples.append('%s\n %s' %
                                                 (long_description,example))
-        
+
         formatted_usage_examples = '\n\n'.join(formatted_usage_examples)
-        
+
         lines = (line1,
                  '', # Blank line
                  self.OptionalInputLine,
@@ -358,12 +326,13 @@ class CLInterface(Interface):
         """Deal with things in output if we know how"""
         for k,handler in self._get_output_map().items():
             if k not in results:
-                raise IncompetentDeveloperError("Expected output not found!")
-             
+                raise IncompetentDeveloperError("Did not find the expected "
+                                                "output '%s' in results." % k)
+
             if handler.OptionName is None:
                 handler.Function(k, results[k])
             else:
-                opt_value = self.HatedFunctionality[handler.OptionName]
+                opt_value = self.BelovedFunctionality[handler.OptionName]
                 handler.Function(k, results[k], opt_value)
 
     def getOutputFilepaths(results, **kwargs):
@@ -393,13 +362,12 @@ def cli(command_constructor, usage_examples, param_conversions, added_options,
         ``command_constructor``.
     output_map - result keys to ``OutputHandler``
     """
-    return general_factory(command_constructor, usage_examples, param_conversions,
-                           added_options, output_map, CLInterface)
+    return general_factory(command_constructor, usage_examples,
+                           param_conversions, added_options, output_map,
+                           CLInterface)
 
 def clmain(interface_object, local_argv):
     """Construct and execute an interface object"""
     cli_cmd = interface_object()
-    
     result = cli_cmd(local_argv[1:])
-    
     return 0

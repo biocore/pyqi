@@ -13,10 +13,9 @@ __copyright__ = "Copyright 2013, The QCLI Project"
 __credits__ = ["Daniel McDonald", "Greg Caporaso", "Doug Wendel",
                "Jai Ram Rideout"]
 __license__ = "BSD"
-__version__ = "0.1-dev"
+__version__ = "0.1.0-dev"
 __maintainer__ = "Daniel McDonald"
 __email__ = "mcdonadt@colorado.edu"
-__status__ = "Development"
 
 from qcli.core.container import WithIO
 from qcli.core.command import Command, Parameter
