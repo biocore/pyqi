@@ -17,7 +17,7 @@ __version__ = "0.1.0-dev"
 __maintainer__ = "Greg Caporaso"
 __email__ = "gregcaporaso@gmail.com"
 
-from qcli.exception import IncompetentDeveloperError
+from qcli.core.exception import IncompetentDeveloperError
 
 # an option is interface dependent
 # a parameter is interface independent
