@@ -65,7 +65,8 @@ def get_cmd_cfg(cmd, opts):
 def get_cmd_obj(cmd, opts):
     cmd_cfg = get_cmd_cfg(cmd, opts)
     return cli(cmd_cfg.CommandConstructor, cmd_cfg.usage_examples, 
-                  cmd_cfg.param_conversions, cmd_cfg.additional_options)
+                  cmd_cfg.param_conversions, cmd_cfg.additional_options,
+                  cmd_cfg.output_map)
 
 def help_(cmd, opts):
     cmd_obj = get_cmd_obj(cmd, opts)

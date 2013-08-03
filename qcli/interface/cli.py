@@ -36,6 +36,18 @@ def new_filepath(data, path):
     f.write(data)
     f.close()
 
+class OutputHandler(object):
+    """Handle result output
+
+    OptionName - the long name of an output command line option
+    Function   - a Python function that accepts the result name, the 
+                 corresponding option value (if tied to a command line option),
+                 and the result data
+    """
+    def __init__(self, OptionName, Function):
+        self.OptionName = OptionName
+        self.Function = Function
+
 class CLOption(Parameter):
     """An augmented option that expands a Parameter into an Option"""
     _cl_types = {'new_filepath': new_filepath}
@@ -153,6 +165,10 @@ class CLInterface(Interface):
     def _get_additional_options(self):
         """Return the ``CLOption`` objects"""
         raise NotImplementedError("Must define _get_additional_options")
+
+    def _get_output_map(self):
+        """Return the ``output_map`` objects"""
+        raise NotImplementedError("Must define _get_output_map")
 
     def _the_in_validator(self, in_):
         """Validate input coming from the command line"""
@@ -340,10 +356,15 @@ class CLInterface(Interface):
 
     def _output_handler(self, results):
         """Deal with things in output if we know how"""
-        for o in self._get_additional_options():
-            if o.ResultName in results:
-                o._cl_type_action(results[o.ResultName], 
-                                  self.HatedFunctionality[o.Name])
+        for k,handler in self._get_output_map().items():
+            if k not in results:
+                raise IncompetentDeveloperError("Expected output not found!")
+             
+            if handler.OptionName is None:
+                handler.Function(k, results[k])
+            else:
+                opt_value = self.HatedFunctionality[handler.OptionName]
+                handler.Function(k, results[k], opt_value)
 
     def getOutputFilepaths(results, **kwargs):
         mapping = {}
@@ -359,7 +380,8 @@ class CLInterface(Interface):
 
         return mapping
 
-def cli(command_constructor, usage_examples, param_conversions, added_options):
+def cli(command_constructor, usage_examples, param_conversions, added_options,
+        output_map):
     """Command line interface factory
     
     command_constructor - a subclass of ``Command``
@@ -369,9 +391,10 @@ def cli(command_constructor, usage_examples, param_conversions, added_options):
         parameters to options.
     added_options - any additional options that are not defined by the 
         ``command_constructor``.
+    output_map - result keys to ``OutputHandler``
     """
     return general_factory(command_constructor, usage_examples, param_conversions,
-                           added_options, CLInterface)
+                           added_options, output_map, CLInterface)
 
 def clmain(interface_object, local_argv):
     """Construct and execute an interface object"""

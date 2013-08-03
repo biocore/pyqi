@@ -55,3 +55,5 @@ additional_options = [
                  CLType='new_filepath',
                  ShortName='o'),
         ]
+
+output_map = {}
