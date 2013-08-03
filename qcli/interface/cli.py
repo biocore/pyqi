@@ -26,7 +26,7 @@ from qcli.option_parsing import (OptionParser, OptionGroup, Option,
 import os
 
 CLTypes = set(['float','int','string','existing_filepath', float, int, str, None,
-            'new_filepath','new_dirpath','existing_dirpath','existing_command'])
+            'new_filepath','new_dirpath','existing_dirpath'])
 CLActions = set(['store','store_true','store_false', 'append'])
 
 def new_filepath(data, path):
