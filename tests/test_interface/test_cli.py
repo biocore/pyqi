@@ -27,5 +27,34 @@ class OutputHandlerTests(TestCase):
         self.assertEqual(obj.OptionName, 'a')
         self.assertEqual(obj.Function, 'b')
 
+class CLOptionTests(TestCase):
+    def test_init(self):
+        obj = CLOption('a','b','c','d',str)
+        self.assertEqual(obj.Type, 'a')
+        self.assertEqual(obj.Help, 'b')
+        self.assertEqual(obj.Name, 'c')
+        self.assertEqual(obj.LongName, 'd')
+        self.assertEqual(obj.CLType, str)
+
+    def test_str(self):
+        obj = CLOption('a','b','c','d',str)
+        exp = '--d'
+        obs = str(obj)
+        self.assertEqual(obs, exp)
+
+        obj = CLOption('a','b','c','d',str, ShortName='e')
+        exp = '-e/--d'
+        obs = str(obj)
+        self.assertEqual(obs, exp)
+
+    def test_fromParameter(self):
+        from qcli.core.command import Parameter
+        p = Parameter(Type='a',Help='b',Name='c',Required=False)
+        obj = CLOption.fromParameter(p, LongName='d',CLType=str)
+        self.assertEqual(obj.Type,'a')
+        self.assertEqual(obj.Help,'b')
+        self.assertEqual(obj.Name,'c')
+        self.assertEqual(obj.Required,False)
+
 if __name__ == '__main__':
     main()
