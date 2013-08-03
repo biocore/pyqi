@@ -21,6 +21,7 @@ from glob import glob
 
 setup(name='pyqi',
       version='0.1.0-dev',
-      packages=['pyqi'],
-      scripts=glob('scripts/pyqi*')
-      )
+      packages=['pyqi', 'pyqi/core', 'pyqi/interface', 'pyqi/pyqi_command',
+                'pyqi/interface/input_handler',
+                'pyqi/interface/output_handler', 'pyqi/pyqi_command/cli'],
+      scripts=glob('scripts/pyqi*'))
