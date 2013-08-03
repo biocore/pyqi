@@ -68,7 +68,10 @@ class CLOption(Parameter):
                                       DefaultDescription=DefaultDescription)
         
     def __str__(self):
-        return '-%s/--%s' % (self.ShortName, self.LongName)
+        if self.ShortName is None:
+            return '--%s' % self.LongName
+        else:
+            return '-%s/--%s' % (self.ShortName, self.LongName)
         
     @classmethod
     def fromParameter(cls, parameter, LongName, CLType, CLAction='store',
@@ -99,10 +102,6 @@ class UsageExample(object):
         self.ShortDesc = ShortDesc
         self.LongDesc = LongDesc
         self.Ex = Ex
-
-    def to_tuple(self):
-        """Returns (short, long, ex)"""
-        return (self.ShortDesc, self.LongDesc, self.Ex)
 
 class ParameterConversion(object):
     """Validation and structure for converting from a parameter to an option"""
