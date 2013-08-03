@@ -5,13 +5,9 @@ Documentation
 About pyqi
 ----------
 
-pyqi (canonically pronounced *queue sea el eye*) contains tools for developing and testing command line interfaces in Python. Features include:
+pyqi (canonically pronounced *pie chee*) is designed to support wrapping general commands in multiple types of interfaces, including at the command line, HTML, and API levels. We're currently in the early stages of development, and there is a lot to be done. We're very interested in having beta users, and we fully embrace collaborative development, so if you're interested in using or developing pyqi, you should get in touch.
 
- * A consistent look-and-feel for all of your script interfaces and their associated help text. Building your first working pyqi-based script is as easy as installing pyqi and running ``pyqi_make_script``. 
- * An automated test framework, which can supplement unit tests (which typically don't test command line interfaces) to alert you of changes that break your usage examples.
- * An automated documentation framework. Sphinx-compatible rst files can be auto-generated for your pyqi scripts.
-
-pyqi is being designed to make `QIIME <http://www.qiime.org>`_'s Command Line Interface framework a standalone package so it can be used in tools other than QIIME without the very heavy-weight dependency of QIIME itself. The name of this package may change as it reaches maturity. pyqi is very light-weight. Its only requirement is a working Python 2.6 installation. 
+pyqi's only requirement is a working Python 2.7 installation.
 
 Documentation index
 -------------------
@@ -29,9 +25,9 @@ Getting involved in development
 
 pyqi is open source software, available under the BSD license.
 
-Development is currently occurring primarily in the `Caporaso <http://www.caporaso.us>`_ and `Knight <https://knightlab.colorado.edu/>`_ labs (at Northern Arizona University and University of Colorado, respectively), but the goal is for pyqi to be a very open development effort. 
+Development is primarily occurring in the [Caporaso](www.caporaso.us) and [Knight](https://knightlab.colorado.edu/) labs (at Northern Arizona University and University of Colorado, respectively), but the goal is for this to be a very open development effort. We accept code submissions as [pull requests](https://help.github.com/articles/using-pull-requests).
 
-All source code is hosted in the `pyqi GitHub repository <https://github.com/bipy/pyqi/>`_. We accept code submissions as `pull requests <https://help.github.com/articles/using-pull-requests>`_.
+All source code is hosted in the `pyqi GitHub repository <https://github.com/bipy/pyqi/>`_.
 
 Getting help with pyqi
 ----------------------

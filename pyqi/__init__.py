@@ -22,7 +22,7 @@ __maintainer__ = "Greg Caporaso"
 __email__ = "gregcaporaso@gmail.com"
 
 # import most commonly used objects and functions so they can
-# be imported directly from qlci (e.g., from pyqi import make_option)
+# be imported directly from pyqi (e.g., from pyqi import make_option)
 from pyqi.option_parsing import (
  make_option, 
  parse_command_line_parameters)
