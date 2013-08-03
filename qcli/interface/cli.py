@@ -142,7 +142,7 @@ class CLInterface(Interface):
                 }
 
         self.ParameterConversionInfo.update(self._get_param_conv_info())
-
+       
         super(CLInterface, self).__init__(**kwargs)
         
         self.Options.extend(self._get_additional_options())
