@@ -76,13 +76,16 @@ class ParameterConversionTests(TestCase):
         self.assertRaises(IncompetentDeveloperError, ParameterConversion, 'a',
                           'not valid')
 
+def oh(key, data, opt_value=None):
+    return data * 2
+
 class CLInterfaceTests(TestCase):
     def setUp(self):
         class ghetto(Command):
             def _get_parameters(self):
                 return [Parameter(str,'b','c')]
             def run(self, **kwargs):
-                return {}
+                return {'itsaresult':10}
         
         class fabulous(CLInterface):
             CommandConstructor = ghetto
@@ -93,7 +96,8 @@ class CLInterfaceTests(TestCase):
             def _get_additional_options(self):
                 return []
             def _get_output_map(self):
-                return {}
+                return {'itsaresult':OutputHandler(OptionName=None,
+                                                   Function=oh)}
         self.interface = fabulous()
     
     def test_init(self):
@@ -111,5 +115,27 @@ class CLInterfaceTests(TestCase):
         obs = self.interface._input_handler(['--a','foo'])
         self.assertEqual(sorted(obs.items()), [('a', 'foo'),('verbose',False)])
 
+    def test_build_usage_lines(self):
+        obs = self.interface._build_usage_lines([])
+        self.assertEqual(obs, usage_lines)
+
+    def test_output_handler(self):
+        results = {'itsaresult':20} 
+        self.interface._output_handler(results)
+        self.assertEqual(results, {'itsaresult':40})
+
+usage_lines = """usage: %prog [options] {}
+
+[] indicates optional input (order unimportant)
+{} indicates required input (order unimportant)
+
+
+
+Example usage: 
+Print help message and exit
+ %prog -h
+
+a: b
+ c"""
 if __name__ == '__main__':
     main()
