@@ -79,7 +79,7 @@ class InterfaceOption(object):
         self.InputType = InputType
         self.InputHandler = InputHandler
         
-        self._validate_option(self)
+        self._validate_option()
 
     def _validate_option(self):
         """Interface specific validation requirements"""
