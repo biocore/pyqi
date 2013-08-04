@@ -28,3 +28,11 @@ def command_handler(option_value):
     module, klass = option_value.rsplit('.',1)
     mod = __import__(module, fromlist=[klass])
     return getattr(mod, klass)()
+
+def string_list_handler(option_value):
+    """Split a comma-separated string into a list of strings."""
+    return option_value.split(',')
+
+def file_reading_handler(option_value):
+    """Open a filepath for reading."""
+    return open(option_value, 'U')
