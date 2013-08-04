@@ -28,7 +28,56 @@ usage_examples = [UsageExample(ShortDesc="Create a bash completion script",
 
 # Parameter conversions tell the interface how to describe command line 
 # options
-param_conversions = {
+"""
+inputs = [
+        OptparseOption(InputType=Tells the interface what to expect
+                       Parameter=CommandConstructor.Parameters.getParameter('foo'), # nullable
+                       Required=True|False, # can override a parameter (False ->True, but not True -> False)
+                       LongName=Ideally the same as Parameter name...
+                       ShortName=Shortform version, specific to CLI 
+                       Help=yup.
+                       InputHandler=foo)
+outputs = [
+        OptparseResult(OutputType=tells the interface something,
+                       Parameter=CommandConstructor.Parameters.getParameter('foo') # nullable
+                       Required=True|False, # can override a parameter (False -> True, but not True -> False)
+                       OutputHandler=foo,
+                       ResultKey=foo)
+        ]
+"""
+inputs = [
+    OptparseOption(InputType=str,
+                   Parameter=CommandConstructor.Parameters.getParameter('command_cfg_directory')
+                   # Required=True implied by Parameter
+                   # Name='command_cfg_directory', implied by Parameter
+                   ShortName=None,
+                   # Help is pulled from parameter since Parameter is not None
+                   InputHandler=None), # optparse handles str just fine
+    OptparseOption(InputType=str,
+                   Parameter=CommandConstructor.Parameters.getParameter('driver_name'),
+                   # Required=True implied by Parameter
+                   # Name='driver_name', implied by Parameter
+                   ShortName=None,
+                   # Help is pulled from parameter since Paramter is not None
+                   InputHander=None),
+    OptparseOption(InputType='new_filepath',
+                   Parameter=None, #
+                   Required=True,
+                   Name='output_fp',
+                   ShortName='o',
+                   Help="Output file path",
+                   InputHandler=None)
+    ]
+outputs = [
+    OptparseResult(OutputType=None??,
+                   Parameter=None,
+                   Name='output_fp' # if specified, must exist as an input
+                   OutputHandler=foo,
+                   ResultKey='my_result_key')
+    ]
+        
+        param_conversions = {
+            #### directory is misnomer, this is a module path
         'command_cfg_directory':ParameterConversion(ShortName=None,
                                        LongName='command_cfg_directory',
                                        CLType=str),
@@ -39,17 +88,17 @@ param_conversions = {
 
 # The output map associated keys in the results returned from Command.run
 # without output handlers
-output_map = {'result':OutputHandler(OptionName='output_fp',
-                                     Function=write_string)
-    }
-
-# In case there are interface specific bits such as output files
-additional_options = [CLOption(Type='output_file',
-                 Help='the resulting configuration file',
-                 Name='output_fp',
-                 Required=True,
-                 LongName='output_fp',
-                 CLType='new_filepath',
-                 ShortName='o')
-    ]
+#output_map = {'result':OutputHandler(OptionName='output_fp',
+#                                     Function=write_string)
+#    }
+#
+## In case there are interface specific bits such as output files
+#additional_options = [CLOption(Type='output_file',
+#                 Help='the resulting configuration file',
+#                 Name='output_fp',
+#                 Required=True,
+#                 LongName='output_fp',
+#                 CLType='new_filepath',
+#                 ShortName='o')
+#    ]
 
