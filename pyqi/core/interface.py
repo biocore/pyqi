@@ -24,7 +24,6 @@ class Interface(object):
 
     def __init__(self, **kwargs):
         """ """
-        self.Options = []
         self.CmdInstance = None
 
         if self.CommandConstructor is None:
@@ -32,9 +31,6 @@ class Interface(object):
                                             "without a CommandConstructor.")
 
         self.CmdInstance = self.CommandConstructor(**kwargs)
-        for parameter in self.CmdInstance.Parameters:
-            option = self._option_factory(parameter)
-            self.Options.append(option)
 
     def __call__(self, in_, *args, **kwargs):
         self._the_in_validator(in_)
@@ -46,9 +42,9 @@ class Interface(object):
         raise NotImplementedError("All subclasses must implement "
                                   "_the_in_validator.")
 
-    def _option_factory(self, parameter):
-        raise NotImplementedError("All subclasses must implement "
-                                  "_option_factory.")
+    ### _option_factory not necessary, the InterfaceOptions link to 
+    ### Parameters where necessary. OptparseInterface._input_handler needs
+    ### to be smarter though
 
     def _input_handler(self, in_, *args, **kwargs):
         raise NotImplementedError("All subclasses must implement "
