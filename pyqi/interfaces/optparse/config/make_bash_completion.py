@@ -8,10 +8,9 @@
 # The full license is in the file COPYING.txt, distributed with this software.
 #-----------------------------------------------------------------------------
 
-from pyqi.core.interfaces.optparse import (CLOption,
-                                           UsageExample,
-                                           ParameterConversion,
-                                           OutputHandler)
+from pyqi.core.interfaces.optparse import (OptparseOption,
+                                           OptparseUsageExample,
+                                           OptparseResult)
 from pyqi.core.interfaces.optparse.output_handler import write_string
 from pyqi.commands.make_bash_completion import CommandConstructor
 
@@ -24,7 +23,8 @@ __maintainer__ = "Daniel McDonald"
 __email__ = "mcdonadt@colorado.edu"
 
 # How you can use the command from the command line
-usage_examples = [UsageExample(ShortDesc="Create a bash completion script",
+### need to make sure comments desc usage_examples goes into make_cli template (make_optparse?)
+usage_examples = [CLUsageExample(ShortDesc="Create a bash completion script",
                                LongDesc="Create a bash completion script for use with a QCLI driver",
                                Ex="%prog --command_cfg_directory pyqi.interfaces.optparse.config --driver_name pyqi -o ~/.bash_completion.d/pyqi")
     ]
@@ -48,6 +48,7 @@ outputs = [
                        ResultKey=foo)
         ]
 """
+### need to make sure comments desc input goes into make_cli template (make_optparse?)
 inputs = [
     OptparseOption(InputType=str,
                    Parameter=CommandConstructor.Parameters.getParameter('command_cfg_directory')
@@ -71,23 +72,25 @@ inputs = [
                    Help="Output file path",
                    InputHandler=None)
     ]
+
+### need to make sure comments desc output goes into make_cli template (make_optparse?)
 outputs = [
-    OptparseResult(OutputType=None??,
+    OptparseResult(OutputType=None, ### do we need an outputtype?
                    Parameter=None,
                    Name='output_fp' # if specified, must exist as an input
-                   OutputHandler=foo,
+                   OutputHandler=write_string,
                    ResultKey='my_result_key')
     ]
         
-        param_conversions = {
-            #### directory is misnomer, this is a module path
-        'command_cfg_directory':ParameterConversion(ShortName=None,
-                                       LongName='command_cfg_directory',
-                                       CLType=str),
-        'driver_name':ParameterConversion(ShortName=None,
-                                       LongName='driver_name',
-                                       CLType=str),
-    }
+#        param_conversions = {
+#            #### directory is misnomer, this is a module path
+#        'command_cfg_directory':ParameterConversion(ShortName=None,
+#                                       LongName='command_cfg_directory',
+#                                       CLType=str),
+#        'driver_name':ParameterConversion(ShortName=None,
+#                                       LongName='driver_name',
+#                                       CLType=str),
+#    }
 
 # The output map associated keys in the results returned from Command.run
 # without output handlers
