@@ -22,7 +22,7 @@ __email__ = "mcdonadt@colorado.edu"
 
 header = """#!/usr/bin/env python
 
-from pyqi.interface.cli import CLOption, UsageExample, ParameterConversion
+from pyqi.core.interfaces.optparse import CLOption, UsageExample, ParameterConversion
 from %(mod)s import CommandConstructor
 
 # How you can use the command from the command line

@@ -27,7 +27,7 @@ from pyqi.core.interfaces.optparse.input_handler import command_handler
 
 usage_examples = [UsageExample(ShortDesc='Stub out a CLI configuration',
                                LongDesc="""Consume an existing Command object and produce the base CLI configuration""",
-                               Ex="%prog -c pyqi.pyqi_command.make_cli.MakeCLI -m pyqi.pyqi_command -o make_cli.py")
+                               Ex="%prog -c pyqi.commands.make_cli.MakeCLI -m pyqi.commands -o make_cli.py")
     ]
 
 param_conversions = {
