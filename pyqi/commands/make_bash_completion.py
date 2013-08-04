@@ -9,7 +9,7 @@
 #-----------------------------------------------------------------------------
 
 from __future__ import division
-from pyqi.core.command import Command, Parameter
+from pyqi.core.command import Command, Parameter, ParameterCollection
 import importlib
 
 __author__ = "Daniel McDonald"
@@ -68,6 +68,13 @@ command_fmt = """       "%(command)s")
 class BashCompletion(Command):
     BriefDescription = "Construct a bash completion script"
     LongDescription = """Construct a bash tab completion script that will search through available commands and options"""
+    Parameters = ParameterCollection([
+        ### this name is a misnomer, cannot fix right now
+        Parameter(Name='command_cfg_directory', Required=True, DataType=str, 
+                  Help="The CLI command configuration module"),
+        Parameter(Name='driver_name', Required=True, DataType=str,
+                  Help="Name of the driver script")
+        ]
 
     def run(self, **kwargs):
         driver = kwargs['driver_name']
@@ -90,11 +97,5 @@ class BashCompletion(Command):
         return {'result':script_fmt % {'driver':driver, 
                                        'commands':all_commands,
                                        'command_list':command_list}}
-
-    def _get_parameters(self):
-        return [Parameter(Name='command_cfg_directory',Required=True,Type=str,
-                          Help='The CLI command configuration directory'),
-                 Parameter(Name='driver_name',Required=True,Type=str,
-                           Help='Name of the driver script')]
 
 CommandConstructor = BashCompletion

@@ -28,9 +28,9 @@ class Parameter(object):
     A ``Command`` variable is interface agnostic and are analogous to a 
     function argument.
     """
-    def __init__(self, Type, Help, Name, Required=False, Default=None,
+    def __init__(self, DataType, Help, Name, Required=False, Default=None,
                  DefaultDescription=None):
-        self.Type = Type
+        self.DataType = DataType
         self.Help = Help
         self.Default = Default
         self.Name = Name
@@ -42,21 +42,31 @@ class Parameter(object):
                     "with default value '%s'. Required parameters cannot have "
                     "default values." % (self.Name, self.Default))
 
+class ParameterCollection(dict):
+    """A collection of parameters with dict like lookup"""
+    def __init__(self, Parameters):
+        self.Parameters = Parameters
+        
+        for p in self.Parameters:
+            self[p.Name] = p
+
+    ### override setattr and contains to throw a more explicit error than
+    ### keyerror if a parameter doesn't exist?
+
 class Command(object):
     """Base class for ``Command``
 
     A ``Command`` is interface agnostic, knows how to run itself and knows 
     about the arguments that it can take (via ``Parameters``).
+
     """
     BriefDescription = "" # 1 sentence description
     LongDescription = """""" # longer, more detailed description
 
     def __init__(self, **kwargs):
         """ """
+        ### do we require/check for self.Parameters?
         self._logger = NullLogger()
-        self.Parameters = []
-        self.Parameters.extend(self._get_default_parameters())
-        self.Parameters.extend(self._get_parameters())
 
     def __call__(self, **kwargs):
         """Safely execute a ``Command``"""
@@ -87,16 +97,3 @@ class Command(object):
         as a result.
         """
         raise NotImplementedError("All subclasses must implement run.")
-
-    def _get_default_parameters(self):
-        return [Parameter(Type=bool,
-                          Help='Print information during execution -- useful '
-                               'for debugging',
-                          Name='verbose',
-                          Required=False,
-                          Default=False)]
-
-    def _get_parameters(self):
-        """Return a list of Parameters for the Command"""
-        raise NotImplementedError("All subclasses must implement "
-                                  "_get_parameters.")

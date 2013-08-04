@@ -17,7 +17,8 @@ __version__ = "0.1.0-dev"
 __maintainer__ = "Greg Caporaso"
 __email__ = "gregcaporaso@gmail.com"
 
-from pyqi.core.interface import Interface
+from pyqi.core.interface import Interface, InterfaceOption, \
+        InterfaceUsageExample, InterfaceResult
 from pyqi.core.factory import general_factory
 from pyqi.core.exception import IncompetentDeveloperError
 from pyqi.core.command import Parameter
@@ -36,42 +37,22 @@ def new_filepath(data, path):
     f.write(data)
     f.close()
 
-class OutputHandler(object):
-    """Handle result output
+class OptparseResult(InterfaceResult):
+    def _validate_result(self):
+        ### anything to validate here?
+        pass
 
-    OptionName - the long name of an output command line option
-    Function   - a Python function that accepts the result name, the 
-                 corresponding option value (if tied to a command line option),
-                 and the result data
-    """
-    def __init__(self, OptionName, Function):
-        self.OptionName = OptionName
-        self.Function = Function
-
-class CLOption(Parameter):
+class OptparseOption(InterfaceOption):
     """An augmented option that expands a Parameter into an Option"""
-    _cl_types = {'new_filepath': new_filepath}
-    def __init__(self, Type, Help, Name, LongName, CLType, CLAction='store',
-                 Required=False, Default=None, DefaultDescription=None,
-                 ShortName=None, ResultName=None):
-        self.LongName = LongName
-        self.CLType = CLType
-        self.CLAction = CLAction
-        self.ShortName = ShortName
-        self.ResultName = ResultName
+    def _validate_option(self):
+        ### require Name, type, etc???
+        pass 
 
-        if CLType in self._cl_types:
-            self._cl_type_action = self._cl_types['new_filepath']
-
-        super(CLOption,self).__init__(Type=Type,Help=Help,Name=Name,
-                                      Required=Required,Default=Default,
-                                      DefaultDescription=DefaultDescription)
-        
     def __str__(self):
         if self.ShortName is None:
-            return '--%s' % self.LongName
+            return '--%s' % self.Name
         else:
-            return '-%s/--%s' % (self.ShortName, self.LongName)
+            return '-%s/--%s' % (self.ShortName, self.Name)
 
     def getOptparseOption(self):
         if self.Required:
@@ -81,11 +62,11 @@ class CLOption(Parameter):
                 help_text += ' [REQUIRED]'
 
             if self.ShortName is None:
-                option = make_option('--' + self.LongName, type=self.CLType,
+                option = make_option('--' + self.Name, type=self.CLType,
                                      help=help_text)
             else:
                 option = make_option('-' + self.ShortName,
-                                     '--' + self.LongName, type=self.CLType,
+                                     '--' + self.Name, type=self.CLType,
                                      help=help_text)
         else:
             if self.DefaultDescription is None:
@@ -95,51 +76,23 @@ class CLOption(Parameter):
                                                   self.DefaultDescription)
 
             if self.ShortName is None:
-                option = make_option('--' + self.LongName, type=self.CLType,
+                option = make_option('--' + self.Name, type=self.CLType,
                                      help=help_text, default=self.Default)
             else:
                 option = make_option('-' + self.ShortName,
-                                     '--' + self.LongName, type=self.CLType,
+                                     '--' + self.Name, type=self.CLType,
                                      help=help_text, default=self.Default)
         return option
 
-    @classmethod
-    def fromParameter(cls, parameter, LongName, CLType, CLAction='store',
-                      ShortName=None):
-        """Go from an existing ``Parameter`` to a ``CLOption``"""
-        result = cls(Type=parameter.Type,
-                     Help=parameter.Help,
-                     Name=parameter.Name,
-                     Required=parameter.Required,
-                     LongName=LongName,
-                     CLType=CLType,
-                     CLAction=CLAction,
-                     Default=parameter.Default,
-                     DefaultDescription=parameter.DefaultDescription,
-                     ShortName=ShortName)
-        return result
-
-class UsageExample(object):
+class OptparseUsageExample(InterfaceUsageExample):
     """Provide structure to a usage example"""
-    def __init__(self, ShortDesc, LongDesc, Ex):
-        self.ShortDesc = ShortDesc
-        self.LongDesc = LongDesc
-        self.Ex = Ex
-
-class ParameterConversion(object):
-    """Validation and structure for converting from a parameter to an option"""
-    def __init__(self, LongName, CLType, CLAction=None, InHandler=None, 
-                 ShortName=None):
-        if CLType not in CLTypes:
-            raise IncompetentDeveloperError("Invalid CLType specified: %s" % CLType)
-        if CLAction is not None and CLAction not in CLActions:
-            raise IncompetentDeveloperError("Invalid CLAction specified: %s" % CLAction)
-
-        self.ShortName = ShortName
-        self.LongName = LongName
-        self.CLType = CLType
-        self.CLAction = CLAction
-        self.InHandler = InHandler
+    def _validate_usage_example(self):
+        if self.ShortDesc is None:
+            raise UsageExampleError("Must define ShortDesc")
+        if self.LongDesc is None:
+            raise UsageExampleError("Must define LongDesc")
+        if self.Ex is None:
+            raise UsageExampleError("Must define Ex")
 
 class CLInterface(Interface):
     """A command line interface"""
@@ -149,7 +102,7 @@ class CLInterface(Interface):
     RequiredInputLine = '{} indicates required input (order unimportant)'
     
     def __init__(self, **kwargs):
-        self.BelovedFunctionality = {}
+        #self.BelovedFunctionality = {}
         self.UsageExamples = []
         self.UsageExamples.extend(self._get_usage_examples())
 
@@ -157,54 +110,17 @@ class CLInterface(Interface):
             raise IncompetentDeveloperError("There are no usage examples "
                                             "associated with this command.")
 
-        self.ParameterConversionInfo = {
-                'verbose':ParameterConversion(ShortName='v',
-                                              LongName='verbose',
-                                              CLType=None,
-                                              CLAction='store_true')
-                }
-
-        self.ParameterConversionInfo.update(self._get_param_conv_info())
-       
         super(CLInterface, self).__init__(**kwargs)
-
-        self.Options.extend(self._get_additional_options())
-
-    def _get_param_conv_info(self):
-        """Return the ``ParameterConversion`` objects"""
-        raise NotImplementedError("Must define _get_param_conv_info")
 
     def _get_usage_examples(self):
         """Return the ``UsageExample`` objects"""
         raise NotImplementedError("Must define _get_usage_examples")
-
-    def _get_additional_options(self):
-        """Return the ``CLOption`` objects"""
-        raise NotImplementedError("Must define _get_additional_options")
-
-    def _get_output_map(self):
-        """Return the ``output_map`` objects"""
-        raise NotImplementedError("Must define _get_output_map")
 
     def _the_in_validator(self, in_):
         """Validate input coming from the command line"""
         if not isinstance(in_, list):
             raise IncompetentDeveloperError("Unsupported input '%r'. Input "
                                             "must be a list." % in_)
-
-    def _option_factory(self, parameter):
-        """Promote a parameter to a CLOption"""
-        name = parameter.Name
-        if name not in self.ParameterConversionInfo:
-            raise IncompetentDeveloperError("%s does not have parameter "
-                    "conversion info (parameter conversions are available for "
-                    "%s)" % (name,
-                             ' '.join(self.ParameterConversionInfo.keys())))
-
-        return CLOption.fromParameter(parameter,
-                     self.ParameterConversionInfo[name].LongName,
-                     self.ParameterConversionInfo[name].CLType,
-                     ShortName=self.ParameterConversionInfo[name].ShortName)
 
     def _input_handler(self, in_, *args, **kwargs):
         """Parses command-line input."""
@@ -320,21 +236,14 @@ class CLInterface(Interface):
                 opt_value = self.BelovedFunctionality[handler.OptionName]
                 results[k] = handler.Function(k, results[k], opt_value)
 
-def cli(command_constructor, usage_examples, param_conversions, added_options,
-        output_map):
+def cli(command_constructor, usage_examples, inputs, outputs):
     """Command line interface factory
     
     command_constructor - a subclass of ``Command``
     usage_examples - usage examples for using ``command_constructor`` on via a
         command line interface.
-    param_conversions - necessary conversion information to converting
-        parameters to options.
-    added_options - any additional options that are not defined by the 
-        ``command_constructor``.
-    output_map - result keys to ``OutputHandler``
     """
-    return general_factory(command_constructor, usage_examples,
-                           param_conversions, added_options, output_map,
+    return general_factory(command_constructor, usage_examples, inputs, outputs,
                            CLInterface)
 
 def clmain(interface_object, local_argv):

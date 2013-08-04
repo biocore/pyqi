@@ -19,15 +19,11 @@ __email__ = "gregcaporaso@gmail.com"
 
 from pyqi.core.exception import IncompetentDeveloperError
 
-# an option is interface dependent
-# a parameter is interface independent
-
 class Interface(object):
     CommandConstructor = None
 
     def __init__(self, **kwargs):
         """ """
-        self.Options = []
         self.CmdInstance = None
 
         if self.CommandConstructor is None:
@@ -35,9 +31,6 @@ class Interface(object):
                                             "without a CommandConstructor.")
 
         self.CmdInstance = self.CommandConstructor(**kwargs)
-        for parameter in self.CmdInstance.Parameters:
-            option = self._option_factory(parameter)
-            self.Options.append(option)
 
     def __call__(self, in_, *args, **kwargs):
         self._the_in_validator(in_)
@@ -49,9 +42,9 @@ class Interface(object):
         raise NotImplementedError("All subclasses must implement "
                                   "_the_in_validator.")
 
-    def _option_factory(self, parameter):
-        raise NotImplementedError("All subclasses must implement "
-                                  "_option_factory.")
+    ### _option_factory not necessary, the InterfaceOptions link to 
+    ### Parameters where necessary. OptparseInterface._input_handler needs
+    ### to be smarter though
 
     def _input_handler(self, in_, *args, **kwargs):
         raise NotImplementedError("All subclasses must implement "
@@ -60,3 +53,75 @@ class Interface(object):
     def _output_handler(self, results):
         raise NotImplementedError("All subclasses must implement "
                                   "_output_handler.")
+
+class InterfaceOption(object):
+    """Describes an option and what to do with it"""
+    def __init__(self, InputType=None, Parameter=None, Required=False, 
+                 Name=None, ShortName=None, InputHandler=None, Help=None):
+        self.Parameter = Parameter
+        if self.Parameter is not None:
+            self.Name = Parameter.Name
+            self.Help = Parameter.Help
+
+            # If a parameter is required, the option is always required, but
+            # if a parameter is not required, but the option does require it,
+            # then we make the option required.
+            if not Parameter.Required and Required:
+                self.Required = True
+            else:
+                self.Required = Parameter.Required
+        else:
+            self.Name = Parameter.Name
+            self.Help = Parameter.Help
+            self.Required = Parameter.Required
+            
+        self.ShortName = ShortName
+        self.InputType = InputType
+        self.InputHandler = InputHandler
+        
+        self._validate_option()
+
+    def _validate_option(self):
+        """Interface specific validation requirements"""
+        raise NotImplementedError("Must define in the subclass")
+
+class InterfaceResult(object):
+    """Describes a result and what to do with it"""
+
+    def __init__(self, OutputType=None, Parameter=None, Name=None, 
+                 OutputHandler=None, ResultKey=None):
+        self.Parameter = Parameter
+        if self.Parameter is not None:
+            self.Name = Parameter.Name
+        else:
+            self.Name = Name # can be None
+
+        if ResultKey is None:
+            raise IncompetentDeveloperError('Must associate to a result key')
+        else:
+            self.ResultKey = ResultKey
+
+        if OutputHandler is None:
+            raise IncompetentDeveloperError('Must associate to a OutputHandler')
+        else:
+            self.OutputHandler = OutputHandler
+
+        self._validate_result()
+
+    def _validate_result(self):
+        """Validate a result object"""
+        raise NotImplementedError("Must implement in a subclass")
+
+class InterfaceUsageExample(object): 
+    """Provide structure to a usage example"""
+    def __init__(self, ShortDesc, LongDesc, Ex):
+        self.ShortDesc = ShortDesc
+        self.LongDesc = LongDesc
+        self.Ex = Ex
+
+        self._validate_usage_example()
+
+    def _validate_usage_example(self):
+        """Interface specific usage example validation"""
+        raise NotImplementedError("Must define in the subclass")
+

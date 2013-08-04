@@ -61,8 +61,7 @@ additional_options = [
                  Required=True,
                  LongName='output-fp',
                  CLType='new_filepath',
-                 ShortName='o',
-                 ResultName='result')
+                 ShortName='o')
         ]
 
 output_map = {'result':OutputHandler(OptionName='output_fp',
