@@ -99,5 +99,12 @@ class CLInterfaceTests(TestCase):
     def test_init(self):
         self.assertRaises(NotImplementedError, CLInterface)
 
+    def test_option_factory(self):
+        obs = self.interface._option_factory(Parameter('a','b','c'))
+        self.assertEqual(obs.Type, 'a')
+        self.assertEqual(obs.Help, 'b')
+        self.assertEqual(obs.Name, 'c')
+        self.assertTrue(isinstance(obs, CLOption))
+
 if __name__ == '__main__':
     main()
