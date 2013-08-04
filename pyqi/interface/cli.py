@@ -53,12 +53,11 @@ class CLOption(Parameter):
     _cl_types = {'new_filepath': new_filepath}
     def __init__(self, Type, Help, Name, LongName, CLType, CLAction='store',
                  Required=False, Default=None, DefaultDescription=None,
-                 ShortName=None, ResultName=None):
+                 ShortName=None):
         self.LongName = LongName
         self.CLType = CLType
         self.CLAction = CLAction
         self.ShortName = ShortName
-        self.ResultName = ResultName
 
         if CLType in self._cl_types:
             self._cl_type_action = self._cl_types['new_filepath']
@@ -266,7 +265,7 @@ class CLInterface(Interface):
             if v.InHandler is not None:
                 long_name = v.LongName
                 value = self.BelovedFunctionality[long_name]
-                self.BelovedFunctionality[long_name] = v.InHandler(value)
+                self.BelovedFunctionality[k] = v.InHandler(value)
             else:
                 pass
         return self.BelovedFunctionality
