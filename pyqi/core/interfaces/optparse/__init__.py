@@ -17,9 +17,9 @@ __version__ = "0.1.0-dev"
 __maintainer__ = "Greg Caporaso"
 __email__ = "gregcaporaso@gmail.com"
 
-from pyqi.interface.core import Interface, InterfaceOption, \
+from pyqi.core.interface import Interface, InterfaceOption, \
         InterfaceUsageExample
-from pyqi.interface.factory import general_factory
+from pyqi.core.factory import general_factory
 from pyqi.core.exception import IncompetentDeveloperError
 from pyqi.core.command import Parameter
 from pyqi.option_parsing import (OptionParser, OptionGroup, Option, 
@@ -231,14 +231,14 @@ class CLInterface(Interface):
                 opt_value = self.BelovedFunctionality[handler.OptionName]
                 results[k] = handler.Function(k, results[k], opt_value)
 
-def cli(command_constructor, usage_examples, inputs, outputs)
+def cli(command_constructor, usage_examples, inputs, outputs):
     """Command line interface factory
     
     command_constructor - a subclass of ``Command``
     usage_examples - usage examples for using ``command_constructor`` on via a
         command line interface.
     """
-    return general_factory(command_constructor, usage_examples, inputs, outputs
+    return general_factory(command_constructor, usage_examples, inputs, outputs,
                            CLInterface)
 
 def clmain(interface_object, local_argv):
