@@ -19,7 +19,7 @@ __email__ = "mcdonadt@colorado.edu"
 
 from unittest import TestCase, main
 from pyqi.interface.cli import OutputHandler, CLOption, UsageExample, \
-        ParameterConversion, CLInterface
+        ParameterConversion, CLInterface, cli, clmain
 from pyqi.core.exception import IncompetentDeveloperError
 from pyqi.core.command import Command, Parameter
 
@@ -81,23 +81,6 @@ def oh(key, data, opt_value=None):
 
 class CLInterfaceTests(TestCase):
     def setUp(self):
-        class ghetto(Command):
-            def _get_parameters(self):
-                return [Parameter(str,'b','c')]
-            def run(self, **kwargs):
-                return {'itsaresult':10}
-        
-        class fabulous(CLInterface):
-            CommandConstructor = ghetto
-            def _get_param_conv_info(self):
-                return {'c':ParameterConversion('a',str)}
-            def _get_usage_examples(self):
-                return [UsageExample('a','b','c')]
-            def _get_additional_options(self):
-                return []
-            def _get_output_map(self):
-                return {'itsaresult':OutputHandler(OptionName=None,
-                                                   Function=oh)}
         self.interface = fabulous()
     
     def test_init(self):
@@ -124,6 +107,38 @@ class CLInterfaceTests(TestCase):
         self.interface._output_handler(results)
         self.assertEqual(results, {'itsaresult':40})
 
+class GeneralTests(TestCase):
+    def setUp(self):
+        self.obj = cli(ghetto, [UsageExample('a','b','c')],
+                       {'c':ParameterConversion('a',str)}, [], 
+                       {'itsaresult':OutputHandler(OptionName=None,
+                                              Function=oh)})
+
+    def test_cli(self):
+        # exercise it
+        foo = self.obj()
+
+    def test_clmain(self):
+        # exercise it
+        foo = clmain(self.obj, ['testing', '--a','bar'])
+        
+class ghetto(Command):
+    def _get_parameters(self):
+        return [Parameter(str,'b','c')]
+    def run(self, **kwargs):
+        return {'itsaresult':10}
+
+class fabulous(CLInterface):
+    CommandConstructor = ghetto
+    def _get_param_conv_info(self):
+        return {'c':ParameterConversion('a',str)}
+    def _get_usage_examples(self):
+        return [UsageExample('a','b','c')]
+    def _get_additional_options(self):
+        return []
+    def _get_output_map(self):
+        return {'itsaresult':OutputHandler(OptionName=None,
+                                           Function=oh)}
 usage_lines = """usage: %prog [options] {}
 
 [] indicates optional input (order unimportant)
