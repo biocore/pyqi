@@ -52,14 +52,14 @@ outputs = [
 ### need to make sure comments desc input goes into make_cli template (make_optparse?)
 inputs = [
     OptparseOption(InputType=str,
-                   Parameter=CommandConstructor.Parameters.getParameter('command_cfg_directory'),
+                   Parameter=CommandConstructor.Parameters['command_cfg_directory'],
                    # Required=True implied by Parameter
                    # Name='command_cfg_directory', implied by Parameter
                    ShortName=None,
                    # Help is pulled from parameter since Parameter is not None
                    InputHandler=None), # optparse handles str just fine
     OptparseOption(InputType=str,
-                   Parameter=CommandConstructor.Parameters.getParameter('driver_name'),
+                   Parameter=CommandConstructor.Parameters['driver_name'],
                    # Required=True implied by Parameter
                    # Name='driver_name', implied by Parameter
                    ShortName=None,
