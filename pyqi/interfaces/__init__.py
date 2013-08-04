@@ -7,6 +7,7 @@
 #
 # The full license is in the file COPYING.txt, distributed with this software.
 #-----------------------------------------------------------------------------
+from __future__ import division
 
 __author__ = "Greg Caporaso"
 __copyright__ = "Copyright 2013, The QIIME Project"
