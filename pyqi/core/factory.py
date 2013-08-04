@@ -17,19 +17,17 @@ __version__ = "0.1.0-dev"
 __maintainer__ = "Daniel McDonald"
 __email__ = "mcdonadt@colorado.edu"
 
-def general_factory(command_constructor, usage_examples, param_conversions, 
-            added_options, output_map, interface=None):
+def general_factory(command_constructor, usage_examples, inputs, outputs, 
+                    interface=None):
     """Generalized interface factory"""
     class IObject(interface):
         """Dynamic interface object"""
         CommandConstructor = command_constructor
-        def _get_param_conv_info(self):
-            return param_conversions
-        def _get_additional_options(self):
-            return added_options
         def _get_usage_examples(self):
             return usage_examples
-        def _get_output_map(self):
-            return output_map
+        def _get_inputs(self):
+            return inputs
+        def _get_outputs(self):
+            return outputs
 
     return IObject
