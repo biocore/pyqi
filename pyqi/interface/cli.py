@@ -266,7 +266,7 @@ class CLInterface(Interface):
             if v.InHandler is not None:
                 long_name = v.LongName
                 value = self.BelovedFunctionality[long_name]
-                self.BelovedFunctionality[long_name] = v.InHandler(value)
+                self.BelovedFunctionality[k] = v.InHandler(value)
             else:
                 pass
         return self.BelovedFunctionality
