@@ -24,9 +24,10 @@ __email__ = "mcdonadt@colorado.edu"
 
 # How you can use the command from the command line
 ### need to make sure comments desc usage_examples goes into make_cli template (make_optparse?)
-usage_examples = [CLUsageExample(ShortDesc="Create a bash completion script",
-                               LongDesc="Create a bash completion script for use with a QCLI driver",
-                               Ex="%prog --command_cfg_directory pyqi.interfaces.optparse.config --driver_name pyqi -o ~/.bash_completion.d/pyqi")
+usage_examples = [OptparseUsageExample(
+                    ShortDesc="Create a bash completion script",
+                    LongDesc="Create a bash completion script for use with a QCLI driver",
+                    Ex="%prog --command_cfg_directory pyqi.interfaces.optparse.config --driver_name pyqi -o ~/.bash_completion.d/pyqi")
     ]
 
 # Parameter conversions tell the interface how to describe command line 
@@ -51,7 +52,7 @@ outputs = [
 ### need to make sure comments desc input goes into make_cli template (make_optparse?)
 inputs = [
     OptparseOption(InputType=str,
-                   Parameter=CommandConstructor.Parameters.getParameter('command_cfg_directory')
+                   Parameter=CommandConstructor.Parameters.getParameter('command_cfg_directory'),
                    # Required=True implied by Parameter
                    # Name='command_cfg_directory', implied by Parameter
                    ShortName=None,
@@ -77,7 +78,7 @@ inputs = [
 outputs = [
     OptparseResult(OutputType=None, ### do we need an outputtype?
                    Parameter=None,
-                   Name='output_fp' # if specified, must exist as an input
+                   Name='output_fp', # if specified, must exist as an input
                    OutputHandler=write_string,
                    ResultKey='my_result_key')
     ]
