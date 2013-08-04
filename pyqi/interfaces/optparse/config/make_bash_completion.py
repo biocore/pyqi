@@ -8,9 +8,12 @@
 # The full license is in the file COPYING.txt, distributed with this software.
 #-----------------------------------------------------------------------------
 
-from pyqi.interface.cli import CLOption, UsageExample, ParameterConversion, OutputHandler
-from pyqi.pyqi_command.make_bash_completion import CommandConstructor
-from pyqi.interface.output_handler.cli import write_string
+from pyqi.core.interfaces.optparse import (CLOption,
+                                           UsageExample,
+                                           ParameterConversion,
+                                           OutputHandler)
+from pyqi.core.interfaces.optparse.output_handler import write_string
+from pyqi.commands.make_bash_completion import CommandConstructor
 
 __author__ = "Daniel McDonald"
 __copyright__ = "Copyright 2013, The QCLI Project"

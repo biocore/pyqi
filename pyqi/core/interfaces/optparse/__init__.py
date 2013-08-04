@@ -17,8 +17,8 @@ __version__ = "0.1.0-dev"
 __maintainer__ = "Greg Caporaso"
 __email__ = "gregcaporaso@gmail.com"
 
-from pyqi.interface.core import Interface
-from pyqi.interface.factory import general_factory
+from pyqi.core.interface import Interface
+from pyqi.core.factory import general_factory
 from pyqi.core.exception import IncompetentDeveloperError
 from pyqi.core.command import Parameter
 from pyqi.option_parsing import (OptionParser, OptionGroup, Option, 
