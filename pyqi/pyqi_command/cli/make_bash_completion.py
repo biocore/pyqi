@@ -29,13 +29,12 @@ usage_examples = [UsageExample(ShortDesc="Create a bash completion script",
 # Parameter conversions tell the interface how to describe command line 
 # options
 param_conversions = {
-    		'command_cfg_directory':ParameterConversion(ShortName=None,
-					LongName='command_cfg_directory',
-					CLType=str),
-		'driver_name':ParameterConversion(ShortName=None,
-					LongName='driver_name',
-					CLType=str),
-
+        'command_cfg_directory':ParameterConversion(ShortName=None,
+                                       LongName='command_cfg_directory',
+                                       CLType=str),
+        'driver_name':ParameterConversion(ShortName=None,
+                                       LongName='driver_name',
+                                       CLType=str),
     }
 
 # The output map associated keys in the results returned from Command.run
