@@ -29,10 +29,16 @@ def command_handler(option_value):
     mod = __import__(module, fromlist=[klass])
     return getattr(mod, klass)()
 
-def string_list_handler(option_value):
+def string_list_handler(option_value=None):
     """Split a comma-separated string into a list of strings."""
-    return option_value.split(',')
+    result = None
+    if option_value is not None:
+        result = option_value.split(',')
+    return result
 
-def file_reading_handler(option_value):
+def file_reading_handler(option_value=None):
     """Open a filepath for reading."""
-    return open(option_value, 'U')
+    result = None
+    if option_value is not None:
+        result = open(option_value, 'U')
+    return result
