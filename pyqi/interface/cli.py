@@ -315,10 +315,10 @@ class CLInterface(Interface):
                                                 "output '%s' in results." % k)
 
             if handler.OptionName is None:
-                handler.Function(k, results[k])
+                results[k] = handler.Function(k, results[k])
             else:
                 opt_value = self.BelovedFunctionality[handler.OptionName]
-                handler.Function(k, results[k], opt_value)
+                results[k] = handler.Function(k, results[k], opt_value)
 
 def cli(command_constructor, usage_examples, param_conversions, added_options,
         output_map):
