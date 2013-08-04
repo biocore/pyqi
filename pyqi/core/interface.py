@@ -119,7 +119,7 @@ class InterfaceUsageExample(object):
         self.LongDesc = LongDesc
         self.Ex = Ex
 
-        self._validate_usage_example(self)
+        self._validate_usage_example()
 
     def _validate_usage_example(self):
         """Interface specific usage example validation"""
