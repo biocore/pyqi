@@ -17,15 +17,17 @@ __version__ = "0.1.0-dev"
 __maintainer__ = "Daniel McDonald"
 __email__ = "mcdonadt@colorado.edu"
 
-from pyqi.interface.cli import CLOption, UsageExample, ParameterConversion, \
-    OutputHandler
-from pyqi.pyqi_command.make_cli import CommandConstructor
-from pyqi.interface.input_handler.cli import command_handler
-from pyqi.interface.output_handler.cli import write_string
+from pyqi.core.interfaces.optparse import (CLOption,
+                                           UsageExample,
+                                           ParameterConversion,
+                                           OutputHandler)
+from pyqi.core.interfaces.optparse.output_handler import write_string
+from pyqi.commands.make_cli import CommandConstructor
+from pyqi.core.interfaces.optparse.input_handler import command_handler
 
 usage_examples = [UsageExample(ShortDesc='Stub out a CLI configuration',
                                LongDesc="""Consume an existing Command object and produce the base CLI configuration""",
-                               Ex="%prog -c pyqi.pyqi_command.make_cli.MakeCLI -m pyqi.pyqi_command -o make_cli.py")
+                               Ex="%prog -c pyqi.commands.make_cli.MakeCLI -m pyqi.commands -o make_cli.py")
     ]
 
 param_conversions = {

@@ -11,24 +11,30 @@
 __author__ = "Daniel McDonald"
 __copyright__ = "Copyright 2013, The QCLI Project"
 __credits__ = ["Daniel McDonald", "Greg Caporaso", "Doug Wendel",
-               "Jai Ram Rideout"]
+                       "Jai Ram Rideout"]
 __license__ = "BSD"
 __version__ = "0.1-dev"
 __maintainer__ = "Daniel McDonald"
 __email__ = "mcdonadt@colorado.edu"
 
 from unittest import TestCase, main
-from pyqi.interface.input_handler.cli import command_handler
-from pyqi.pyqi_command.make_cli import MakeCLI
+from pyqi.core.interfaces.optparse.output_handler import write_string
+from pyqi.core.exception import IncompetentDeveloperError
+import os
 
-class CLIInputHandlerTests(TestCase):
+class CLIOutputHandlerTests(TestCase):
     def setUp(self):
         pass
 
-    def test_command_handler(self):
-        exp = MakeCLI()
-        obs = command_handler('pyqi.pyqi_command.make_cli.MakeCLI')
-        self.assertEqual(type(obs), type(exp))
+    def test_write_string(self):
+        # can't write without a path
+        self.assertRaises(IncompetentDeveloperError, write_string, 'a','b')
+
+        write_string('foo','bar','testfile')
+        obs = open('testfile').read()
+        self.assertEqual(obs, 'bar')
+
+        os.remove('testfile')
 
 if __name__ == '__main__':
     main()

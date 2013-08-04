@@ -16,6 +16,8 @@ import CGIHTTPServer
 ## This line enables CGI error reporting
 import cgitb; cgitb.enable()
 
+from pyqi.core.exception import IncompetentDeveloperError
+
 PORT=8000
 
 def usage():
@@ -41,5 +43,6 @@ if __name__ == '__main__':
     #handler.cgi_directories = ['/']
     httpd = server(server_address, handler)
 
-    print "Serving at port", port
+    print "Server started. Open a browser window to the following URL:\nlocalhost:{0}/htbin/commands.py".format(port)
     httpd.serve_forever()
+

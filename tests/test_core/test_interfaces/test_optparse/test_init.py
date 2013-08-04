@@ -18,7 +18,7 @@ __maintainer__ = "Daniel McDonald"
 __email__ = "mcdonadt@colorado.edu"
 
 from unittest import TestCase, main
-from pyqi.interface.cli import OutputHandler, CLOption, UsageExample, \
+from pyqi.core.interfaces.optparse import OutputHandler, CLOption, UsageExample, \
         ParameterConversion, CLInterface, cli, clmain
 from pyqi.core.exception import IncompetentDeveloperError
 from pyqi.core.command import Command, Parameter

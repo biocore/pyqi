@@ -17,10 +17,12 @@ __version__ = "0.1.0-dev"
 __maintainer__ = "Daniel McDonald"
 __email__ = "mcdonadt@colorado.edu"
 
-from pyqi.interface.cli import CLOption, UsageExample, ParameterConversion, \
-        OutputHandler
-from pyqi.pyqi_command.make_command import CommandConstructor
-from pyqi.interface.output_handler.cli import write_string
+from pyqi.core.interfaces.optparse import (CLOption,
+                                           UsageExample,
+                                           ParameterConversion,
+                                           OutputHandler)
+from pyqi.core.interfaces.optparse.output_handler import write_string
+from pyqi.commands.make_command import CommandConstructor
 
 usage_examples = [
         UsageExample(ShortDesc="Basic function",

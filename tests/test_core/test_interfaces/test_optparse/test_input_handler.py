@@ -1,11 +1,5 @@
 #!/usr/bin/env python
 
-"""Command line interface input handlers
-
-All input handlers must conform to the following function definittion
-
-function(option_value)
-"""
 #-----------------------------------------------------------------------------
 # Copyright (c) 2013, The BiPy Development Team.
 #
@@ -23,8 +17,18 @@ __version__ = "0.1-dev"
 __maintainer__ = "Daniel McDonald"
 __email__ = "mcdonadt@colorado.edu"
 
-def command_handler(option_value):
-    """Dynamically load a Python object from a module and return an instance"""
-    module, klass = option_value.rsplit('.',1)
-    mod = __import__(module, fromlist=[klass])
-    return getattr(mod, klass)()
+from unittest import TestCase, main
+from pyqi.core.interfaces.optparse.input_handler import command_handler
+from pyqi.commands.make_cli import MakeCLI
+
+class CLIInputHandlerTests(TestCase):
+    def setUp(self):
+        pass
+
+    def test_command_handler(self):
+        exp = MakeCLI()
+        obs = command_handler('pyqi.commands.make_cli.MakeCLI')
+        self.assertEqual(type(obs), type(exp))
+
+if __name__ == '__main__':
+    main()
