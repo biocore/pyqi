@@ -19,9 +19,6 @@ __email__ = "gregcaporaso@gmail.com"
 
 from pyqi.core.exception import IncompetentDeveloperError
 
-# an option is interface dependent
-# a parameter is interface independent
-
 class Interface(object):
     CommandConstructor = None
 
