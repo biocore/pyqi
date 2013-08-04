@@ -29,7 +29,7 @@ class BashCompletionTests(TestCase):
         self.assertEqual(_get_cfg_module('pyqi'), pyqi)
 
     def test_load_cfg(self):
-        pc, ao = _load_cfg('pyqi.pyqi_command.cli', 'make_bash_completion')
+        pc, ao = _load_cfg('pyqi.interfaces.optparse.config', 'make_bash_completion')
         self.assertEqual(pc, param_conversions)
         self.assertEqual(ao, additional_options)
     
@@ -37,7 +37,7 @@ class BashCompletionTests(TestCase):
         obj = BashCompletion()
 
     def test_run(self):
-        params = {'command_cfg_directory':'pyqi.pyqi_command.cli',
+        params = {'command_cfg_directory':'pyqi.interfaces.optparse.config',
                   'driver_name':'pyqi'}
         obs = BashCompletion().run(**params)
         self.assertEqual(obs, {'result':outputandstuff})    

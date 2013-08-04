@@ -27,7 +27,7 @@ class CLIInputHandlerTests(TestCase):
 
     def test_command_handler(self):
         exp = MakeCLI()
-        obs = command_handler('pyqi.pyqi_command.make_cli.MakeCLI')
+        obs = command_handler('pyqi.commands.make_cli.MakeCLI')
         self.assertEqual(type(obs), type(exp))
 
 if __name__ == '__main__':
