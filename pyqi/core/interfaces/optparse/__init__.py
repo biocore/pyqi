@@ -37,7 +37,7 @@ def new_filepath(data, path):
     f.write(data)
     f.close()
 
-class CLOption(InterfaceOption):
+class OptparseOption(InterfaceOption):
     """An augmented option that expands a Parameter into an Option"""
     def _validate_option(self):
         # require Name, type, etc???
@@ -79,7 +79,7 @@ class CLOption(InterfaceOption):
                                      help=help_text, default=self.Default)
         return option
 
-class CLUsageExample(InterfaceUsageExample):
+class OptparseUsageExample(InterfaceUsageExample):
     """Provide structure to a usage example"""
     def _validate_usage_example(self):
         if self.ShortDesc is None:
@@ -97,7 +97,7 @@ class CLInterface(Interface):
     RequiredInputLine = '{} indicates required input (order unimportant)'
     
     def __init__(self, **kwargs):
-        self.BelovedFunctionality = {}
+        #self.BelovedFunctionality = {}
         self.UsageExamples = []
         self.UsageExamples.extend(self._get_usage_examples())
 
@@ -105,54 +105,17 @@ class CLInterface(Interface):
             raise IncompetentDeveloperError("There are no usage examples "
                                             "associated with this command.")
 
-        self.ParameterConversionInfo = {
-                'verbose':ParameterConversion(ShortName='v',
-                                              LongName='verbose',
-                                              CLType=None,
-                                              CLAction='store_true')
-                }
-
-        self.ParameterConversionInfo.update(self._get_param_conv_info())
-       
         super(CLInterface, self).__init__(**kwargs)
-
-        self.Options.extend(self._get_additional_options())
-
-    def _get_param_conv_info(self):
-        """Return the ``ParameterConversion`` objects"""
-        raise NotImplementedError("Must define _get_param_conv_info")
 
     def _get_usage_examples(self):
         """Return the ``UsageExample`` objects"""
         raise NotImplementedError("Must define _get_usage_examples")
-
-    def _get_additional_options(self):
-        """Return the ``CLOption`` objects"""
-        raise NotImplementedError("Must define _get_additional_options")
-
-    def _get_output_map(self):
-        """Return the ``output_map`` objects"""
-        raise NotImplementedError("Must define _get_output_map")
 
     def _the_in_validator(self, in_):
         """Validate input coming from the command line"""
         if not isinstance(in_, list):
             raise IncompetentDeveloperError("Unsupported input '%r'. Input "
                                             "must be a list." % in_)
-
-    def _option_factory(self, parameter):
-        """Promote a parameter to a CLOption"""
-        name = parameter.Name
-        if name not in self.ParameterConversionInfo:
-            raise IncompetentDeveloperError("%s does not have parameter "
-                    "conversion info (parameter conversions are available for "
-                    "%s)" % (name,
-                             ' '.join(self.ParameterConversionInfo.keys())))
-
-        return CLOption.fromParameter(parameter,
-                     self.ParameterConversionInfo[name].LongName,
-                     self.ParameterConversionInfo[name].CLType,
-                     ShortName=self.ParameterConversionInfo[name].ShortName)
 
     def _input_handler(self, in_, *args, **kwargs):
         """Parses command-line input."""
@@ -268,21 +231,14 @@ class CLInterface(Interface):
                 opt_value = self.BelovedFunctionality[handler.OptionName]
                 results[k] = handler.Function(k, results[k], opt_value)
 
-def cli(command_constructor, usage_examples, param_conversions, added_options,
-        output_map):
+def cli(command_constructor, usage_examples, inputs, outputs)
     """Command line interface factory
     
     command_constructor - a subclass of ``Command``
     usage_examples - usage examples for using ``command_constructor`` on via a
         command line interface.
-    param_conversions - necessary conversion information to converting
-        parameters to options.
-    added_options - any additional options that are not defined by the 
-        ``command_constructor``.
-    output_map - result keys to ``OutputHandler``
     """
-    return general_factory(command_constructor, usage_examples,
-                           param_conversions, added_options, output_map,
+    return general_factory(command_constructor, usage_examples, inputs, outputs
                            CLInterface)
 
 def clmain(interface_object, local_argv):
