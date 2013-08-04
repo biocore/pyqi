@@ -64,7 +64,7 @@ inputs = [
                    # Name='driver_name', implied by Parameter
                    ShortName=None,
                    # Help is pulled from parameter since Paramter is not None
-                   InputHander=None),
+                   InputHandler=None),
     OptparseOption(InputType='new_filepath',
                    Parameter=None, #
                    Required=True,
