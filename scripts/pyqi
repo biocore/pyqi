@@ -23,7 +23,10 @@ import importlib
 from os.path import basename, expanduser
 from ConfigParser import SafeConfigParser
 
+# drop any path fluff
 argv[0] = basename(argv[0])
+
+# check if there is a configuration and load the cfg base
 c = SafeConfigParser()
 try:
     c.readfp(open(expanduser('~/.pyqi/%s' % argv[0])))
@@ -32,6 +35,7 @@ except IOError:
 else:
     CFG_BASE = c.get('driver', 'cfg_base')
 
+# load the cli configuration base
 try:
     cli_cfg = importlib.import_module(CFG_BASE)
 except ImportError:
@@ -40,6 +44,9 @@ except ImportError:
 
 def usage(opts):
     """Modeled after git..."""
+    # limit to a reasonable number of characters
+    desc_limit = 70 
+
     print "usage: %s <command> [<args>]" % argv[0]
     print
     print "The currently available commands are:"
@@ -47,8 +54,8 @@ def usage(opts):
     for c in sorted(cli_cfg.__all__):
         cmd_cfg = get_cmd_cfg(c, opts)
         desc = cmd_cfg.CommandConstructor.BriefDescription
-        if len(desc) > 70:
-            print ''.join(['   ', c, '\t', desc[:70], '...'])
+        if len(desc) > desc_limit:
+            print ''.join(['   ', c, '\t', desc[:desc_limit], '...'])
         else:
             print ''.join(['   ', c, '\t', desc])
 
@@ -57,16 +64,19 @@ def usage(opts):
     exit(0)
 
 def unknown_command(cmd):
+    """Handle an unknown command"""
     stderr.write("Unknown command: %s\n" % cmd)
     exit(1)
 
 def cmd_exists(cmd):
+    """Check if a ``Command`` configuration exists"""
     if cmd in cli_cfg.__all_lookup__:
         return True
     else:
         return False
 
 def get_cmd_cfg(cmd, opts):
+    """Get the configuration for a ``Command``"""
     try:
         cmd_cfg = importlib.import_module('.'.join([CFG_BASE, cmd]))
     except ImportError, e:
@@ -78,21 +88,26 @@ def get_cmd_cfg(cmd, opts):
     return cmd_cfg
 
 def get_cmd_obj(cmd, opts):
+    """Get a ``Command`` object"""
     cmd_cfg = get_cmd_cfg(cmd, opts)
     return cli(cmd_cfg.CommandConstructor, cmd_cfg.usage_examples, 
                   cmd_cfg.param_conversions, cmd_cfg.additional_options,
                   cmd_cfg.output_map)
 
 def help_(cmd, opts):
+    """Dump the help for a ``Command``"""
     cmd_obj = get_cmd_obj(cmd, opts)
     clmain(cmd_obj, ['help','-h'])
 
 if __name__ == '__main__':
     opts = {'--verbose':False}
+
     if len(argv) == 1:
         usage(opts)
     else:
+        # check if argv[1] is one of our special options
         if argv[1] in opts:
+            # and then handle it ungracefully
             if len(argv) == 2:
                 opts['--verbose'] = True
                 usage(opts)
@@ -100,18 +115,23 @@ if __name__ == '__main__':
             argv.pop(1)
         cmd = argv[1]
 
+    # if the command appears to be some cry for help
     if cmd in ['help','HELP','-?','-h']:
         if not len(argv) > 2:
             usage(opts)
         help_cmd = argv[2]
 
-        # tears.
+        # tears. 
+        # .
+        # this voodoo is to coerce optparse/argparse to dump the program name
+        # at usage and examples correctly.
         argv[0] = ' '.join([argv[0], argv[2]])
         if cmd_exists(help_cmd):
             help_(help_cmd, opts)
         else:
             unknown_command(help_cmd)
     else:
+        # see the note about crying about tears.
         argv[0] = ' '.join([argv[0], argv[1]])
 
     if not cmd_exists(cmd):
@@ -119,4 +139,5 @@ if __name__ == '__main__':
 
     cmd_obj = get_cmd_obj(cmd, opts)
     
+    # and execute FTW
     clmain(cmd_obj, argv[1:])

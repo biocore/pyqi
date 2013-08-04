@@ -46,9 +46,9 @@ additional_options = [
 
 """
 
-param_fmt = """\t\t'%(name)s':ParameterConversion(ShortName="MUST BE DEFINED",
-\t\t\t\t\tLongName='%(name)s',
-\t\t\t\t\tCLType=%(type)s),
+param_fmt = """        '%(name)s':ParameterConversion(ShortName="MUST BE DEFINED",
+                    LongName='%(name)s',
+                    CLType=%(type)s),
 """
 
 class MakeCLI(Command):

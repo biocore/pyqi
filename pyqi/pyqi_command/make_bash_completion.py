@@ -10,6 +10,7 @@
 
 from __future__ import division
 from pyqi.core.command import Command, Parameter
+import importlib
 
 __author__ = "Daniel McDonald"
 __copyright__ = "Copyright 2013, The QCLI Project"
@@ -19,12 +20,13 @@ __version__ = "0.1.0-dev"
 __maintainer__ = "Daniel McDonald"
 __email__ = "mcdonadt@colorado.edu"
 
-import importlib
 def _get_cfg_module(desc):
+    """Load a module"""
     mod = importlib.import_module(desc)
     return mod
 
 def _load_cfg(mod, cmd):
+    """Load some variables from a module"""
     foo = __import__(mod, fromlist=[cmd])
     actual_cmd_mod = getattr(foo, cmd)
     return (getattr(actual_cmd_mod, 'param_conversions'), 
