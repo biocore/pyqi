@@ -111,5 +111,22 @@ class CLInterfaceTests(TestCase):
         obs = self.interface._input_handler(['--a','foo'])
         self.assertEqual(sorted(obs.items()), [('a', 'foo'),('verbose',False)])
 
+    def test_build_usage_lines(self):
+        obs = self.interface._build_usage_lines([])
+        self.assertEqual(obs, usage_lines)
+
+usage_lines = """usage: %prog [options] {}
+
+[] indicates optional input (order unimportant)
+{} indicates required input (order unimportant)
+
+
+
+Example usage: 
+Print help message and exit
+ %prog -h
+
+a: b
+ c"""
 if __name__ == '__main__':
     main()
