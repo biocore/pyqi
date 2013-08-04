@@ -18,7 +18,7 @@ __maintainer__ = "Daniel McDonald"
 __email__ = "mcdonadt@colorado.edu"
 
 from sys import argv, exit, stderr
-from pyqi.interface.cli import clmain, cli
+from pyqi.core.interfaces.optparse import clmain, cli
 import importlib
 from os.path import basename, expanduser
 from ConfigParser import SafeConfigParser
@@ -31,7 +31,7 @@ c = SafeConfigParser()
 try:
     c.readfp(open(expanduser('~/.pyqi/%s' % argv[0])))
 except IOError:
-    CFG_BASE = 'pyqi.pyqi_command.cli'
+    CFG_BASE = 'pyqi.interfaces.optparse.config'
 else:
     CFG_BASE = c.get('driver', 'cfg_base')
 
