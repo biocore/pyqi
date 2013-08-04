@@ -80,7 +80,7 @@ class CLInterfaceTests(TestCase):
     def setUp(self):
         class ghetto(Command):
             def _get_parameters(self):
-                return [Parameter('a','b','c')]
+                return [Parameter(str,'b','c')]
             def run(self, **kwargs):
                 return {}
         
@@ -105,6 +105,11 @@ class CLInterfaceTests(TestCase):
         self.assertEqual(obs.Help, 'b')
         self.assertEqual(obs.Name, 'c')
         self.assertTrue(isinstance(obs, CLOption))
+
+    def test_input_handler(self):
+        # note the the argument is --a due to the parameter conversion c->a
+        obs = self.interface._input_handler(['--a','foo'])
+        self.assertEqual(sorted(obs.items()), [('a', 'foo'),('verbose',False)])
 
 if __name__ == '__main__':
     main()
