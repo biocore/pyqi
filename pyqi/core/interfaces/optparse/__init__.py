@@ -18,7 +18,7 @@ __maintainer__ = "Greg Caporaso"
 __email__ = "gregcaporaso@gmail.com"
 
 from pyqi.core.interface import Interface, InterfaceOption, \
-        InterfaceUsageExample
+        InterfaceUsageExample, InterfaceResult
 from pyqi.core.factory import general_factory
 from pyqi.core.exception import IncompetentDeveloperError
 from pyqi.core.command import Parameter
@@ -37,10 +37,15 @@ def new_filepath(data, path):
     f.write(data)
     f.close()
 
+class OptparseResult(InterfaceResult):
+    def _validate_result(self):
+        ### anything to validate here?
+        pass
+
 class OptparseOption(InterfaceOption):
     """An augmented option that expands a Parameter into an Option"""
     def _validate_option(self):
-        # require Name, type, etc???
+        ### require Name, type, etc???
         pass 
 
     def __str__(self):
