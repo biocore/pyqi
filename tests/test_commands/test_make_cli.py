@@ -9,7 +9,7 @@
 #-----------------------------------------------------------------------------
 
 from __future__ import division
-from pyqi.pyqi_command.make_cli import MakeCLI
+from pyqi.commands.make_cli import MakeCLI
 from pyqi.core.command import Parameter
 from unittest import TestCase, main
 

@@ -18,7 +18,7 @@ __maintainer__ = "Daniel McDonald"
 __email__ = "mcdonadt@colorado.edu"
 
 from unittest import TestCase, main
-from pyqi.interface.output_handler.cli import write_string
+from pyqi.core.interfaces.optparse.output_handler import write_string
 from pyqi.core.exception import IncompetentDeveloperError
 import os
 

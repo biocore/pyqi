@@ -18,8 +18,8 @@ __maintainer__ = "Daniel McDonald"
 __email__ = "mcdonadt@colorado.edu"
 
 from unittest import TestCase, main
-from pyqi.interface.input_handler.cli import command_handler
-from pyqi.pyqi_command.make_cli import MakeCLI
+from pyqi.core.interfaces.optparse.input_handler import command_handler
+from pyqi.commands.make_cli import MakeCLI
 
 class CLIInputHandlerTests(TestCase):
     def setUp(self):

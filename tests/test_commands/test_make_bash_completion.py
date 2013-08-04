@@ -9,12 +9,12 @@
 #-----------------------------------------------------------------------------
 
 from __future__ import division
-from pyqi.pyqi_command.make_bash_completion import BashCompletion, \
-        _get_cfg_module, _load_cfg
 from unittest import TestCase, main
-from pyqi.pyqi_command.cli.make_bash_completion import param_conversions, \
-        additional_options
 import pyqi
+from pyqi.commands.make_bash_completion import BashCompletion, \
+        _get_cfg_module, _load_cfg
+from pyqi.interfaces.optparse.config.make_bash_completion import param_conversions, \
+        additional_options
 
 __author__ = "Daniel McDonald"
 __copyright__ = "Copyright 2013, The QCLI Project"
