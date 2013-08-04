@@ -40,6 +40,7 @@ if __name__ == '__main__':
     server = BaseHTTPServer.HTTPServer
     handler = CGIHTTPServer.CGIHTTPRequestHandler
     server_address = ('', port)
+    #handler.cgi_directories = ['/']
     httpd = server(server_address, handler)
 
     print "Server started. Open a browser window to the following URL:\nlocalhost:{0}/htbin/commands.py".format(port)
