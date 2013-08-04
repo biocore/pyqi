@@ -26,7 +26,7 @@ __email__ = "mcdonadt@colorado.edu"
 # How you can use the command from the command line
 usage_examples = [UsageExample(ShortDesc="Create a bash completion script",
                                LongDesc="Create a bash completion script for use with a QCLI driver",
-                               Ex="%prog --command_cfg_directory pyqi.interfaces.opts.config --driver_name pyqi -o ~/.bash_completion.d/pyqi")
+                               Ex="%prog --command_cfg_directory pyqi.interfaces.optparse.config --driver_name pyqi -o ~/.bash_completion.d/pyqi")
     ]
 
 # Parameter conversions tell the interface how to describe command line 
