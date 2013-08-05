@@ -76,7 +76,6 @@ class BashCompletion(Command):
         ])
 
     def run(self, **kwargs):
-        print kwargs
         driver = kwargs['driver_name']
         cfg_mod_path = kwargs['command_config_module']
         cfg_mod = _get_cfg_module(cfg_mod_path)
