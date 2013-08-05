@@ -23,6 +23,8 @@ import importlib
 from os.path import basename, expanduser
 from ConfigParser import SafeConfigParser
 
+### we actually have some flexibility here to make the driver interface agnostic as well
+
 # drop any path fluff
 argv[0] = basename(argv[0])
 
