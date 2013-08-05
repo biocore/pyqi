@@ -26,10 +26,6 @@ from pyqi.option_parsing import (OptionParser, OptionGroup, Option,
                                  OptionValueError, OptionError, make_option)
 import os
 
-CLTypes = set(['float','int','string','existing_filepath', float, int, str,
-               None, 'new_filepath','new_dirpath','existing_dirpath'])
-CLActions = set(['store','store_true','store_false', 'append'])
-
 def new_filepath(data, path):
     if os.path.exists(path):
         raise IOError("Output path %s already exists." % path)
@@ -62,11 +58,11 @@ class OptparseOption(InterfaceOption):
                 help_text += ' [REQUIRED]'
 
             if self.ShortName is None:
-                option = make_option('--' + self.Name, type=self.CLType,
+                option = make_option('--' + self.Name, type=self.InputType,
                                      help=help_text)
             else:
                 option = make_option('-' + self.ShortName,
-                                     '--' + self.Name, type=self.CLType,
+                                     '--' + self.Name, type=self.InputType,
                                      help=help_text)
         else:
             if self.DefaultDescription is None:
@@ -76,11 +72,11 @@ class OptparseOption(InterfaceOption):
                                                   self.DefaultDescription)
 
             if self.ShortName is None:
-                option = make_option('--' + self.Name, type=self.CLType,
+                option = make_option('--' + self.Name, type=self.InputType,
                                      help=help_text, default=self.Default)
             else:
                 option = make_option('-' + self.ShortName,
-                                     '--' + self.Name, type=self.CLType,
+                                     '--' + self.Name, type=self.InputType,
                                      help=help_text, default=self.Default)
         return option
 
@@ -120,8 +116,8 @@ class OptparseInterface(Interface):
 
     def _input_handler(self, in_, *args, **kwargs):
         """Parses command-line input."""
-        required_opts = [opt for opt in self.Options if opt.Required]
-        optional_opts = [opt for opt in self.Options if not opt.Required]
+        required_opts = [opt for opt in self._get_inputs() if opt.Required]
+        optional_opts = [opt for opt in self._get_inputs() if not opt.Required]
 
         # Build the usage and version strings
         usage = self._build_usage_lines(required_opts)
