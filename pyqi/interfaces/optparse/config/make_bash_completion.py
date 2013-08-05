@@ -27,7 +27,7 @@ __email__ = "mcdonadt@colorado.edu"
 usage_examples = [
     OptparseUsageExample(ShortDesc="Create a bash completion script",
                          LongDesc="Create a bash completion script for use with a QCLI driver",
-                         Ex="%prog --command-config-module pyqi.interfaces.optparse.config --driver_name pyqi -o ~/.bash_completion.d/pyqi")
+                         Ex="%prog --command-config-module pyqi.interfaces.optparse.config --driver-name pyqi -o ~/.bash_completion.d/pyqi")
 ]
 
 # Parameter conversions tell the interface how to describe command line 
