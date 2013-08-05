@@ -29,8 +29,8 @@ def _load_cfg(mod, cmd):
     """Load some variables from a module"""
     foo = __import__(mod, fromlist=[cmd])
     actual_cmd_mod = getattr(foo, cmd)
-    return (getattr(actual_cmd_mod, 'param_conversions'), 
-            getattr(actual_cmd_mod, 'additional_options'))
+    return (getattr(actual_cmd_mod, 'inputs'), 
+            getattr(actual_cmd_mod, 'outputs'))
 
 # Based on http://stackoverflow.com/questions/5302650/multi-level-bash-completion
 script_fmt = """_%(driver)s_complete()
@@ -73,7 +73,7 @@ class BashCompletion(Command):
                   Help="The CLI command configuration module"),
         Parameter(Name='driver-name', Required=True, DataType=str,
                   Help="Name of the driver script")
-    ])
+        ])
 
     def run(self, **kwargs):
         driver = kwargs['driver-name']
@@ -83,11 +83,10 @@ class BashCompletion(Command):
 
         commands = []
         for cmd in cfg_mod.__all__:
-            param_convs, added_opts = _load_cfg(cfg_mod_path, cmd)
-
+            inputs, outputs = _load_cfg(cfg_mod_path, cmd)
+            
             command_options = []
-            command_options.extend(['--%s' % n for n in param_convs.keys()])
-            command_options.extend(['--%s' % o.LongName for o in added_opts])
+            command_options.extend(['--%s' % p.Name for p in inputs])
             opts = ' '.join(command_options)
 
             commands.append(command_fmt % {'command':cmd, 'options':opts})

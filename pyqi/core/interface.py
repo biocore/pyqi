@@ -71,9 +71,14 @@ class InterfaceOption(object):
             else:
                 self.Required = Parameter.Required
         else:
-            self.Name = Parameter.Name
-            self.Help = Parameter.Help
-            self.Required = Parameter.Required
+            if Name is None:
+                raise IncompetentDeveloperError("No Parameter, and no Name!")
+            if Help is None:
+                raise IncompetentDeveloperError("Please specify Help")
+
+            self.Name = Name
+            self.Help = Help
+            self.Required = Required
             
         self.ShortName = ShortName
         self.InputType = InputType
