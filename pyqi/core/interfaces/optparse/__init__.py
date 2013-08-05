@@ -112,9 +112,9 @@ class OptparseInterface(Interface):
 
         super(OptparseInterface, self).__init__(**kwargs)
 
-    def _get_usage_examples(self):
-        """Return the ``UsageExample`` objects"""
-        raise NotImplementedError("Must define _get_usage_examples")
+    def _get_inputs(self):
+        """Return the list of ``Option`` objects"""
+        raise NotImplementedError(
 
     def _the_in_validator(self, in_):
         """Validate input coming from the command line"""
