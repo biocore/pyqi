@@ -170,13 +170,11 @@ class OptparseInterface(Interface):
 
         beloved_functionality = opts.__dict__
         self.BelovedFunctionality = beloved_functionality
-        for k, v in self.ParameterConversionInfo.items():
-            if v.InHandler is not None:
-                long_name = v.LongName
-                value = self.BelovedFunctionality[long_name]
-                self.BelovedFunctionality[k] = v.InHandler(value)
-            else:
-                pass
+        for option in self._get_inputs():
+            if option.InputHandler is not None:
+                name = option.Name
+                value = self.BelovedFunctionality[name]
+                self.BelovedFunctionality[name] = option.InHandler(value)
         return self.BelovedFunctionality
 
     def _build_usage_lines(self, required_options):
