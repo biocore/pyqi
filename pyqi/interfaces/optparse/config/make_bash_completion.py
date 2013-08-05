@@ -24,11 +24,11 @@ __email__ = "mcdonadt@colorado.edu"
 
 # How you can use the command from the command line
 ### need to make sure comments desc usage_examples goes into make_cli template (make_optparse?)
-usage_examples = [OptparseUsageExample(
-                    ShortDesc="Create a bash completion script",
-                    LongDesc="Create a bash completion script for use with a QCLI driver",
-                    Ex="%prog --command_cfg_directory pyqi.interfaces.optparse.config --driver_name pyqi -o ~/.bash_completion.d/pyqi")
-    ]
+usage_examples = [
+    OptparseUsageExample(ShortDesc="Create a bash completion script",
+                         LongDesc="Create a bash completion script for use with a QCLI driver",
+                         Ex="%prog --command-config-module pyqi.interfaces.optparse.config --driver_name pyqi -o ~/.bash_completion.d/pyqi")
+]
 
 # Parameter conversions tell the interface how to describe command line 
 # options
@@ -52,14 +52,14 @@ outputs = [
 ### need to make sure comments desc input goes into make_cli template (make_optparse?)
 inputs = [
     OptparseOption(InputType=str,
-                   Parameter=CommandConstructor.Parameters['command_cfg_directory'],
+                   Parameter=CommandConstructor.Parameters['command-config-module'],
                    # Required=True implied by Parameter
                    # Name='command_cfg_directory', implied by Parameter
                    ShortName=None,
                    # Help is pulled from parameter since Parameter is not None
                    InputHandler=None), # optparse handles str just fine
     OptparseOption(InputType=str,
-                   Parameter=CommandConstructor.Parameters['driver_name'],
+                   Parameter=CommandConstructor.Parameters['driver-name'],
                    # Required=True implied by Parameter
                    # Name='driver_name', implied by Parameter
                    ShortName=None,
@@ -68,7 +68,7 @@ inputs = [
     OptparseOption(InputType='new_filepath',
                    Parameter=None, #
                    Required=True,
-                   Name='output_fp',
+                   Name='output-fp',
                    ShortName='o',
                    Help="Output file path",
                    InputHandler=None)
@@ -78,11 +78,11 @@ inputs = [
 outputs = [
     OptparseResult(OutputType=None, ### do we need an outputtype?
                    Parameter=None,
-                   Name='output_fp', # if specified, must exist as an input
+                   Name='output-fp', # if specified, must exist as an input
                    OutputHandler=write_string,
                    ResultKey='my_result_key')
     ]
-        
+
 #        param_conversions = {
 #            #### directory is misnomer, this is a module path
 #        'command_cfg_directory':ParameterConversion(ShortName=None,
