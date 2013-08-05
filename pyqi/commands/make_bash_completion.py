@@ -69,22 +69,21 @@ class BashCompletion(Command):
     BriefDescription = "Construct a bash completion script"
     LongDescription = """Construct a bash tab completion script that will search through available commands and options"""
     Parameters = ParameterCollection([
-        ### this name is a misnomer, cannot fix right now
-        Parameter(Name='command_cfg_directory', Required=True, DataType=str, 
+        Parameter(Name='command-config-module', Required=True, DataType=str, 
                   Help="The CLI command configuration module"),
-        Parameter(Name='driver_name', Required=True, DataType=str,
+        Parameter(Name='driver-name', Required=True, DataType=str,
                   Help="Name of the driver script")
         ])
 
     def run(self, **kwargs):
-        driver = kwargs['driver_name']
-        cfg_dir = kwargs['command_cfg_directory']
-        cfg_mod = _get_cfg_module(cfg_dir)
+        driver = kwargs['driver-name']
+        cfg_mod_path = kwargs['command-config-module']
+        cfg_mod = _get_cfg_module(cfg_mod_path)
         command_list = ' '.join(cfg_mod.__all__[:])
 
         commands = []
         for cmd in cfg_mod.__all__:
-            inputs, outputs = _load_cfg(cfg_dir, cmd)
+            inputs, outputs = _load_cfg(cfg_mod_path, cmd)
             
             command_options = []
             command_options.extend(['--%s' % n for n in param_convs.keys()])
