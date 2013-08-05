@@ -20,7 +20,7 @@ __email__ = "mcdonadt@colorado.edu"
 
 from pyqi.core.command import Command
 from pyqi.core.interfaces.optparse import (OptparseOption, OptparseUsageExample,
-    OptparseOption, OptparseResult)
+    OptparseResult)
 from pyqi.core.interfaces.optparse.output_handler import write_string
 from pyqi.core.interfaces.optparse.input_handler import command_handler
 from pyqi.commands.make_optparse import CommandConstructor
