@@ -85,7 +85,7 @@ class MakeCommand(Command):
         
         if 'credits' in kwargs:
             f = lambda x: '"%s"' % x
-            head['credits'] = ', '.join(map(f, head['credits'].split(',')))
+            head['credits'] = ', '.join(map(f, kwargs['credits'].split(',')))
         else:
             head['credits'] = ''
 
