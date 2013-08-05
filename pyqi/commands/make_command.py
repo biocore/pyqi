@@ -21,9 +21,6 @@ from pyqi.core.command import Command, Parameter, ParameterCollection
 
 header = """#!/usr/bin/env python
 
-from __future__ import division
-from pyqi.core.command import Command, Parameter
-
 __author__ = "%(author)s"
 __copyright__ = "%(copyright)s"
 __credits__ = ["%(author)s", %(credits)s]
@@ -32,6 +29,10 @@ __version__ = "%(func_version)s"
 __maintainer__ = "%(author)s"
 __email__ = "%(email)s"
 
+"""
+
+command_imports = """from __future__ import division
+from pyqi.core.command import Command, Parameter
 """
 
 command_format = """class %s(Command):
@@ -53,6 +54,20 @@ command_format = """class %s(Command):
 CommandConstructor = %s
 """
 
+test_fmt = """from unittest import TestCase, main
+from FILL IN MODULE PATH import %(name)s
+
+class %(name)sTests(TestCase):
+    def setUp(self):
+        self.cmd_obj = %(name)s()
+
+    def test_run(self):
+        self.fail()
+
+if __name__ == '__main__':
+    main()
+"""
+
 class MakeCommand(Command):
     BriefDescription = "Construct a stringified stubbed out ``Command`` object"
     LongDescription = """This method will is intended to construct the basics of a ``Command`` object to so that a developer can dive straight into the fun bits"""
@@ -69,7 +84,9 @@ class MakeCommand(Command):
                   Help='the function copyright'),
         Parameter(Name='func_version',Required=True,DataType=str,
                   Help='the function version'),
-### Default is not honored right now
+        Parameter(Name='testcode',Required=False, DataType=bool,
+                  Default=False, Help='create test code'),
+### Default is not honored right now, and not reported right (shows "none")
         Parameter(Name='credits',Required=False,DataType=str,Default='',
                   Help='comma separated list of other authors')
         ])
@@ -90,8 +107,17 @@ class MakeCommand(Command):
             head['credits'] = ''
 
         result_lines = [header % head]
+        result_lines.append(command_imports)
         result_lines.append(command_format % (kwargs['name'], kwargs['name']))
 
-        return {'result':''.join(result_lines)}
+        output = {}
+        output['result'] = ''.join(result_lines)
+
+        if 'testcode' in kwargs:
+            result_lines = [header % head]
+            result_lines.append(test_fmt % {'name':kwargs['name']})
+            output['result_testcode'] = ''.join(result_lines)
+
+        return output
 
 CommandConstructor = MakeCommand
