@@ -80,7 +80,7 @@ outputs = [
                    Parameter=None,
                    Name='output-fp', # if specified, must exist as an input
                    OutputHandler=write_string,
-                   ResultKey='my_result_key')
+                   ResultKey='result')
     ]
 
 #        param_conversions = {
