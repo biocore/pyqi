@@ -30,25 +30,6 @@ usage_examples = [
                          Ex="%prog --command-config-module pyqi.interfaces.optparse.config --driver-name pyqi -o ~/.bash_completion.d/pyqi")
 ]
 
-# Parameter conversions tell the interface how to describe command line 
-# options
-"""
-inputs = [
-        OptparseOption(InputType=Tells the interface what to expect
-                       Parameter=CommandConstructor.Parameters.getParameter('foo'), # nullable
-                       Required=True|False, # can override a parameter (False ->True, but not True -> False)
-                       LongName=Ideally the same as Parameter name...
-                       ShortName=Shortform version, specific to CLI 
-                       Help=yup.
-                       InputHandler=foo)
-outputs = [
-        OptparseResult(OutputType=tells the interface something,
-                       Parameter=CommandConstructor.Parameters.getParameter('foo') # nullable
-                       Required=True|False, # can override a parameter (False -> True, but not True -> False)
-                       OutputHandler=foo,
-                       ResultKey=foo)
-        ]
-"""
 ### need to make sure comments desc input goes into make_cli template (make_optparse?)
 inputs = [
     OptparseOption(InputType=str,
@@ -82,30 +63,3 @@ outputs = [
                    OutputHandler=write_string,
                    ResultKey='result')
     ]
-
-#        param_conversions = {
-#            #### directory is misnomer, this is a module path
-#        'command_cfg_directory':ParameterConversion(ShortName=None,
-#                                       LongName='command_cfg_directory',
-#                                       CLType=str),
-#        'driver_name':ParameterConversion(ShortName=None,
-#                                       LongName='driver_name',
-#                                       CLType=str),
-#    }
-
-# The output map associated keys in the results returned from Command.run
-# without output handlers
-#output_map = {'result':OutputHandler(OptionName='output_fp',
-#                                     Function=write_string)
-#    }
-#
-## In case there are interface specific bits such as output files
-#additional_options = [CLOption(Type='output_file',
-#                 Help='the resulting configuration file',
-#                 Name='output_fp',
-#                 Required=True,
-#                 LongName='output_fp',
-#                 CLType='new_filepath',
-#                 ShortName='o')
-#    ]
-
