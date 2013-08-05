@@ -86,8 +86,8 @@ class BashCompletion(Command):
             inputs, outputs = _load_cfg(cfg_mod_path, cmd)
             
             command_options = []
-            command_options.extend(['--%s' % n for n in param_convs.keys()])
-            command_options.extend(['--%s' % o.LongName for o in added_opts])
+            command_options.extend(['--%s' % n for n in self.Parameters.keys()])
+            #command_options.extend(['--%s' % o.LongName for o in added_opts])
             opts = ' '.join(command_options)
 
             commands.append(command_fmt % {'command':cmd, 'options':opts})
