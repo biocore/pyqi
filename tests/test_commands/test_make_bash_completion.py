@@ -13,8 +13,8 @@ from unittest import TestCase, main
 import pyqi
 from pyqi.commands.make_bash_completion import BashCompletion, \
         _get_cfg_module, _load_cfg
-from pyqi.interfaces.optparse.config.make_bash_completion import param_conversions, \
-        additional_options
+from pyqi.interfaces.optparse.config.make_bash_completion import (inputs,
+        outputs, usage_examples)
 
 __author__ = "Daniel McDonald"
 __copyright__ = "Copyright 2013, The QCLI Project"
@@ -29,18 +29,22 @@ class BashCompletionTests(TestCase):
         self.assertEqual(_get_cfg_module('pyqi'), pyqi)
 
     def test_load_cfg(self):
-        pc, ao = _load_cfg('pyqi.interfaces.optparse.config', 'make_bash_completion')
-        self.assertEqual(pc, param_conversions)
-        self.assertEqual(ao, additional_options)
+        in_, out_ = _load_cfg('pyqi.interfaces.optparse.config', 'make_bash_completion')
+        self.assertEqual(in_, inputs)
+        self.assertEqual(out_, outputs)
     
     def test_init(self):
         obj = BashCompletion()
 
     def test_run(self):
-        params = {'command_cfg_directory':'pyqi.interfaces.optparse.config',
+        params = {'command_config_module':'pyqi.interfaces.optparse.config',
                   'driver_name':'pyqi'}
         obs = BashCompletion().run(**params)
-        self.assertEqual(obs, {'result':outputandstuff})    
+        
+        # output is dependent on the commands and options, this is not a good
+        # test. 
+        #self.assertEqual(obs, {'result':outputandstuff})    
+        self.fail("need more sane test that is independent of changes in commands/options")
 
 outputandstuff = """_pyqi_complete()
 {
@@ -59,13 +63,13 @@ outputandstuff = """_pyqi_complete()
   elif [ $COMP_CWORD -gt 1 ]; then
     case "$prev" in
              "make_bash_completion")
-        COMPREPLY=( $(compgen -W "--driver_name --command_cfg_directory --output_fp" -- $cur) )
-        ;;
-       "make_cli")
-        COMPREPLY=( $(compgen -W "--command --mod --output-fp" -- $cur) )
+        COMPREPLY=( $(compgen -W "--command_config_module --driver_name --output_fp" -- $cur) )
         ;;
        "make_command")
-        COMPREPLY=( $(compgen -W "--license --name --copyright --author --func_version --credits --email --output-fp" -- $cur) )
+        COMPREPLY=( $(compgen -W "--license --name --copyright --author --func_version --credits --email --testcode --output-fp" -- $cur) )
+        ;;
+       "make_optparse")
+        COMPREPLY=( $(compgen -W "--command --mod --output-fp" -- $cur) )
         ;;
 
       *)
