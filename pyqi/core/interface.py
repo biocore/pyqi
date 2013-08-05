@@ -81,7 +81,8 @@ class Interface(object):
 class InterfaceOption(object):
     """Describes an option and what to do with it"""
     def __init__(self, InputType=None, Parameter=None, Required=False, 
-                 Name=None, ShortName=None, InputHandler=None, Help=None):
+                 Name=None, ShortName=None, InputHandler=None, Help=None,
+                 Default=None, DefaultDescription=None):
         self.Parameter = Parameter
         if self.Parameter is not None:
             self.Name = Parameter.Name
@@ -107,7 +108,9 @@ class InterfaceOption(object):
         self.ShortName = ShortName
         self.InputType = InputType
         self.InputHandler = InputHandler
-        
+        self.Default = Default
+        self.DefaultDescription = DefaultDescription
+
         self._validate_option()
 
     def _validate_option(self):
