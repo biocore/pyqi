@@ -94,7 +94,7 @@ class OptparseUsageExample(InterfaceUsageExample):
         if self.Ex is None:
             raise UsageExampleError("Must define Ex")
 
-class CLInterface(Interface):
+class OptparseInterface(Interface):
     """A command line interface"""
     DisallowPositionalArguments = True
     HelpOnNoArguments = True 
