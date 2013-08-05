@@ -236,18 +236,20 @@ class CLInterface(Interface):
                 opt_value = self.BelovedFunctionality[handler.OptionName]
                 results[k] = handler.Function(k, results[k], opt_value)
 
-def cli(command_constructor, usage_examples, inputs, outputs):
-    """Command line interface factory
+def optparse_factory(command_constructor, usage_examples, inputs, outputs):
+    """Optparse command line interface factory
     
     command_constructor - a subclass of ``Command``
     usage_examples - usage examples for using ``command_constructor`` on via a
         command line interface.
+    inputs  - config ``inputs`` or a list of ``OptparseOptions``
+    otuputs - config ``outputs`` or a list of ``OptparseResults`` 
     """
     return general_factory(command_constructor, usage_examples, inputs, outputs,
-                           CLInterface)
+                           OptparseInterface)
 
-def clmain(interface_object, local_argv):
+def optparse_main(interface_object, local_argv):
     """Construct and execute an interface object"""
-    cli_cmd = interface_object()
-    result = cli_cmd(local_argv[1:])
+    optparse_cmd = interface_object()
+    result = optparse_cmd(local_argv[1:])
     return 0
