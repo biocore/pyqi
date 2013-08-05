@@ -8,29 +8,28 @@
 # The full license is in the file COPYING.txt, distributed with this software.
 #-----------------------------------------------------------------------------
 
-from __future__ import division
-from pyqi.core.command import Command, Parameter, ParameterCollection
-
 __author__ = "Daniel McDonald"
-__copyright__ = "Copyright 2013, the QCLI project"
-__credits__ = ["Daniel McDonald", "Jai Ram Rideout", "Greg Caporaso",
-               "Doug Wendel"]
+__copyright__ = "Copyright 2013, The QCLI Project"
+__credits__ = ["Daniel McDonald", "Greg Caporaso", "Doug Wendel",
+               "Jai Ram Rideout"]
 __license__ = "BSD"
 __version__ = "0.1.0-dev"
 __maintainer__ = "Daniel McDonald"
 __email__ = "mcdonadt@colorado.edu"
 
-header = """#!/usr/bin/env python
 
+from pyqi.core.command import Command
 from pyqi.core.interfaces.optparse import (OptparseOption, OptparseUsageExample,
-        OptparseOption, OptparseResult)
-from %(mod)s import CommandConstructor
+    OptparseOption, OptparseResult)
+from pyqi.core.interfaces.optparse.output_handler import write_string
+from pyqi.core.interfaces.optparse.input_handler import command_handler
+from pyqi.commands.make_optparse import CommandConstructor
 
 # Examples of how the command can be used from the command line
 usage_examples = [
-    OptparseUsageExample(ShortDesc="A short single sentence description of the example",
-                         LongDesc="A longer, more detailed description",
-                         Ex="%%prog --foo --bar some_file")
+    OptparseUsageExample(ShortDesc="Fill in an Optparse config template",
+                         LongDesc="Construct the beginning of an Optparse configuration file based on the Parameters required by the Command",
+                         Ex="%prog -c pyqi.commands.make_optparse.MakeOptparse -m pyqi.commands.make_optparse -o pyqi/interfaces/optparse/config/make_optparse.py")
     ]
 
 # Inputs map command line arguments and values onto Parameters. It is possible to
@@ -54,7 +53,27 @@ inputs = [
     #               ShortName='o',
     #               Help='Output file path',
     #               InputHandler=None)
-%(input_fmt)s
+    OptparseOption(InputType=Command,
+                    Parameter=CommandConstructor.Parameters['command'],
+                    # Name='command', # implied by Parameter
+                    # Required=True, # implied by Parameter
+                    ShortName='c', # must be defined if desired
+                    # Help='An existing Command', # implied by Parameter
+                    InputHandler=command_handler), # must be defined if desired
+    OptparseOption(InputType=str,
+                    Parameter=CommandConstructor.Parameters['mod'],
+                    # Name='mod', # implied by Parameter
+                    # Required=True, # implied by Parameter
+                    ShortName='m', # must be defined if desired
+                    # Help='the command source module', # implied by Parameter
+                    InputHandler=None), # must be defined if desired
+    OptparseOption(InputType=str,
+                   Parameter=None,
+                   Name='output_fp',
+                   Required=True,
+                   ShortName='o',
+                   Help='The output file',
+                   InputHandler=None)
     ]
 
 # Outputs map result keys to output options and handlers. It is not necessary
@@ -72,41 +91,9 @@ outputs = [
     #               Name='output_fp',
     #               OutputHandler=write_string,
     #               ResultKey='some_other_result')
+    OptparseResult(OutputType=None,
+                   Parameter=None,
+                   Name='output_fp',
+                   OutputHandler=write_string,
+                   ResultKey='result')
     ]
-"""
-
-### currently filling out by Parameter, but commenting out the implied stuff
-input_fmt = """    OptparseOption(InputType=%(datatype)s,
-                    Parameter=CommandConstructor.Parameters['%(name)s'],
-                    # Name='%(name)s', # implied by Parameter
-                    # Required=%(required)s, # implied by Parameter
-                    # ShortName=None, # must be defined if desired
-                    # Help='%(help)s', # implied by Parameter
-                    InputHandler=None), # must be defined if desired
-"""
-
-class MakeOptparse(Command):
-    BriefDescription = "Consume a Command, stub out an Optparse configuration"
-    LongDescription = """Construct and stub out the basic Optparse configuration for a given Command. This template provides comments and examples of what to fill in."""
-    Parameters = ParameterCollection([
-        Parameter(Name='command',Required=True,DataType=Command,
-                  Help='An existing Command'),
-        Parameter(Name='mod',Required=True,DataType=str,
-                  Help='the command source module')
-        ])
-
-    def run(self, **kwargs):
-        param_formatted = []
-        
-        # construct inputs based off of parameters
-        for param in kwargs['command'].Parameters.values():
-            fmt = {'name':param.Name, 'datatype':param.DataType, 
-                   'required':str(param.Required), 'help':param.Help}
-            param_formatted.append(input_fmt % fmt)
-        
-        param_formatted = ''.join(param_formatted)
-        header_format = {'mod':kwargs['mod'], 'input_fmt': param_formatted}
-        
-        return {'result': header % header_format}
-
-CommandConstructor = MakeOptparse
