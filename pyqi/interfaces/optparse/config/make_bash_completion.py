@@ -78,7 +78,7 @@ inputs = [
 outputs = [
     OptparseResult(OutputType=None, ### do we need an outputtype?
                    Parameter=None,
-                   Name='output-fp', # if specified, must exist as an input
+                   Name='output_fp', # if specified, must exist as an input
                    OutputHandler=write_string,
                    ResultKey='result')
     ]
