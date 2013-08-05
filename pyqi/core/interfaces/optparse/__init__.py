@@ -215,16 +215,18 @@ class OptparseInterface(Interface):
 
     def _output_handler(self, results):
         """Deal with things in output if we know how"""
-        for k,handler in self._get_output_map().items():
-            if k not in results:
+        for output in self._get_outputs():
+            rk = output.ResultKey
+            if rk not in results:
                 raise IncompetentDeveloperError("Did not find the expected "
-                                                "output '%s' in results." % k)
+                                                "output '%s' in results." % rk)
 
-            if handler.OptionName is None:
-                results[k] = handler.Function(k, results[k])
+
+            if output.Name is None:
+                results[rk] = output.OutputHandler(rk, results[rk])
             else:
-                opt_value = self.BelovedFunctionality[handler.OptionName]
-                results[k] = handler.Function(k, results[k], opt_value)
+                opt_value = self.BelovedFunctionality[output.Name]
+                results[rk] = output.OutputHandler(rk, results[rk], opt_value)
 
 def optparse_factory(command_constructor, usage_examples, inputs, outputs):
     """Optparse command line interface factory
