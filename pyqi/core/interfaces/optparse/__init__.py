@@ -24,6 +24,9 @@ from pyqi.core.exception import IncompetentDeveloperError
 from pyqi.core.command import Parameter
 from pyqi.option_parsing import (OptionParser, OptionGroup, Option, 
                                  OptionValueError, OptionError, make_option)
+from optparse import Option as OPTPARSE_OPTION 
+OPTPARSE_TYPES = OPTPARSE_OPTION.TYPES
+
 import os
 
 def new_filepath(data, path):
@@ -51,6 +54,13 @@ class OptparseOption(InterfaceOption):
             return '-%s/--%s' % (self.ShortName, self.Name)
 
     def getOptparseOption(self):
+        # can't figure out callbacks right now. InputHandler applied anyway
+        # at the end of _handle_input
+        if self.InputType not in OPTPARSE_TYPES:
+            input_type = 'str'
+        else:
+            input_type = self.InputType
+
         if self.Required:
             # If the option doesn't already end with [REQUIRED], add it.
             help_text = self.Help
@@ -58,11 +68,11 @@ class OptparseOption(InterfaceOption):
                 help_text += ' [REQUIRED]'
 
             if self.ShortName is None:
-                option = make_option('--' + self.Name, type=self.InputType,
+                option = make_option('--' + self.Name, type=input_type,
                                      help=help_text)
             else:
                 option = make_option('-' + self.ShortName,
-                                     '--' + self.Name, type=self.InputType,
+                                     '--' + self.Name, type=input_type,
                                      help=help_text)
         else:
             if self.DefaultDescription is None:
@@ -72,11 +82,11 @@ class OptparseOption(InterfaceOption):
                                                   self.DefaultDescription)
 
             if self.ShortName is None:
-                option = make_option('--' + self.Name, type=self.InputType,
+                option = make_option('--' + self.Name, type=input_type,
                                      help=help_text, default=self.Default)
             else:
                 option = make_option('-' + self.ShortName,
-                                     '--' + self.Name, type=self.InputType,
+                                     '--' + self.Name, type=input_type,
                                      help=help_text, default=self.Default)
         return option
 
@@ -174,7 +184,7 @@ class OptparseInterface(Interface):
             if option.InputHandler is not None:
                 name = option.Name
                 value = self.BelovedFunctionality[name]
-                self.BelovedFunctionality[name] = option.InHandler(value)
+                self.BelovedFunctionality[name] = option.InputHandler(value)
         return self.BelovedFunctionality
 
     def _build_usage_lines(self, required_options):
