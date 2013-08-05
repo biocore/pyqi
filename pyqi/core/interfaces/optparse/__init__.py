@@ -102,7 +102,7 @@ class OptparseInterface(Interface):
     RequiredInputLine = '{} indicates required input (order unimportant)'
     
     def __init__(self, **kwargs):
-        #self.BelovedFunctionality = {}
+        self.BelovedFunctionality = {}
         self.UsageExamples = []
         self.UsageExamples.extend(self._get_usage_examples())
 
@@ -110,7 +110,7 @@ class OptparseInterface(Interface):
             raise IncompetentDeveloperError("There are no usage examples "
                                             "associated with this command.")
 
-        super(CLInterface, self).__init__(**kwargs)
+        super(OptparseInterface, self).__init__(**kwargs)
 
     def _get_usage_examples(self):
         """Return the ``UsageExample`` objects"""
