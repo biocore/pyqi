@@ -9,27 +9,27 @@
 #-----------------------------------------------------------------------------
 
 from __future__ import division
-from pyqi.commands.make_cli import MakeCLI
+from pyqi.commands.make_optparse import MakeOptparse
 from pyqi.core.command import Parameter
 from unittest import TestCase, main
 
 __author__ = "Daniel McDonald"
-__copyright__ = "Copyright 2013, The QCLI Project"
+__copyright__ = "Copyright 2013, The pyqi Project"
 __credits__ = ["Daniel McDonald", "Jai Ram Rideout", "Doug Wendel", "Greg Caporaso"]
 __license__ = "BSD"
 __version__ = "0.1.0-dev"
 __maintainer__ = "Daniel McDonald"
 __email__ = "mcdonadt@colorado.edu"
 
-class MakeCLITests(TestCase):
+class MakeOptparseTests(TestCase):
     def setUp(self):
         pass
 
     def test_init(self):
-        obj = MakeCLI()
+        obj = MakeOptparse()
 
     def test_run(self):
-        obj = MakeCLI()
+        obj = MakeOptparse()
         exp = win_text
         
         pc = Parameter(Name='DUN', Required=True, Type=str, Help="")
