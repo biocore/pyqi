@@ -81,11 +81,14 @@ class Interface(object):
 class InterfaceOption(object):
     """Describes an option and what to do with it"""
     def __init__(self, InputType=None, Parameter=None, Required=False, 
-                 Name=None, ShortName=None, InputHandler=None, Help=None):
+                 Name=None, ShortName=None, InputHandler=None, Help=None,
+                 Default=None, DefaultDescription=None):
         self.Parameter = Parameter
         if self.Parameter is not None:
             self.Name = Parameter.Name
             self.Help = Parameter.Help
+            self.Default = Parameter.Default
+            self.DefaultDescription = Parameter.DefaultDescription
 
             # If a parameter is required, the option is always required, but
             # if a parameter is not required, but the option does require it,
@@ -103,7 +106,9 @@ class InterfaceOption(object):
             self.Name = Name
             self.Help = Help
             self.Required = Required
-            
+            self.Default = Default
+            self.DefaultDescription = DefaultDescription
+
         self.ShortName = ShortName
         self.InputType = InputType
         self.InputHandler = InputHandler
