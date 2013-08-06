@@ -30,42 +30,38 @@ usage_examples = [
 ]
 
 inputs = [
-    OptparseOption()
+    OptparseOption(InputType=str,
+                   Parameter=CommandConstructor.Parameters['name'],
+                   ShortName='n'),
+    OptparseOption(InputType=str,
+                   Parameter=CommandConstructor.Parameters['email'],
+                   ShortName='e'),
+    OptparseOption(InputType=str,
+                   Parameter=CommandConstructor.Parameters['author'],
+                   ShortName='a'),
+    OptparseOption(InputType=str,
+                   Parameter=CommandConstructor.Parameters['license'],
+                   ShortName='l'),
+    OptparseOption(InputType=str,
+                   Parameter=CommandConstructor.Parameters['copyright'],
+                   ShortName='c'),
+    OptparseOption(InputType=str,
+                   Parameter=CommandConstructor.Parameters['func_version'],
+                   ShortName=None),
+    OptparseOption(InputType=str,
+                   Parameter=CommandConstructor.Parameters['credits'],
+                   ShortName=None),
+    OptparseOption(InputType='new_filepath',
+                   Help='the resulting Python file',
+                   Name='output_fp',
+                   Required=True,
+                   ShortName='o')
 ]
 
-# TODO finish converting these:
-#        'name':ParameterConversion(ShortName='n',
-#                                     LongName='name',
-#                                     CLType=str),
-#        'email':ParameterConversion(ShortName='e',
-#                                     LongName='email',
-#                                     CLType=str),
-#        'author':ParameterConversion(ShortName='a',
-#                                     LongName='author',
-#                                     CLType=str),
-#        'license':ParameterConversion(ShortName='l',
-#                                     LongName='license',
-#                                     CLType=str),
-#        'copyright':ParameterConversion(ShortName='c',
-#                                     LongName='copyright',
-#                                     CLType=str),
-#        'credits':ParameterConversion(ShortName=None,
-#                                     LongName='credits',
-#                                     CLType=str),
-#        'func_version':ParameterConversion(ShortName=None,
-#                                     LongName='func_version',
-#                                     CLType=str),
-#        }
-
-additional_options = [
-        CLOption(Type='output_file',
-                 Help='the resulting Python file',
-                 Name='output_fp',
-                 Required=True,
-                 LongName='output-fp',
-                 CLType='new_filepath',
-                 ShortName='o')
-        ]
-
-output_map = {'result':OutputHandler(OptionName='output_fp',
-                                     Function=write_string)}
+outputs = [
+    OptparseResult(OutputType=None,
+                   Parameters=None,
+                   Name='output_fp',
+                   OutputHandler=write_string,
+                   ResultKey='result')
+    ]

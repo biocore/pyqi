@@ -115,7 +115,7 @@ def check_blast_db(option, opt, value):
             "option %s: not a directory: %r" % (opt, db_dir))
     return value
 
-class QcliOption(Option):
+class pyqiOption(Option):
     ATTRS = Option.ATTRS + ['mchoices','split_char']
 
     TYPES = Option.TYPES + ("existing_path",
@@ -175,7 +175,7 @@ class QcliOption(Option):
 
 # When this code was in PyCogent, the option object was called
 # CogentOption, so leaving that name in place for backward compatibility.
-make_option = CogentOption = QcliOption
+make_option = CogentOption = pyqiOption
 
 ## End definition of new option type
 

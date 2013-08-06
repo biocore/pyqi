@@ -9,7 +9,7 @@
 #-----------------------------------------------------------------------------
 
 __author__ = "Daniel McDonald"
-__copyright__ = "Copyright 2013, The QCLI Project"
+__copyright__ = "Copyright 2013, The pyqi Project"
 __credits__ = ["Greg Caporaso", "Daniel McDonald", "Doug Wendel",
                "Jai Ram Rideout"]
 __license__ = "BSD"
@@ -18,10 +18,12 @@ __maintainer__ = "Daniel McDonald"
 __email__ = "mcdonadt@colorado.edu"
 
 from sys import argv, exit, stderr
-from pyqi.core.interfaces.optparse import clmain, cli
+from pyqi.core.interfaces.optparse import optparse_main, optparse_factory
 import importlib
 from os.path import basename, expanduser
 from ConfigParser import SafeConfigParser
+
+### we actually have some flexibility here to make the driver interface agnostic as well
 
 # drop any path fluff
 argv[0] = basename(argv[0])
@@ -37,7 +39,7 @@ else:
 
 # load the cli configuration base
 try:
-    cli_cfg = importlib.import_module(CFG_BASE)
+    cfg = importlib.import_module(CFG_BASE)
 except ImportError:
     stderr.write("Unable to read CFG_BASE: %s\n" % CFG_BASE)
     exit(1)
@@ -51,7 +53,7 @@ def usage(opts):
     print
     print "The currently available commands are:"
     
-    for c in sorted(cli_cfg.__all__):
+    for c in sorted(cfg.__all__):
         cmd_cfg = get_cmd_cfg(c, opts)
         desc = cmd_cfg.CommandConstructor.BriefDescription
         if len(desc) > desc_limit:
@@ -70,7 +72,7 @@ def unknown_command(cmd):
 
 def cmd_exists(cmd):
     """Check if a ``Command`` configuration exists"""
-    if cmd in cli_cfg.__all_lookup__:
+    if cmd in cfg.__all_lookup__:
         return True
     else:
         return False
@@ -90,14 +92,13 @@ def get_cmd_cfg(cmd, opts):
 def get_cmd_obj(cmd, opts):
     """Get a ``Command`` object"""
     cmd_cfg = get_cmd_cfg(cmd, opts)
-    return cli(cmd_cfg.CommandConstructor, cmd_cfg.usage_examples, 
-                  cmd_cfg.param_conversions, cmd_cfg.additional_options,
-                  cmd_cfg.output_map)
+    return optparse_factory(cmd_cfg.CommandConstructor, cmd_cfg.usage_examples, 
+                            cmd_cfg.inputs, cmd_cfg.outputs)
 
 def help_(cmd, opts):
     """Dump the help for a ``Command``"""
     cmd_obj = get_cmd_obj(cmd, opts)
-    clmain(cmd_obj, ['help','-h'])
+    optparse_main(cmd_obj, ['help','-h'])
 
 if __name__ == '__main__':
     opts = {'--verbose':False}
@@ -140,4 +141,4 @@ if __name__ == '__main__':
     cmd_obj = get_cmd_obj(cmd, opts)
     
     # and execute FTW
-    clmain(cmd_obj, argv[1:])
+    optparse_main(cmd_obj, argv[1:])

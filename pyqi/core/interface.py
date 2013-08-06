@@ -54,6 +54,30 @@ class Interface(object):
         raise NotImplementedError("All subclasses must implement "
                                   "_output_handler.")
 
+    def _get_usage_examples(self):
+        """Return a list of ``UsageExample`` objects
+        
+        These are typically set in a command+interface specific configuration
+        file and passed to ``pyqi.core.general_factory``
+        """
+        raise NotImplementedError("Must define _get_usage_examples")
+
+    def _get_inputs(self):
+        """Return a list of ``Option`` objects
+        
+        These are typically set in a command+interface specific configuration
+        file and passed to ``pyqi.core.general_factory``
+        """
+        raise NotImplementedError("Must define _get_usage_examples")
+
+    def _get_usage_examples(self):
+        """Return a list of ``Result`` objects
+        
+        These are typically set in a command+interface specific configuration
+        file and passed to ``pyqi.core.general_factory``
+        """
+        raise NotImplementedError("Must define _get_usage_examples")
+
 class InterfaceOption(object):
     """Describes an option and what to do with it"""
     def __init__(self, InputType=None, Parameter=None, Required=False, 

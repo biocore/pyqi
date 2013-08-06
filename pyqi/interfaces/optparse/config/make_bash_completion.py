@@ -27,39 +27,20 @@ __email__ = "mcdonadt@colorado.edu"
 usage_examples = [
     OptparseUsageExample(ShortDesc="Create a bash completion script",
                          LongDesc="Create a bash completion script for use with a QCLI driver",
-                         Ex="%prog --command-config-module pyqi.interfaces.optparse.config --driver_name pyqi -o ~/.bash_completion.d/pyqi")
+                         Ex="%prog --command-config-module pyqi.interfaces.optparse.config --driver-name pyqi -o ~/.bash_completion.d/pyqi")
 ]
 
-# Parameter conversions tell the interface how to describe command line 
-# options
-"""
-inputs = [
-        OptparseOption(InputType=Tells the interface what to expect
-                       Parameter=CommandConstructor.Parameters.getParameter('foo'), # nullable
-                       Required=True|False, # can override a parameter (False ->True, but not True -> False)
-                       LongName=Ideally the same as Parameter name...
-                       ShortName=Shortform version, specific to CLI 
-                       Help=yup.
-                       InputHandler=foo)
-outputs = [
-        OptparseResult(OutputType=tells the interface something,
-                       Parameter=CommandConstructor.Parameters.getParameter('foo') # nullable
-                       Required=True|False, # can override a parameter (False -> True, but not True -> False)
-                       OutputHandler=foo,
-                       ResultKey=foo)
-        ]
-"""
 ### need to make sure comments desc input goes into make_cli template (make_optparse?)
 inputs = [
     OptparseOption(InputType=str,
-                   Parameter=CommandConstructor.Parameters['command-config-module'],
+                   Parameter=CommandConstructor.Parameters['command_config_module'],
                    # Required=True implied by Parameter
                    # Name='command_cfg_directory', implied by Parameter
                    ShortName=None,
                    # Help is pulled from parameter since Parameter is not None
                    InputHandler=None), # optparse handles str just fine
     OptparseOption(InputType=str,
-                   Parameter=CommandConstructor.Parameters['driver-name'],
+                   Parameter=CommandConstructor.Parameters['driver_name'],
                    # Required=True implied by Parameter
                    # Name='driver_name', implied by Parameter
                    ShortName=None,
@@ -68,7 +49,7 @@ inputs = [
     OptparseOption(InputType='new_filepath',
                    Parameter=None, #
                    Required=True,
-                   Name='output-fp',
+                   Name='output_fp',
                    ShortName='o',
                    Help="Output file path",
                    InputHandler=None)
@@ -78,34 +59,7 @@ inputs = [
 outputs = [
     OptparseResult(OutputType=None, ### do we need an outputtype?
                    Parameter=None,
-                   Name='output-fp', # if specified, must exist as an input
+                   Name='output_fp', # if specified, must exist as an input
                    OutputHandler=write_string,
-                   ResultKey='my_result_key')
+                   ResultKey='result')
     ]
-
-#        param_conversions = {
-#            #### directory is misnomer, this is a module path
-#        'command_cfg_directory':ParameterConversion(ShortName=None,
-#                                       LongName='command_cfg_directory',
-#                                       CLType=str),
-#        'driver_name':ParameterConversion(ShortName=None,
-#                                       LongName='driver_name',
-#                                       CLType=str),
-#    }
-
-# The output map associated keys in the results returned from Command.run
-# without output handlers
-#output_map = {'result':OutputHandler(OptionName='output_fp',
-#                                     Function=write_string)
-#    }
-#
-## In case there are interface specific bits such as output files
-#additional_options = [CLOption(Type='output_file',
-#                 Help='the resulting configuration file',
-#                 Name='output_fp',
-#                 Required=True,
-#                 LongName='output_fp',
-#                 CLType='new_filepath',
-#                 ShortName='o')
-#    ]
-

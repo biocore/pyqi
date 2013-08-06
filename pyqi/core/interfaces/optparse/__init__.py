@@ -24,11 +24,10 @@ from pyqi.core.exception import IncompetentDeveloperError
 from pyqi.core.command import Parameter
 from pyqi.option_parsing import (OptionParser, OptionGroup, Option, 
                                  OptionValueError, OptionError, make_option)
-import os
+from optparse import Option as OPTPARSE_OPTION 
+OPTPARSE_TYPES = OPTPARSE_OPTION.TYPES
 
-CLTypes = set(['float','int','string','existing_filepath', float, int, str,
-               None, 'new_filepath','new_dirpath','existing_dirpath'])
-CLActions = set(['store','store_true','store_false', 'append'])
+import os
 
 def new_filepath(data, path):
     if os.path.exists(path):
@@ -55,6 +54,13 @@ class OptparseOption(InterfaceOption):
             return '-%s/--%s' % (self.ShortName, self.Name)
 
     def getOptparseOption(self):
+        # can't figure out callbacks right now. InputHandler applied anyway
+        # at the end of _handle_input
+        if self.InputType not in OPTPARSE_TYPES:
+            input_type = 'str'
+        else:
+            input_type = self.InputType
+
         if self.Required:
             # If the option doesn't already end with [REQUIRED], add it.
             help_text = self.Help
@@ -62,11 +68,11 @@ class OptparseOption(InterfaceOption):
                 help_text += ' [REQUIRED]'
 
             if self.ShortName is None:
-                option = make_option('--' + self.Name, type=self.CLType,
+                option = make_option('--' + self.Name, type=input_type,
                                      help=help_text)
             else:
                 option = make_option('-' + self.ShortName,
-                                     '--' + self.Name, type=self.CLType,
+                                     '--' + self.Name, type=input_type,
                                      help=help_text)
         else:
             if self.DefaultDescription is None:
@@ -76,11 +82,11 @@ class OptparseOption(InterfaceOption):
                                                   self.DefaultDescription)
 
             if self.ShortName is None:
-                option = make_option('--' + self.Name, type=self.CLType,
+                option = make_option('--' + self.Name, type=input_type,
                                      help=help_text, default=self.Default)
             else:
                 option = make_option('-' + self.ShortName,
-                                     '--' + self.Name, type=self.CLType,
+                                     '--' + self.Name, type=input_type,
                                      help=help_text, default=self.Default)
         return option
 
@@ -94,7 +100,7 @@ class OptparseUsageExample(InterfaceUsageExample):
         if self.Ex is None:
             raise UsageExampleError("Must define Ex")
 
-class CLInterface(Interface):
+class OptparseInterface(Interface):
     """A command line interface"""
     DisallowPositionalArguments = True
     HelpOnNoArguments = True 
@@ -102,7 +108,7 @@ class CLInterface(Interface):
     RequiredInputLine = '{} indicates required input (order unimportant)'
     
     def __init__(self, **kwargs):
-        #self.BelovedFunctionality = {}
+        self.BelovedFunctionality = {}
         self.UsageExamples = []
         self.UsageExamples.extend(self._get_usage_examples())
 
@@ -110,11 +116,7 @@ class CLInterface(Interface):
             raise IncompetentDeveloperError("There are no usage examples "
                                             "associated with this command.")
 
-        super(CLInterface, self).__init__(**kwargs)
-
-    def _get_usage_examples(self):
-        """Return the ``UsageExample`` objects"""
-        raise NotImplementedError("Must define _get_usage_examples")
+        super(OptparseInterface, self).__init__(**kwargs)
 
     def _the_in_validator(self, in_):
         """Validate input coming from the command line"""
@@ -124,8 +126,8 @@ class CLInterface(Interface):
 
     def _input_handler(self, in_, *args, **kwargs):
         """Parses command-line input."""
-        required_opts = [opt for opt in self.Options if opt.Required]
-        optional_opts = [opt for opt in self.Options if not opt.Required]
+        required_opts = [opt for opt in self._get_inputs() if opt.Required]
+        optional_opts = [opt for opt in self._get_inputs() if not opt.Required]
 
         # Build the usage and version strings
         usage = self._build_usage_lines(required_opts)
@@ -178,13 +180,11 @@ class CLInterface(Interface):
 
         beloved_functionality = opts.__dict__
         self.BelovedFunctionality = beloved_functionality
-        for k, v in self.ParameterConversionInfo.items():
-            if v.InHandler is not None:
-                long_name = v.LongName
-                value = self.BelovedFunctionality[long_name]
-                self.BelovedFunctionality[k] = v.InHandler(value)
-            else:
-                pass
+        for option in self._get_inputs():
+            if option.InputHandler is not None:
+                name = option.Name
+                value = self.BelovedFunctionality[name]
+                self.BelovedFunctionality[name] = option.InputHandler(value)
         return self.BelovedFunctionality
 
     def _build_usage_lines(self, required_options):
@@ -225,29 +225,33 @@ class CLInterface(Interface):
 
     def _output_handler(self, results):
         """Deal with things in output if we know how"""
-        for k,handler in self._get_output_map().items():
-            if k not in results:
+        for output in self._get_outputs():
+            rk = output.ResultKey
+            if rk not in results:
                 raise IncompetentDeveloperError("Did not find the expected "
-                                                "output '%s' in results." % k)
+                                                "output '%s' in results." % rk)
 
-            if handler.OptionName is None:
-                results[k] = handler.Function(k, results[k])
+
+            if output.Name is None:
+                results[rk] = output.OutputHandler(rk, results[rk])
             else:
-                opt_value = self.BelovedFunctionality[handler.OptionName]
-                results[k] = handler.Function(k, results[k], opt_value)
+                opt_value = self.BelovedFunctionality[output.Name]
+                results[rk] = output.OutputHandler(rk, results[rk], opt_value)
 
-def cli(command_constructor, usage_examples, inputs, outputs):
-    """Command line interface factory
+def optparse_factory(command_constructor, usage_examples, inputs, outputs):
+    """Optparse command line interface factory
     
     command_constructor - a subclass of ``Command``
     usage_examples - usage examples for using ``command_constructor`` on via a
         command line interface.
+    inputs  - config ``inputs`` or a list of ``OptparseOptions``
+    otuputs - config ``outputs`` or a list of ``OptparseResults`` 
     """
     return general_factory(command_constructor, usage_examples, inputs, outputs,
-                           CLInterface)
+                           OptparseInterface)
 
-def clmain(interface_object, local_argv):
+def optparse_main(interface_object, local_argv):
     """Construct and execute an interface object"""
-    cli_cmd = interface_object()
-    result = cli_cmd(local_argv[1:])
+    optparse_cmd = interface_object()
+    result = optparse_cmd(local_argv[1:])
     return 0
