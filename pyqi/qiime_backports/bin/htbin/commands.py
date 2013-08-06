@@ -20,7 +20,7 @@ print format_page_header()
 print "<h2>List of QIIME commands:</h2>"
 print "<table>"
 
-for c in sorted(qiime_cli.__all__):
+for c in qiime_cli.__all__:
 	try:
 	    cmd_cfg = get_cmd_cfg(c)
 	    desc = cmd_cfg.CommandConstructor.BriefDescription
