@@ -94,11 +94,11 @@ class OptparseUsageExample(InterfaceUsageExample):
     """Provide structure to a usage example"""
     def _validate_usage_example(self):
         if self.ShortDesc is None:
-            raise UsageExampleError("Must define ShortDesc")
+            raise IncompetentDeveloperError("Must define ShortDesc")
         if self.LongDesc is None:
-            raise UsageExampleError("Must define LongDesc")
+            raise IncompetentDeveloperError("Must define LongDesc")
         if self.Ex is None:
-            raise UsageExampleError("Must define Ex")
+            raise IncompetentDeveloperError("Must define Ex")
 
 class OptparseInterface(Interface):
     """A command line interface"""

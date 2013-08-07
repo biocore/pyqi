@@ -19,16 +19,17 @@ __email__ = "mcdonadt@colorado.edu"
 
 from unittest import TestCase, main
 from pyqi.core.interfaces.optparse.input_handler import command_handler
-from pyqi.commands.make_cli import MakeCLI
+from pyqi.commands.make_optparse import MakeOptparse
 
-class CLIInputHandlerTests(TestCase):
+class OptparseInputHandlerTests(TestCase):
     def setUp(self):
         pass
 
     def test_command_handler(self):
-        exp = MakeCLI()
-        obs = command_handler('pyqi.commands.make_cli.MakeCLI')
+        exp = MakeOptparse()
+        obs = command_handler('pyqi.commands.make_optparse.MakeOptparse')
         self.assertEqual(type(obs), type(exp))
+
 
 if __name__ == '__main__':
     main()

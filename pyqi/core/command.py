@@ -62,10 +62,10 @@ class Command(object):
     """
     BriefDescription = "" # 1 sentence description
     LongDescription = """""" # longer, more detailed description
+    Parameters = ParameterCollection([])
 
     def __init__(self, **kwargs):
         """ """
-        ### do we require/check for self.Parameters?
         self._logger = NullLogger()
 
     def __call__(self, **kwargs):

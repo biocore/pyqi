@@ -11,92 +11,75 @@
 __author__ = "Daniel McDonald"
 __copyright__ = "Copyright 2013, The QIIME Project"
 __credits__ = ["Greg Caporaso", "Daniel McDonald", "Doug Wendel",
-                       "Jai Ram Rideout"]
+               "Jai Ram Rideout"]
 __license__ = "BSD"
 __version__ = "0.1.0-dev"
 __maintainer__ = "Daniel McDonald"
 __email__ = "mcdonadt@colorado.edu"
 
 from unittest import TestCase, main
-from pyqi.core.interfaces.optparse import OutputHandler, CLOption, UsageExample, \
-        ParameterConversion, CLInterface, cli, clmain
+from pyqi.core.interfaces.optparse import (OptparseResult, OptparseOption,
+                                           OptparseUsageExample,
+                                           OptparseInterface, optparse_factory,
+                                           optparse_main)
 from pyqi.core.exception import IncompetentDeveloperError
-from pyqi.core.command import Command, Parameter
+from pyqi.core.command import Command, Parameter, ParameterCollection
 
-class OutputHandlerTests(TestCase):
-    def test_init(self):
-        # why...
-        obj = OutputHandler('a','b')
-        self.assertEqual(obj.OptionName, 'a')
-        self.assertEqual(obj.Function, 'b')
+class OptparseResultTests(TestCase):
+    # Nothing to test yet
+    pass
 
-class CLOptionTests(TestCase):
+class OptparseOptionTests(TestCase):
+    def setUp(self):
+        p = Parameter(int, 'some int', 'number', Required=False, Default=42,
+                      DefaultDescription='forty-two')
+        # With associated parameter.
+        self.opt1 = OptparseOption(int, p)
+
+        # Without associated parameter.
+        self.opt2 = OptparseOption(int, None, False, 'number', 'n', None,
+                                   'help!!!')
+
     def test_init(self):
-        obj = CLOption('a','b','c','d',str)
-        self.assertEqual(obj.Type, 'a')
-        self.assertEqual(obj.Help, 'b')
-        self.assertEqual(obj.Name, 'c')
-        self.assertEqual(obj.LongName, 'd')
-        self.assertEqual(obj.CLType, str)
+        self.assertEqual(self.opt1.InputType, int)
+        self.assertEqual(self.opt1.Help, 'some int')
+        self.assertEqual(self.opt1.Name, 'number')
+        self.assertEqual(self.opt1.Default, 42)
+        self.assertEqual(self.opt1.DefaultDescription, 'forty-two')
+        self.assertEqual(self.opt1.ShortName, None)
 
     def test_str(self):
-        obj = CLOption('a','b','c','d',str)
-        exp = '--d'
-        obs = str(obj)
+        exp = '--number'
+        obs = str(self.opt1)
         self.assertEqual(obs, exp)
 
-        obj = CLOption('a','b','c','d',str, ShortName='e')
-        exp = '-e/--d'
-        obs = str(obj)
+        exp = '-n/--number'
+        obs = str(self.opt2)
         self.assertEqual(obs, exp)
 
-    def test_fromParameter(self):
-        from pyqi.core.command import Parameter
-        p = Parameter(Type='a',Help='b',Name='c',Required=False)
-        obj = CLOption.fromParameter(p, LongName='d',CLType=str)
-        self.assertEqual(obj.Type,'a')
-        self.assertEqual(obj.Help,'b')
-        self.assertEqual(obj.Name,'c')
-        self.assertEqual(obj.Required,False)
-
-class UsageExampleTests(TestCase):
+class OptparseUsageExampleTests(TestCase):
     def test_init(self):
-        obj = UsageExample(ShortDesc='a', LongDesc='b', Ex='c')
+        obj = OptparseUsageExample(ShortDesc='a', LongDesc='b', Ex='c')
         self.assertEqual(obj.ShortDesc, 'a')
         self.assertEqual(obj.LongDesc, 'b')
         self.assertEqual(obj.Ex, 'c')
 
-class ParameterConversionTests(TestCase):
-    def test_init(self):
-        obj = ParameterConversion('a',str,CLAction='store')
-        self.assertEqual(obj.LongName, 'a')
-        self.assertEqual(obj.CLType, str)
-        self.assertEqual(obj.CLAction, 'store')
-
-        self.assertRaises(IncompetentDeveloperError, ParameterConversion, 'a',
-                          'not valid')
+        with self.assertRaises(IncompetentDeveloperError):
+            _ = OptparseUsageExample('a', 'b', Ex=None)
 
 def oh(key, data, opt_value=None):
     return data * 2
 
-class CLInterfaceTests(TestCase):
+class OptparseInterfaceTests(TestCase):
     def setUp(self):
         self.interface = fabulous()
     
     def test_init(self):
-        self.assertRaises(NotImplementedError, CLInterface)
-
-    def test_option_factory(self):
-        obs = self.interface._option_factory(Parameter('a','b','c'))
-        self.assertEqual(obs.Type, 'a')
-        self.assertEqual(obs.Help, 'b')
-        self.assertEqual(obs.Name, 'c')
-        self.assertTrue(isinstance(obs, CLOption))
+        self.assertRaises(NotImplementedError, OptparseInterface)
 
     def test_input_handler(self):
-        # note the the argument is --a due to the parameter conversion c->a
-        obs = self.interface._input_handler(['--a','foo'])
-        self.assertEqual(sorted(obs.items()), [('a', 'foo'),('verbose',False)])
+        obs = self.interface._input_handler(['--c','foo'])
+        self.assertEqual(obs.items(), [('c', 'foo')])
 
     def test_build_usage_lines(self):
         obs = self.interface._build_usage_lines([])
@@ -109,36 +92,42 @@ class CLInterfaceTests(TestCase):
 
 class GeneralTests(TestCase):
     def setUp(self):
-        self.obj = cli(ghetto, [UsageExample('a','b','c')],
-                       {'c':ParameterConversion('a',str)}, [], 
-                       {'itsaresult':OutputHandler(OptionName=None,
-                                              Function=oh)})
+        self.obj = optparse_factory(ghetto,
+                [OptparseUsageExample('a','b','c')],
+                [OptparseOption(InputType=str,
+                                Parameter=ghetto.Parameters['c'],
+                                ShortName='n')],
+                [OptparseResult(ResultKey='itsaresult', OutputHandler=oh)])
 
-    def test_cli(self):
+    def test_optparse_factory(self):
         # exercise it
-        foo = self.obj()
+        _ = self.obj()
 
-    def test_clmain(self):
+    def test_optparse_main(self):
         # exercise it
-        foo = clmain(self.obj, ['testing', '--a','bar'])
-        
+        _ = optparse_main(self.obj, ['testing', '--c', 'bar'])
+
 class ghetto(Command):
-    def _get_parameters(self):
-        return [Parameter(str,'b','c')]
+    Parameters = ParameterCollection([Parameter(str,'b','c')])
+
     def run(self, **kwargs):
         return {'itsaresult':10}
 
-class fabulous(CLInterface):
+class fabulous(OptparseInterface):
     CommandConstructor = ghetto
-    def _get_param_conv_info(self):
-        return {'c':ParameterConversion('a',str)}
+
+    def _get_inputs(self):
+        return [OptparseOption(InputType=str,
+                Parameter=self.CommandConstructor.Parameters['c'],
+                ShortName='n')]
+
     def _get_usage_examples(self):
-        return [UsageExample('a','b','c')]
-    def _get_additional_options(self):
-        return []
-    def _get_output_map(self):
-        return {'itsaresult':OutputHandler(OptionName=None,
-                                           Function=oh)}
+        return [OptparseUsageExample('a','b','c')]
+
+    def _get_outputs(self):
+        return [OptparseResult(ResultKey='itsaresult', OutputHandler=oh)]
+
+
 usage_lines = """usage: %prog [options] {}
 
 [] indicates optional input (order unimportant)
@@ -152,5 +141,7 @@ Print help message and exit
 
 a: b
  c"""
+
+
 if __name__ == '__main__':
     main()
