@@ -32,7 +32,7 @@ class BashCompletionTests(TestCase):
         i, o = _load_cfg('pyqi.interfaces.optparse.config',
                          'make_bash_completion')
         self.assertEqual(i, inputs)
-        self.assertEqual(o, o)
+        self.assertEqual(o, outputs)
     
     def test_init(self):
         obj = BashCompletion()
