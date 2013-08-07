@@ -25,7 +25,10 @@ from pyqi.core.exception import IncompetentDeveloperError
 class CommandTests(TestCase):
     def test_init(self):
         """Jog the init"""
-        self.assertRaises(NotImplementedError, Command)
+        c = Command()
+        self.assertEqual(len(c.Parameters), 0)
+        with self.assertRaises(NotImplementedError):
+            _ = c()
 
     def test_subclass_init(self):
         """Exercise the subclassing"""
