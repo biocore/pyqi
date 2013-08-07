@@ -55,7 +55,7 @@ class Interface(object):
                                   "_output_handler.")
 
     def _get_usage_examples(self):
-        """Return a list of ``UsageExample`` objects
+        """Return a list of ``InterfaceUsageExample`` objects
         
         These are typically set in a command+interface specific configuration
         file and passed to ``pyqi.core.general_factory``
@@ -63,29 +63,32 @@ class Interface(object):
         raise NotImplementedError("Must define _get_usage_examples")
 
     def _get_inputs(self):
-        """Return a list of ``Option`` objects
+        """Return a list of ``InterfaceOption`` objects
         
         These are typically set in a command+interface specific configuration
         file and passed to ``pyqi.core.general_factory``
         """
-        raise NotImplementedError("Must define _get_usage_examples")
+        raise NotImplementedError("Must define _get_inputs")
 
-    def _get_usage_examples(self):
-        """Return a list of ``Result`` objects
+    def _get_outputs(self):
+        """Return a list of ``InterfaceResult`` objects
         
         These are typically set in a command+interface specific configuration
         file and passed to ``pyqi.core.general_factory``
         """
-        raise NotImplementedError("Must define _get_usage_examples")
+        raise NotImplementedError("Must define _get_outputs")
 
 class InterfaceOption(object):
     """Describes an option and what to do with it"""
     def __init__(self, InputType=None, Parameter=None, Required=False, 
-                 Name=None, ShortName=None, InputHandler=None, Help=None):
+                 Name=None, ShortName=None, InputHandler=None, Help=None,
+                 Default=None, DefaultDescription=None):
         self.Parameter = Parameter
         if self.Parameter is not None:
             self.Name = Parameter.Name
             self.Help = Parameter.Help
+            self.Default = Parameter.Default
+            self.DefaultDescription = Parameter.DefaultDescription
 
             # If a parameter is required, the option is always required, but
             # if a parameter is not required, but the option does require it,
@@ -103,7 +106,9 @@ class InterfaceOption(object):
             self.Name = Name
             self.Help = Help
             self.Required = Required
-            
+            self.Default = Default
+            self.DefaultDescription = DefaultDescription
+
         self.ShortName = ShortName
         self.InputType = InputType
         self.InputHandler = InputHandler

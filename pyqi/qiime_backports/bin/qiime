@@ -21,7 +21,7 @@ def usage():
     print
     print "The currently available commands are:"
     
-    for c in sorted(qiime_cli.__all__):
+    for c in qiime_cli.__all__:
         cmd_cfg = get_cmd_cfg(c)
         desc = cmd_cfg.CommandConstructor.BriefDescription
         if len(desc) > 70:

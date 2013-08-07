@@ -53,7 +53,7 @@ def usage(opts):
     print
     print "The currently available commands are:"
     
-    for c in sorted(cfg.__all__):
+    for c in cfg.__all__:
         cmd_cfg = get_cmd_cfg(c, opts)
         desc = cmd_cfg.CommandConstructor.BriefDescription
         if len(desc) > desc_limit:

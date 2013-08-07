@@ -60,7 +60,7 @@ inputs = [
 
 outputs = [
     OptparseResult(OutputType=None,
-                   Parameters=None,
+                   Parameter=None,
                    Name='output_fp',
                    OutputHandler=write_string,
                    ResultKey='result')
