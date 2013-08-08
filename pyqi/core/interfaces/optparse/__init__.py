@@ -74,26 +74,20 @@ class OptparseOption(InterfaceOption):
         return self.Name.replace('-', '_')
 
     def getOptparseOption(self):
-        # can't figure out callbacks right now. InputHandler applied anyway
-        # at the end of _handle_input
-        if self.InputType not in OPTPARSE_TYPES:
-            input_type = 'str'
-        else:
-            input_type = self.InputType
-
         if self.Required:
             # If the option doesn't already end with [REQUIRED], add it.
             help_text = self.Help
+
             if not help_text.strip().endswith('[REQUIRED]'):
                 help_text += ' [REQUIRED]'
 
             if self.ShortName is None:
-                option = make_option('--' + self.Name, type=input_type,
-                                     help=help_text)
+                option = make_option('--' + self.Name, type=self.InputType,
+                                     action=self.InputAction, help=help_text)
             else:
                 option = make_option('-' + self.ShortName,
-                                     '--' + self.Name, type=input_type,
-                                     help=help_text)
+                                     '--' + self.Name, type=self.InputType,
+                                     action=self.InputAction, help=help_text)
         else:
             if self.DefaultDescription is None:
                 help_text = '%s [default: %%default]' % self.Help
@@ -102,12 +96,15 @@ class OptparseOption(InterfaceOption):
                                                   self.DefaultDescription)
 
             if self.ShortName is None:
-                option = make_option('--' + self.Name, type=input_type,
-                                     help=help_text, default=self.Default)
+                option = make_option('--' + self.Name, type=self.InputType,
+                                     action=self.InputAction, help=help_text,
+                                     default=self.Default)
             else:
                 option = make_option('-' + self.ShortName,
-                                     '--' + self.Name, type=input_type,
-                                     help=help_text, default=self.Default)
+                                     '--' + self.Name, type=self.InputType,
+                                     action=self.InputAction, help=help_text,
+                                     default=self.Default)
+
         return option
 
 class OptparseUsageExample(InterfaceUsageExample):
