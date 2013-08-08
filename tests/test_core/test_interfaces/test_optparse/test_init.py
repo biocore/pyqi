@@ -31,14 +31,15 @@ class OptparseResultTests(TestCase):
 
 class OptparseOptionTests(TestCase):
     def setUp(self):
-        p = Parameter(int, 'some int', 'number', Required=False, Default=42,
+        p = Parameter('number', int, 'some int', Required=False, Default=42,
                       DefaultDescription='forty-two')
         # With associated parameter.
-        self.opt1 = OptparseOption(int, p)
+        self.opt1 = OptparseOption(p, int)
 
         # Without associated parameter.
-        self.opt2 = OptparseOption(int, None, False, 'number', 'n', None,
-                                   'help!!!')
+        self.opt2 = OptparseOption(None, int, InputHandler=None, ShortName='n',
+                                   Name='number', Required=False,
+                                   Help='help!!!')
 
     def test_init(self):
         self.assertEqual(self.opt1.InputType, int)
@@ -47,6 +48,7 @@ class OptparseOptionTests(TestCase):
         self.assertEqual(self.opt1.Default, 42)
         self.assertEqual(self.opt1.DefaultDescription, 'forty-two')
         self.assertEqual(self.opt1.ShortName, None)
+        self.assertEqual(self.opt1.Required, False)
 
     def test_str(self):
         exp = '--number'
@@ -86,9 +88,9 @@ class OptparseInterfaceTests(TestCase):
         self.assertEqual(obs, usage_lines)
 
     def test_output_handler(self):
-        results = {'itsaresult':20} 
-        self.interface._output_handler(results)
-        self.assertEqual(results, {'itsaresult':40})
+        results = {'itsaresult':20}
+        obs = self.interface._output_handler(results)
+        self.assertEqual(obs, {'itsaresult':40})
 
 class GeneralTests(TestCase):
     def setUp(self):
@@ -108,7 +110,7 @@ class GeneralTests(TestCase):
         _ = optparse_main(self.obj, ['testing', '--c', 'bar'])
 
 class ghetto(Command):
-    Parameters = ParameterCollection([Parameter(str,'b','c')])
+    Parameters = ParameterCollection([Parameter('c', str, 'b')])
 
     def run(self, **kwargs):
         return {'itsaresult':10}
