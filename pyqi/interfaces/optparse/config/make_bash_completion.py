@@ -42,5 +42,5 @@ inputs = [
 outputs = [
     OptparseResult(ResultKey='result',
                    OutputHandler=write_string,
-                   Option=inputs[2]) # if specified, must exist in inputs
+                   OptionName='output-fp')
 ]

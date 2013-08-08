@@ -140,10 +140,10 @@ class InterfaceOption(object):
 class InterfaceResult(object):
     """Describes a result and what to do with it"""
 
-    def __init__(self, ResultKey, OutputHandler, Option=None):
+    def __init__(self, ResultKey, OutputHandler, OptionName=None):
         self.ResultKey = ResultKey
         self.OutputHandler = OutputHandler
-        self.Option = Option
+        self.OptionName = OptionName
 
         self._validate_result()
 

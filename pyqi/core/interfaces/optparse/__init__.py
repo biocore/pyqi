@@ -70,9 +70,6 @@ class OptparseOption(InterfaceOption):
         else:
             return self.Parameter.Name
 
-    def getOptparseCleanName(self):
-        return self.Name.replace('-', '_')
-
     def getOptparseOption(self):
         if self.Required:
             # If the option doesn't already end with [REQUIRED], add it.
@@ -203,7 +200,8 @@ class OptparseInterface(Interface):
         for option in self._get_inputs():
             if option.Parameter is not None:
                 param_name = option.getParameterName()
-                optparse_clean_name = option.getOptparseCleanName()
+                optparse_clean_name = \
+                        self._get_optparse_clean_name(option.Name)
 
                 if option.InputHandler is None:
                     value = self._optparse_input[optparse_clean_name]
@@ -261,15 +259,20 @@ class OptparseInterface(Interface):
                 raise IncompetentDeveloperError("Did not find the expected "
                                                 "output '%s' in results." % rk)
 
-            if output.Option is None:
+            if output.OptionName is None:
                 handled_results[rk] = output.OutputHandler(rk, results[rk])
             else:
-                opt_value = self._optparse_input[
-                        output.Option.getOptparseCleanName()]
+                optparse_clean_name = \
+                        self._get_optparse_clean_name(output.OptionName)
+                opt_value = self._optparse_input[optparse_clean_name]
                 handled_results[rk] = output.OutputHandler(rk, results[rk],
                                                            opt_value)
 
         return handled_results
+
+    def _get_optparse_clean_name(self, name):
+        # optparse converts dashes to underscores in long option names.
+        return name.replace('-', '_')
 
 def optparse_factory(command_constructor, usage_examples, inputs, outputs):
     """Optparse command line interface factory

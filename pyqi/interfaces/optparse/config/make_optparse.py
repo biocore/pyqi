@@ -36,7 +36,7 @@ inputs = [
                    ShortName='c',
                    InputHandler=command_handler),
     OptparseOption(Parameter=CommandConstructor.Parameters['command_module'],
-                    ShortName='m'),
+                   ShortName='m'),
     OptparseOption(Parameter=None,
                    InputType='new_filepath',
                    ShortName='o',
@@ -48,5 +48,5 @@ inputs = [
 outputs = [
     OptparseResult(ResultKey='result',
                    OutputHandler=write_string,
-                   Option=inputs[2])
+                   OptionName='output-fp')
 ]

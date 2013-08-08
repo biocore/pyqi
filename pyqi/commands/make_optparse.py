@@ -65,8 +65,13 @@ inputs = [
 outputs = [
     # An example option that maps to a result key.
     # OptparseResult(ResultKey='some_result',
-    #                OutputHandler=f, # a function applied to the value at ResultKey
-    #                Option=inputs[1]),
+    #                OutputHandler=write_string, # a function applied to the value at ResultKey
+    #
+    #                # the name of the option (defined in inputs, above), whose
+    #                # value will be made available to OutputHandler. This name
+    #                # can be either an underscored or dashed version of the
+    #                # option name (e.g., 'output_fp' or 'output-fp')
+    #                OptionName='output-fp'), 
     #
     # An example option that does not map to a result key.
     # OptparseResult(ResultKey='some_other_result',

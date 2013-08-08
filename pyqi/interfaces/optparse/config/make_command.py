@@ -53,5 +53,5 @@ inputs = [
 outputs = [
     OptparseResult(ResultKey='result',
                    OutputHandler=write_string,
-                   Option=inputs[7])
+                   OptionName='output-fp')
 ]
