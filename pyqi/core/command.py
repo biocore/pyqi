@@ -29,6 +29,7 @@ class Parameter(object):
     A ``Command`` variable is interface agnostic and is analogous to a function
     argument.
     """
+
     def __init__(self, Name, DataType, Description, Required=False,
                  Default=None, DefaultDescription=None):
         """
