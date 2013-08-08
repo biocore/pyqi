@@ -126,6 +126,11 @@ class InterfaceOption(object):
         if convert_to_dashed_name:
             self.Name = self.Name.replace('_', '-')
 
+        if self.Required and self.Default is not None:
+            raise IncompetentDeveloperError("Found required option '%s' "
+                    "with default value '%s'. Required options cannot have "
+                    "default values." % (self.Name, self.Default))
+
         self._validate_option()
 
     def _validate_option(self):

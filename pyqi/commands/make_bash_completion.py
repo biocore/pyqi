@@ -69,11 +69,12 @@ class BashCompletion(Command):
     BriefDescription = "Construct a bash completion script"
     LongDescription = """Construct a bash tab completion script that will search through available commands and options"""
     Parameters = ParameterCollection([
-        Parameter(Name='command_config_module', Required=True, DataType=str, 
-                  Description="The CLI command configuration module"),
-        Parameter(Name='driver_name', Required=True, DataType=str,
-                  Description="Name of the driver script")
-        ])
+        Parameter(Name='command_config_module', DataType=str,
+                  Description="CLI command configuration module",
+                  Required=True),
+        Parameter(Name='driver_name', DataType=str,
+                  Description="name of the driver script", Required=True)
+    ])
 
     def run(self, **kwargs):
         driver = kwargs['driver_name']
