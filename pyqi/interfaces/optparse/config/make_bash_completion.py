@@ -33,33 +33,31 @@ usage_examples = [
 ### need to make sure comments desc input goes into make_cli template (make_optparse?)
 inputs = [
     OptparseOption(InputType=str,
-                   Parameter=CommandConstructor.Parameters['command-config-module'],
+                   Parameter=CommandConstructor.Parameters['command_config_module'],
                    # Required=True implied by Parameter
                    # Name='command_cfg_directory', implied by Parameter
                    ShortName=None,
                    # Help is pulled from parameter since Parameter is not None
                    InputHandler=None), # optparse handles str just fine
     OptparseOption(InputType=str,
-                   Parameter=CommandConstructor.Parameters['driver-name'],
+                   Parameter=CommandConstructor.Parameters['driver_name'],
                    # Required=True implied by Parameter
                    # Name='driver_name', implied by Parameter
                    ShortName=None,
                    # Help is pulled from parameter since Paramter is not None
                    InputHandler=None),
     OptparseOption(InputType='new_filepath',
-                   Parameter=None, #
+                   Parameter=None,
                    Required=True,
                    Name='output-fp',
                    ShortName='o',
-                   Help="Output filepath",
+                   Help='Output filepath',
                    InputHandler=None)
 ]
 
 ### need to make sure comments desc output goes into make_cli template (make_optparse?)
 outputs = [
-    OptparseResult(OutputType=None, ### do we need an outputtype?
-                   Parameter=None,
-                   Name='output_fp', # if specified, must exist as an input
+    OptparseResult(Option=inputs[2], # if specified, must exist as an input
                    OutputHandler=write_string,
                    ResultKey='result')
 ]

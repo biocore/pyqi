@@ -43,15 +43,36 @@ class OptparseResult(InterfaceResult):
 
 class OptparseOption(InterfaceOption):
     """An augmented option that expands a Parameter into an Option"""
+
+    def __init__(self, Parameter=None, InputType=str, InputAction='store',
+                 InputHandler=None, ShortName=None, Name=None, Required=False,
+                 Help=None, Default=None, DefaultDescription=None,
+                 convert_to_dashed_name=True):
+        super(OptparseOption, self).__init__(Parameter=Parameter,
+                InputType=InputType, InputAction=InputAction,
+                InputHandler=InputHandler, ShortName=ShortName, Name=Name,
+                Required=Required, Help=Help, Default=Default,
+                DefaultDescription=DefaultDescription,
+                convert_to_dashed_name=convert_to_dashed_name)
+
     def _validate_option(self):
-        ### require Name, type, etc???
-        pass 
+        ### TODO: check InputType and InputAction
+        pass
 
     def __str__(self):
         if self.ShortName is None:
             return '--%s' % self.Name
         else:
             return '-%s/--%s' % (self.ShortName, self.Name)
+
+    def getParameterName(self):
+        if self.Parameter is None:
+            return None
+        else:
+            return self.Parameter.Name
+
+    def getOptparseCleanName(self):
+        return self.Name.replace('-', '_')
 
     def getOptparseOption(self):
         # can't figure out callbacks right now. InputHandler applied anyway
@@ -178,14 +199,25 @@ class OptparseInterface(Interface):
                     parser.error('Required option --%s omitted.' %
                                  required_option_id)
 
-        beloved_functionality = opts.__dict__
-        self.BelovedFunctionality = beloved_functionality
+        # Build up command input dictionary. This will be passed to
+        # Command.__call__ as kwargs.
+        self._optparse_input = opts.__dict__
+
+        cmd_input_kwargs = {}
         for option in self._get_inputs():
-            if option.InputHandler is not None:
-                name = option.Name
-                value = self.BelovedFunctionality[name]
-                self.BelovedFunctionality[name] = option.InputHandler(value)
-        return self.BelovedFunctionality
+            if option.Parameter is not None:
+                param_name = option.getParameterName()
+                optparse_clean_name = option.getOptparseCleanName()
+
+                if option.InputHandler is None:
+                    value = self._optparse_input[optparse_clean_name]
+                else:
+                    value = option.InputHandler(
+                            self._optparse_input[optparse_clean_name])
+
+                cmd_input_kwargs[param_name] = value
+
+        return cmd_input_kwargs
 
     def _build_usage_lines(self, required_options):
         """ Build the usage string from components """
@@ -225,18 +257,23 @@ class OptparseInterface(Interface):
 
     def _output_handler(self, results):
         """Deal with things in output if we know how"""
+        handled_results = {}
+
         for output in self._get_outputs():
             rk = output.ResultKey
             if rk not in results:
                 raise IncompetentDeveloperError("Did not find the expected "
                                                 "output '%s' in results." % rk)
 
-
-            if output.Name is None:
-                results[rk] = output.OutputHandler(rk, results[rk])
+            if output.Option is None:
+                handled_results[rk] = output.OutputHandler(rk, results[rk])
             else:
-                opt_value = self.BelovedFunctionality[output.Name]
-                results[rk] = output.OutputHandler(rk, results[rk], opt_value)
+                opt_value = self._optparse_input[
+                        output.Option.getOptparseCleanName()]
+                handled_results[rk] = output.OutputHandler(rk, results[rk],
+                                                           opt_value)
+
+        return handled_results
 
 def optparse_factory(command_constructor, usage_examples, inputs, outputs):
     """Optparse command line interface factory
