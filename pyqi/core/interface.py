@@ -135,23 +135,10 @@ class InterfaceOption(object):
 class InterfaceResult(object):
     """Describes a result and what to do with it"""
 
-    def __init__(self, OutputType=None, Parameter=None, Name=None, 
-                 OutputHandler=None, ResultKey=None):
-        self.Parameter = Parameter
-        if self.Parameter is not None:
-            self.Name = Parameter.Name
-        else:
-            self.Name = Name # can be None
-
-        if ResultKey is None:
-            raise IncompetentDeveloperError('Must associate to a result key')
-        else:
-            self.ResultKey = ResultKey
-
-        if OutputHandler is None:
-            raise IncompetentDeveloperError('Must associate to a OutputHandler')
-        else:
-            self.OutputHandler = OutputHandler
+    def __init__(self, ResultKey, OutputHandler, Option=None):
+        self.ResultKey = ResultKey
+        self.OutputHandler = OutputHandler
+        self.Option = Option
 
         self._validate_result()
 
@@ -171,4 +158,3 @@ class InterfaceUsageExample(object):
     def _validate_usage_example(self):
         """Interface specific usage example validation"""
         raise NotImplementedError("Must define in the subclass")
-

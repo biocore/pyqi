@@ -38,7 +38,6 @@ def new_filepath(data, path):
 
 class OptparseResult(InterfaceResult):
     def _validate_result(self):
-        ### anything to validate here?
         pass
 
 class OptparseOption(InterfaceOption):
