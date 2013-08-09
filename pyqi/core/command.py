@@ -38,7 +38,7 @@ class Parameter(object):
         a dictionary as input or named arguments.
 
         ``DataType`` specifies the type that the input must be. The input
-        should be an instance of the type that ``DataType`` points to.
+        should be an instance of type ``DataType``.
         """
         if not self._is_valid_name(Name):
             raise IncompetentDeveloperError("Parameter '%s' is not a valid "
