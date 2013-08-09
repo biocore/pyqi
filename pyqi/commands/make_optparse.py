@@ -22,91 +22,97 @@ __email__ = "mcdonadt@colorado.edu"
 
 header = """#!/usr/bin/env python
 
-from pyqi.core.interfaces.optparse import (OptparseOption, OptparseUsageExample,
-        OptparseOption, OptparseResult)
-from %(mod)s import CommandConstructor
+from pyqi.core.interfaces.optparse import (OptparseOption,
+                                           OptparseUsageExample,
+                                           OptparseOption, OptparseResult)
+from %(command_module)s import CommandConstructor
 
-# Examples of how the command can be used from the command line
+# Examples of how the command can be used from the command line using an
+# optparse interface.
 usage_examples = [
     OptparseUsageExample(ShortDesc="A short single sentence description of the example",
                          LongDesc="A longer, more detailed description",
                          Ex="%%prog --foo --bar some_file")
-    ]
+]
 
-# Inputs map command line arguments and values onto Parameters. It is possible to
-# define options here that do not exist as parameters, e.g., an output file
+# inputs map command line arguments and values onto Parameters. It is possible
+# to define options here that do not exist as parameters, e.g., an output file.
 inputs = [
-    # An example option that has a direct relationship with a Parameter 
-    #OptparseOption(InputType=str, # can be non-primitive, handled by InputHandler
-### do we want to define a helper method, get_param = lambda x: CommandConstructor.Parameters[x]
-### and drop it in each config file via the template?
-    #               Parameter=CommandConstructor.Parameters['name_of_a_parameter'],
-    #               # Required, implied by Parameter. Can be promoted by setting True
-    #               # Name, implied by Parameter
-    #               ShortName='n', # a parameter short name, can be None
-    #               # Help, implied by Parameter
-    #               InputHandler=None), # Apply a function to the input value
-    # An example option that does not have an associated Parameter
-    #OptparseOption(InputType='new_filepath',
-    #               Parameter=None,
-    #               Required=True,
-    #               Name='output_fp',
-    #               ShortName='o',
-    #               Help='Output file path',
-    #               InputHandler=None)
+    # An example option that has a direct relationship with a Parameter.
+    # OptparseOption(Parameter=CommandConstructor.Parameters['name_of_a_parameter'],
+    #                InputType='existing_filepath', # the optparse type of input
+    #                InputHandler=None, # Apply a function to the input value to convert it into the type expected by Parameter.DataType
+    #                ShortName='n', # a parameter short name, can be None
+    #                # Name='foo', # implied by Parameter. Can be overwritten here if desired
+    #                # Required=True, # implied by Parameter. Can be promoted by setting True
+    #                # Help, # implied by Parameter.Description. Can be overwritten here if desired
+    #                convert_to_dashed_name=True), # whether the Name (either implied by Parameter or defined above) should have underscores converted to dashes when displayed to the user
+    #
+    # An example option that does not have an associated Parameter.
+    # OptparseOption(Parameter=None,
+    #                InputType='new_filepath',
+    #                InputHandler=None, # we don't need an InputHandler because this option isn't being converted into a format that a Parameter expects
+    #                ShortName='o',
+    #                Name='output-fp',
+    #                Required=True,
+    #                Help='output filepath')
 %(input_fmt)s
-    ]
+]
 
-# Outputs map result keys to output options and handlers. It is not necessary
-# to gave an associated option.
+# outputs map result keys to output options and handlers. It is not necessary
+# to supply an associated option, but if you do, it must be an option from the
+# inputs list (above).
 outputs = [
-    # An example option that maps to a result key
-    #OptparseResult(OutputType=None, # undefined at this time
-    #               Parameter=CommandConstructor.Parameters['name_of_a_parameter'],
-    #               # Name, implied by Parameter
-    #               OutputHandler=f, # a function applied to the value at ResultKey
-    #               ResultKey='some_result'),
-    # An example option that does not map to a result key
-    #OptparseResult(OutputType=None,
-    #               Parameter=None, # no Command.Parameter associated
-    #               Name='output_fp',
-    #               OutputHandler=write_string,
-    #               ResultKey='some_other_result')
-    ]
+    # An example option that maps to a result key.
+    # OptparseResult(ResultKey='some_result',
+    #                OutputHandler=write_string, # a function applied to the value at ResultKey
+    #
+    #                # the name of the option (defined in inputs, above), whose
+    #                # value will be made available to OutputHandler. This name
+    #                # can be either an underscored or dashed version of the
+    #                # option name (e.g., 'output_fp' or 'output-fp')
+    #                OptionName='output-fp'), 
+    #
+    # An example option that does not map to a result key.
+    # OptparseResult(ResultKey='some_other_result',
+    #                OutputHandler=print_string)
+]
 """
 
-### currently filling out by Parameter, but commenting out the implied stuff
-input_fmt = """    OptparseOption(InputType=%(datatype)s,
-                    Parameter=CommandConstructor.Parameters['%(name)s'],
-                    # Name='%(name)s', # implied by Parameter
-                    # Required=%(required)s, # implied by Parameter
-                    # ShortName=None, # must be defined if desired
-                    # Help='%(help)s', # implied by Parameter
-                    InputHandler=None), # must be defined if desired
+# Fill out by Parameter, and comment out some of the most common stuff.
+input_fmt = """    OptparseOption(Parameter=CommandConstructor.Parameters['%(name)s'],
+                   InputType=%(datatype)s,
+                   InputHandler=None, # must be defined if desired
+                   ShortName=None), # must be defined if desired
+                   # Name='%(name)s', # implied by Parameter
+                   # Required=%(required)s, # implied by Parameter
+                   # Help='%(help)s', # implied by Parameter
 """
 
 class MakeOptparse(Command):
-    BriefDescription = "Consume a Command, stub out an Optparse configuration"
-    LongDescription = """Construct and stub out the basic Optparse configuration for a given Command. This template provides comments and examples of what to fill in."""
+    BriefDescription = "Consume a Command, stub out an optparse configuration"
+    LongDescription = """Construct and stub out the basic optparse configuration for a given Command. This template provides comments and examples of what to fill in."""
     Parameters = ParameterCollection([
-        Parameter(Name='command',Required=True,DataType=Command,
-                  Help='An existing Command'),
-        Parameter(Name='mod',Required=True,DataType=str,
-                  Help='the command source module')
-        ])
+        Parameter(Name='command', DataType=Command,
+                  Description='an existing Command', Required=True),
+        Parameter(Name='command_module', DataType=str,
+                  Description='the Command source module', Required=True)
+    ])
 
     def run(self, **kwargs):
         param_formatted = []
-        
+
         # construct inputs based off of parameters
         for param in kwargs['command'].Parameters.values():
-            fmt = {'name':param.Name, 'datatype':param.DataType, 
-                   'required':str(param.Required), 'help':param.Help}
+            fmt = {'name':param.Name, 'datatype':param.DataType,
+                   'required':str(param.Required),
+                   'help':param.Description}
             param_formatted.append(input_fmt % fmt)
-        
+
         param_formatted = ''.join(param_formatted)
-        header_format = {'mod':kwargs['mod'], 'input_fmt': param_formatted}
-        
+        header_format = {'command_module':kwargs['command_module'],
+                         'input_fmt': param_formatted}
+
         return {'result': header % header_format}
 
 CommandConstructor = MakeOptparse

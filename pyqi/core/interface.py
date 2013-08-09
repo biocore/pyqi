@@ -80,15 +80,34 @@ class Interface(object):
 
 class InterfaceOption(object):
     """Describes an option and what to do with it"""
-    def __init__(self, InputType=None, Parameter=None, Required=False, 
-                 Name=None, ShortName=None, InputHandler=None, Help=None,
-                 Default=None, DefaultDescription=None):
+
+    def __init__(self, Parameter=None, InputType=None, InputAction=None,
+                 InputHandler=None, ShortName=None, Name=None, Required=False,
+                 Help=None, Default=None, DefaultDescription=None,
+                 convert_to_dashed_name=True):
         self.Parameter = Parameter
-        if self.Parameter is not None:
-            self.Name = Parameter.Name
-            self.Help = Parameter.Help
-            self.Default = Parameter.Default
-            self.DefaultDescription = Parameter.DefaultDescription
+
+        if self.Parameter is None:
+            if Name is None:
+                raise IncompetentDeveloperError("Must specify a Name for the "
+                                                "InterfaceOption since it "
+                                                "doesn't have a Parameter.")
+            if Help is None:
+                raise IncompetentDeveloperError("Must specify Help for the "
+                                                "InterfaceOption since it "
+                                                "doesn't have a Parameter.")
+            self.Name = Name
+            self.Help = Help
+            self.Required = Required
+            self.Default = Default
+            self.DefaultDescription = DefaultDescription
+        else:
+            # Transfer information from Parameter unless overridden here.
+            self.Name = Parameter.Name if Name is None else Name
+            self.Help = Parameter.Description if Help is None else Help
+            self.Default = Parameter.Default if Default is None else Default
+            self.DefaultDescription = Parameter.DefaultDescription if \
+                    DefaultDescription is None else DefaultDescription
 
             # If a parameter is required, the option is always required, but
             # if a parameter is not required, but the option does require it,
@@ -97,22 +116,21 @@ class InterfaceOption(object):
                 self.Required = True
             else:
                 self.Required = Parameter.Required
-        else:
-            if Name is None:
-                raise IncompetentDeveloperError("No Parameter, and no Name!")
-            if Help is None:
-                raise IncompetentDeveloperError("Please specify Help")
 
-            self.Name = Name
-            self.Help = Help
-            self.Required = Required
-            self.Default = Default
-            self.DefaultDescription = DefaultDescription
-
-        self.ShortName = ShortName
+        # This information is never contained in a Parameter.
         self.InputType = InputType
+        self.InputAction = InputAction
         self.InputHandler = InputHandler
-        
+        self.ShortName = ShortName
+
+        if convert_to_dashed_name:
+            self.Name = self.Name.replace('_', '-')
+
+        if self.Required and self.Default is not None:
+            raise IncompetentDeveloperError("Found required option '%s' "
+                    "with default value '%s'. Required options cannot have "
+                    "default values." % (self.Name, self.Default))
+
         self._validate_option()
 
     def _validate_option(self):
@@ -122,23 +140,10 @@ class InterfaceOption(object):
 class InterfaceResult(object):
     """Describes a result and what to do with it"""
 
-    def __init__(self, OutputType=None, Parameter=None, Name=None, 
-                 OutputHandler=None, ResultKey=None):
-        self.Parameter = Parameter
-        if self.Parameter is not None:
-            self.Name = Parameter.Name
-        else:
-            self.Name = Name # can be None
-
-        if ResultKey is None:
-            raise IncompetentDeveloperError('Must associate to a result key')
-        else:
-            self.ResultKey = ResultKey
-
-        if OutputHandler is None:
-            raise IncompetentDeveloperError('Must associate to a OutputHandler')
-        else:
-            self.OutputHandler = OutputHandler
+    def __init__(self, ResultKey, OutputHandler, OptionName=None):
+        self.ResultKey = ResultKey
+        self.OutputHandler = OutputHandler
+        self.OptionName = OptionName
 
         self._validate_result()
 
@@ -158,4 +163,3 @@ class InterfaceUsageExample(object):
     def _validate_usage_example(self):
         """Interface specific usage example validation"""
         raise NotImplementedError("Must define in the subclass")
-

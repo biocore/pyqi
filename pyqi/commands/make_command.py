@@ -28,7 +28,7 @@ __author__ = "%(author)s"
 __copyright__ = "%(copyright)s"
 __credits__ = [%(credits)s]
 __license__ = "%(license)s"
-__version__ = "%(func_version)s"
+__version__ = "%(command_version)s"
 __maintainer__ = "%(author)s"
 __email__ = "%(email)s"
 
@@ -38,12 +38,13 @@ command_format = """class %s(Command):
     BriefDescription = "FILL IN A 1 SENTENCE DESCRIPTION"
     LongDescription = "GO INTO MORE DETAIL"
     Parameters = ParameterCollection([
-        Parameter(Name='foo',Required=True,DataType=str,
-                  Help='some required parameter'),
-        Parameter(Name='bar',Required=False,DataType=int,
-                  Help='some optional parameter',Default=1)
-        ])
-        
+        Parameter(Name='foo', DataType=str,
+                  Description='some required parameter', Required=True),
+        Parameter(Name='bar', DataType=int,
+                  Description='some optional parameter', Required=False,
+                  Default=1)
+    ])
+
     def run(self, **kwargs):
         # EXAMPLE:
         # return {'result_1': kwargs['foo'] * kwargs['bar'],
@@ -54,25 +55,26 @@ CommandConstructor = %s
 """
 
 class MakeCommand(Command):
-    BriefDescription = "Construct a stringified stubbed out ``Command`` object"
-    LongDescription = """This method will is intended to construct the basics of a Command object to so that a developer can dive straight into the fun bits"""
+    BriefDescription = "Construct a stubbed out Command object"
+    LongDescription = """This command is intended to construct the basics of a Command object so that a developer can dive straight into the implementation of the command"""
     Parameters = ParameterCollection([
-        Parameter(Name='name',Required=True,DataType=str,
-                  Help='the name of the Command'), 
-        Parameter(Name='email',Required=True,DataType=str,
-                  Help='maintainer email address'),
-        Parameter(Name='author',Required=True,DataType=str,
-                  Help='the function author'),
-        Parameter(Name='license',Required=True,DataType=str,
-                  Help='the license for the function'),
-        Parameter(Name='copyright',Required=True,DataType=str,
-                  Help='the function copyright'),
-        Parameter(Name='func_version',Required=True,DataType=str,
-                  Help='the function version'),
-        Parameter(Name='credits',Required=False,DataType=str,Default='',
-                  Help='comma separated list of other authors')
-        ])
-    
+        Parameter(Name='name', DataType=str,
+                  Description='the name of the Command', Required=True),
+        Parameter(Name='email', DataType=str,
+                  Description='maintainer email address', Required=True),
+        Parameter(Name='author', DataType=str,
+                  Description='the Command author', Required=True),
+        Parameter(Name='license', DataType=str,
+                  Description='the license for the Command', Required=True),
+        Parameter(Name='copyright', DataType=str,
+                  Description='the Command copyright', Required=True),
+        Parameter(Name='command_version', DataType=str,
+                  Description='the Command version', Required=True),
+        Parameter(Name='credits', DataType=str,
+                  Description='comma-separated list of other authors',
+                  Required=False, Default='')
+    ])
+
     def run(self, **kwargs):
         # build a string formatting dictionary for the file header
         head = {}
@@ -80,11 +82,11 @@ class MakeCommand(Command):
         head['author']       = kwargs['author']
         head['license']      = kwargs['license']
         head['copyright']    = kwargs['copyright']
-        head['func_version'] = kwargs['func_version']
+        head['command_version'] = kwargs['command_version']
 
         # Credits always includes author.
         credits = [head['author']]
-        if 'credits' in kwargs and len(kwargs['credits']) > 0:
+        if len(kwargs['credits']) > 0:
             credits.extend(kwargs['credits'].split(','))
 
         f = lambda x: '"%s"' % x

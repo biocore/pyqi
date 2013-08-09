@@ -38,14 +38,25 @@ def new_filepath(data, path):
 
 class OptparseResult(InterfaceResult):
     def _validate_result(self):
-        ### anything to validate here?
         pass
 
 class OptparseOption(InterfaceOption):
     """An augmented option that expands a Parameter into an Option"""
+
+    def __init__(self, Parameter=None, InputType=str, InputAction='store',
+                 InputHandler=None, ShortName=None, Name=None, Required=False,
+                 Help=None, Default=None, DefaultDescription=None,
+                 convert_to_dashed_name=True):
+        super(OptparseOption, self).__init__(Parameter=Parameter,
+                InputType=InputType, InputAction=InputAction,
+                InputHandler=InputHandler, ShortName=ShortName, Name=Name,
+                Required=Required, Help=Help, Default=Default,
+                DefaultDescription=DefaultDescription,
+                convert_to_dashed_name=convert_to_dashed_name)
+
     def _validate_option(self):
-        ### require Name, type, etc???
-        pass 
+        ### TODO: check InputType and InputAction
+        pass
 
     def __str__(self):
         if self.ShortName is None:
@@ -53,27 +64,27 @@ class OptparseOption(InterfaceOption):
         else:
             return '-%s/--%s' % (self.ShortName, self.Name)
 
-    def getOptparseOption(self):
-        # can't figure out callbacks right now. InputHandler applied anyway
-        # at the end of _handle_input
-        if self.InputType not in OPTPARSE_TYPES:
-            input_type = 'str'
+    def getParameterName(self):
+        if self.Parameter is None:
+            return None
         else:
-            input_type = self.InputType
+            return self.Parameter.Name
 
+    def getOptparseOption(self):
         if self.Required:
             # If the option doesn't already end with [REQUIRED], add it.
             help_text = self.Help
+
             if not help_text.strip().endswith('[REQUIRED]'):
                 help_text += ' [REQUIRED]'
 
             if self.ShortName is None:
-                option = make_option('--' + self.Name, type=input_type,
-                                     help=help_text)
+                option = make_option('--' + self.Name, type=self.InputType,
+                                     action=self.InputAction, help=help_text)
             else:
                 option = make_option('-' + self.ShortName,
-                                     '--' + self.Name, type=input_type,
-                                     help=help_text)
+                                     '--' + self.Name, type=self.InputType,
+                                     action=self.InputAction, help=help_text)
         else:
             if self.DefaultDescription is None:
                 help_text = '%s [default: %%default]' % self.Help
@@ -82,12 +93,15 @@ class OptparseOption(InterfaceOption):
                                                   self.DefaultDescription)
 
             if self.ShortName is None:
-                option = make_option('--' + self.Name, type=input_type,
-                                     help=help_text, default=self.Default)
+                option = make_option('--' + self.Name, type=self.InputType,
+                                     action=self.InputAction, help=help_text,
+                                     default=self.Default)
             else:
                 option = make_option('-' + self.ShortName,
-                                     '--' + self.Name, type=input_type,
-                                     help=help_text, default=self.Default)
+                                     '--' + self.Name, type=self.InputType,
+                                     action=self.InputAction, help=help_text,
+                                     default=self.Default)
+
         return option
 
 class OptparseUsageExample(InterfaceUsageExample):
@@ -178,14 +192,26 @@ class OptparseInterface(Interface):
                     parser.error('Required option --%s omitted.' %
                                  required_option_id)
 
-        beloved_functionality = opts.__dict__
-        self.BelovedFunctionality = beloved_functionality
+        # Build up command input dictionary. This will be passed to
+        # Command.__call__ as kwargs.
+        self._optparse_input = opts.__dict__
+
+        cmd_input_kwargs = {}
         for option in self._get_inputs():
-            if option.InputHandler is not None:
-                name = option.Name
-                value = self.BelovedFunctionality[name]
-                self.BelovedFunctionality[name] = option.InputHandler(value)
-        return self.BelovedFunctionality
+            if option.Parameter is not None:
+                param_name = option.getParameterName()
+                optparse_clean_name = \
+                        self._get_optparse_clean_name(option.Name)
+
+                if option.InputHandler is None:
+                    value = self._optparse_input[optparse_clean_name]
+                else:
+                    value = option.InputHandler(
+                            self._optparse_input[optparse_clean_name])
+
+                cmd_input_kwargs[param_name] = value
+
+        return cmd_input_kwargs
 
     def _build_usage_lines(self, required_options):
         """ Build the usage string from components """
@@ -225,18 +251,28 @@ class OptparseInterface(Interface):
 
     def _output_handler(self, results):
         """Deal with things in output if we know how"""
+        handled_results = {}
+
         for output in self._get_outputs():
             rk = output.ResultKey
             if rk not in results:
                 raise IncompetentDeveloperError("Did not find the expected "
                                                 "output '%s' in results." % rk)
 
-
-            if output.Name is None:
-                results[rk] = output.OutputHandler(rk, results[rk])
+            if output.OptionName is None:
+                handled_results[rk] = output.OutputHandler(rk, results[rk])
             else:
-                opt_value = self.BelovedFunctionality[output.Name]
-                results[rk] = output.OutputHandler(rk, results[rk], opt_value)
+                optparse_clean_name = \
+                        self._get_optparse_clean_name(output.OptionName)
+                opt_value = self._optparse_input[optparse_clean_name]
+                handled_results[rk] = output.OutputHandler(rk, results[rk],
+                                                           opt_value)
+
+        return handled_results
+
+    def _get_optparse_clean_name(self, name):
+        # optparse converts dashes to underscores in long option names.
+        return name.replace('-', '_')
 
 def optparse_factory(command_constructor, usage_examples, inputs, outputs):
     """Optparse command line interface factory

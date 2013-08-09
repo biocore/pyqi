@@ -18,6 +18,7 @@ __version__ = "0.1.0-dev"
 __maintainer__ = "Greg Caporaso"
 __email__ = "gregcaporaso@gmail.com"
 
+import re
 from pyqi.core.log import NullLogger
 from pyqi.core.exception import (IncompetentDeveloperError,
                                  InvalidReturnTypeError)
@@ -25,22 +26,51 @@ from pyqi.core.exception import (IncompetentDeveloperError,
 class Parameter(object):
     """A ``Command`` variable
 
-    A ``Command`` variable is interface agnostic and are analogous to a 
-    function argument.
+    A ``Command`` variable is interface agnostic and is analogous to a function
+    argument.
     """
-    def __init__(self, DataType, Help, Name, Required=False, Default=None,
-                 DefaultDescription=None):
-        self.DataType = DataType
-        self.Help = Help
-        self.Default = Default
-        self.Name = Name
-        self.Required = Required
-        self.DefaultDescription = DefaultDescription
 
-        if self.Required and self.Default is not None:
+    def __init__(self, Name, DataType, Description, Required=False,
+                 Default=None, DefaultDescription=None):
+        """
+        
+        ``Name`` should be a valid Python name so that users can supply either
+        a dictionary as input or named arguments.
+
+        ``DataType`` specifies the type that the input must be. The input
+        should be an instance of type ``DataType``.
+        """
+        if not self._is_valid_name(Name):
+            raise IncompetentDeveloperError("Parameter '%s' is not a valid "
+                                            "Python variable name. Parameter "
+                                            "names must be alphanumeric and "
+                                            "start with a letter or "
+                                            "underscore." % Name)
+
+        if Required and Default is not None:
             raise IncompetentDeveloperError("Found required parameter '%s' "
                     "with default value '%s'. Required parameters cannot have "
-                    "default values." % (self.Name, self.Default))
+                    "default values." % (Name, Default))
+
+        self.Name = Name
+        self.DataType = DataType
+        self.Description = Description
+        self.Required = Required
+        self.Default = Default
+        self.DefaultDescription = DefaultDescription
+
+    def _is_valid_name(self, name):
+        return name == self._pythonize(name)
+
+    def _pythonize(self, name):
+        """Taken from http://stackoverflow.com/a/3303361"""
+        # Remove invalid characters.
+        name = re.sub('[^0-9a-zA-Z_]', '', name)
+
+        # Remove leading characters until we find a letter or underscore.
+        name = re.sub('^[^a-zA-Z_]+', '', name)
+
+        return name
 
 class ParameterCollection(dict):
     """A collection of parameters with dict like lookup"""

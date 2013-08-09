@@ -33,8 +33,10 @@ class CommandTests(TestCase):
     def test_subclass_init(self):
         """Exercise the subclassing"""
         class foo(Command):
-            Parameters = ParameterCollection([Parameter(str,'help1','a',True),
-                    Parameter(str,'help2','b',False)])
+            Parameters = ParameterCollection([Parameter('a', str, 'help1',
+                                                        Required=True),
+                                              Parameter('b', str, 'help2',
+                                                        Required=False)])
             def run(self, **kwargs):
                 return {}
 
@@ -46,15 +48,15 @@ class CommandTests(TestCase):
 class ParameterTests(TestCase):
     def test_init(self):
         """Jog the init"""
-        obj = Parameter(str,'help','a',False)
-        self.assertEqual(obj.DataType, str)
-        self.assertEqual(obj.Help, 'help')
+        obj = Parameter('a', str, 'help', Required=False)
         self.assertEqual(obj.Name, 'a')
+        self.assertEqual(obj.DataType, str)
+        self.assertEqual(obj.Description, 'help')
         self.assertEqual(obj.Required, False)
         self.assertEqual(obj.Default, None)
         self.assertEqual(obj.DefaultDescription, None)
-        self.assertRaises(IncompetentDeveloperError, Parameter, str, 'help',
-                'a', True, 'x')
+        self.assertRaises(IncompetentDeveloperError, Parameter, 'a', str,
+                          'help', True, 'x')
 
 
 if __name__ == '__main__':

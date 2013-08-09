@@ -22,44 +22,25 @@ __version__ = "0.1.0-dev"
 __maintainer__ = "Daniel McDonald"
 __email__ = "mcdonadt@colorado.edu"
 
-# How you can use the command from the command line
-### need to make sure comments desc usage_examples goes into make_cli template (make_optparse?)
 usage_examples = [
     OptparseUsageExample(ShortDesc="Create a bash completion script",
-                         LongDesc="Create a bash completion script for use with a QCLI driver",
+                         LongDesc="Create a bash completion script for use with a pyqi driver",
                          Ex="%prog --command-config-module pyqi.interfaces.optparse.config --driver-name pyqi -o ~/.bash_completion.d/pyqi")
 ]
 
-### need to make sure comments desc input goes into make_cli template (make_optparse?)
 inputs = [
-    OptparseOption(InputType=str,
-                   Parameter=CommandConstructor.Parameters['command-config-module'],
-                   # Required=True implied by Parameter
-                   # Name='command_cfg_directory', implied by Parameter
-                   ShortName=None,
-                   # Help is pulled from parameter since Parameter is not None
-                   InputHandler=None), # optparse handles str just fine
-    OptparseOption(InputType=str,
-                   Parameter=CommandConstructor.Parameters['driver-name'],
-                   # Required=True implied by Parameter
-                   # Name='driver_name', implied by Parameter
-                   ShortName=None,
-                   # Help is pulled from parameter since Paramter is not None
-                   InputHandler=None),
-    OptparseOption(InputType='new_filepath',
-                   Parameter=None, #
-                   Required=True,
-                   Name='output-fp',
+    OptparseOption(Parameter=CommandConstructor.Parameters['command_config_module']),
+    OptparseOption(Parameter=CommandConstructor.Parameters['driver_name']),
+    OptparseOption(Parameter=None,
+                   InputType='new_filepath',
                    ShortName='o',
-                   Help="Output filepath",
-                   InputHandler=None)
+                   Name='output-fp',
+                   Required=True,
+                   Help='output filepath')
 ]
 
-### need to make sure comments desc output goes into make_cli template (make_optparse?)
 outputs = [
-    OptparseResult(OutputType=None, ### do we need an outputtype?
-                   Parameter=None,
-                   Name='output_fp', # if specified, must exist as an input
+    OptparseResult(ResultKey='result',
                    OutputHandler=write_string,
-                   ResultKey='result')
+                   OptionName='output-fp')
 ]

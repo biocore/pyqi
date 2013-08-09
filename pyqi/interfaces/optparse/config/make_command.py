@@ -24,44 +24,34 @@ from pyqi.core.interfaces.optparse.output_handler import write_string
 from pyqi.commands.make_command import CommandConstructor
 
 usage_examples = [
-    OptparseUsageExample(ShortDesc="Basic function",
-                         LongDesc="Create a basic function with appropriate attribution",
-                         Ex='%prog -n example -a "some author" -c "Copyright 2013, The QCLI Project" -e "foo@bar.com" -l BSD --func_version "0.1" --credits "someone else","and another person" -o example.py')
+    OptparseUsageExample(ShortDesc="Basic Command",
+                         LongDesc="Create a basic Command with appropriate attribution",
+                         Ex='%prog -n example -a "some author" -c "Copyright 2013, The pyqi project" -e "foo@bar.com" -l BSD --command-version "0.1" --credits "someone else","and another person" -o example.py')
 ]
 
 inputs = [
-    OptparseOption(InputType=str,
-                   Parameter=CommandConstructor.Parameters['name'],
+    OptparseOption(Parameter=CommandConstructor.Parameters['name'],
                    ShortName='n'),
-    OptparseOption(InputType=str,
-                   Parameter=CommandConstructor.Parameters['email'],
+    OptparseOption(Parameter=CommandConstructor.Parameters['email'],
                    ShortName='e'),
-    OptparseOption(InputType=str,
-                   Parameter=CommandConstructor.Parameters['author'],
+    OptparseOption(Parameter=CommandConstructor.Parameters['author'],
                    ShortName='a'),
-    OptparseOption(InputType=str,
-                   Parameter=CommandConstructor.Parameters['license'],
+    OptparseOption(Parameter=CommandConstructor.Parameters['license'],
                    ShortName='l'),
-    OptparseOption(InputType=str,
-                   Parameter=CommandConstructor.Parameters['copyright'],
+    OptparseOption(Parameter=CommandConstructor.Parameters['copyright'],
                    ShortName='c'),
-    OptparseOption(InputType=str,
-                   Parameter=CommandConstructor.Parameters['func_version'],
-                   ShortName=None),
-    OptparseOption(InputType=str,
-                   Parameter=CommandConstructor.Parameters['credits'],
-                   ShortName=None),
-    OptparseOption(InputType='new_filepath',
-                   Help='the resulting Python file',
-                   Name='output_fp',
+    OptparseOption(Parameter=CommandConstructor.Parameters['command_version']),
+    OptparseOption(Parameter=CommandConstructor.Parameters['credits']),
+    OptparseOption(Parameter=None,
+                   InputType='new_filepath',
+                   ShortName='o',
+                   Name='output-fp',
                    Required=True,
-                   ShortName='o')
+                   Help='output filepath to store generated Python code')
 ]
 
 outputs = [
-    OptparseResult(OutputType=None,
-                   Parameter=None,
-                   Name='output_fp',
+    OptparseResult(ResultKey='result',
                    OutputHandler=write_string,
-                   ResultKey='result')
-    ]
+                   OptionName='output-fp')
+]
