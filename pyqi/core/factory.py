@@ -9,7 +9,7 @@
 #-----------------------------------------------------------------------------
 
 __author__ = "Daniel McDonald"
-__copyright__ = "Copyright 2013, The QCLI Project"
+__copyright__ = "Copyright 2013, The pyqi project"
 __credits__ = ["Greg Caporaso", "Daniel McDonald", "Doug Wendel",
                "Jai Ram Rideout"]
 __license__ = "BSD"

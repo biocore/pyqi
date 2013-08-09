@@ -12,7 +12,7 @@ from __future__ import division
 from pyqi.core.command import Command, Parameter, ParameterCollection
 
 __author__ = "Daniel McDonald"
-__copyright__ = "Copyright 2013, the QCLI project"
+__copyright__ = "Copyright 2013, The pyqi project"
 __credits__ = ["Daniel McDonald", "Jai Ram Rideout", "Greg Caporaso",
                "Doug Wendel"]
 __license__ = "BSD"
