@@ -15,7 +15,7 @@ function(option_value)
 #-----------------------------------------------------------------------------
 
 __author__ = "Daniel McDonald"
-__copyright__ = "Copyright 2013, The QCLI Project"
+__copyright__ = "Copyright 2013, The pyqi project"
 __credits__ = ["Daniel McDonald", "Greg Caporaso", "Doug Wendel",
                "Jai Ram Rideout"]
 __license__ = "BSD"

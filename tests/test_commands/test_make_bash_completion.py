@@ -17,7 +17,7 @@ from pyqi.interfaces.optparse.config.make_bash_completion import (inputs,
                                                                   outputs)
 
 __author__ = "Daniel McDonald"
-__copyright__ = "Copyright 2013, The QCLI Project"
+__copyright__ = "Copyright 2013, The pyqi project"
 __credits__ = ["Daniel McDonald", "Jai Ram Rideout", "Doug Wendel", "Greg Caporaso"]
 __license__ = "BSD"
 __version__ = "0.1.0-dev"
