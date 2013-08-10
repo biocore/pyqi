@@ -27,6 +27,13 @@ from pyqi.core.interfaces.optparse import (OptparseOption,
                                            OptparseOption, OptparseResult)
 from %(command_module)s import CommandConstructor
 
+# If you need access to input or output handlers provided by pyqi, consider
+# importing from the following modules:
+# pyqi.core.interfaces.optparse.input_handler
+# pyqi.core.interfaces.optparse.output_handler
+# pyqi.interfaces.optparse.input_handler
+# pyqi.interfaces.optparse.output_handler
+
 # Examples of how the command can be used from the command line using an
 # optparse interface.
 usage_examples = [
