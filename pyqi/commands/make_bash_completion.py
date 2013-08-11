@@ -13,7 +13,7 @@ from pyqi.core.command import Command, Parameter, ParameterCollection
 import importlib
 
 __author__ = "Daniel McDonald"
-__copyright__ = "Copyright 2013, The QCLI Project"
+__copyright__ = "Copyright 2013, The pyqi project"
 __credits__ = ["Daniel McDonald", "Jai Ram Rideout", "Doug Wendel", "Greg Caporaso"]
 __license__ = "BSD"
 __version__ = "0.1.0-dev"
@@ -69,11 +69,12 @@ class BashCompletion(Command):
     BriefDescription = "Construct a bash completion script"
     LongDescription = """Construct a bash tab completion script that will search through available commands and options"""
     Parameters = ParameterCollection([
-        Parameter(Name='command_config_module', Required=True, DataType=str, 
-                  Help="The CLI command configuration module"),
-        Parameter(Name='driver_name', Required=True, DataType=str,
-                  Help="Name of the driver script")
-        ])
+        Parameter(Name='command_config_module', DataType=str,
+                  Description="CLI command configuration module",
+                  Required=True),
+        Parameter(Name='driver_name', DataType=str,
+                  Description="name of the driver script", Required=True)
+    ])
 
     def run(self, **kwargs):
         driver = kwargs['driver_name']
@@ -84,9 +85,9 @@ class BashCompletion(Command):
         commands = []
         for cmd in cfg_mod.__all__:
             inputs, outputs = _load_cfg(cfg_mod_path, cmd)
-            
+
             command_options = []
-            command_options.extend(['--%s' % p.Name for p in inputs])
+            command_options.extend(sorted(['--%s' % p.Name for p in inputs]))
             opts = ' '.join(command_options)
 
             commands.append(command_fmt % {'command':cmd, 'options':opts})

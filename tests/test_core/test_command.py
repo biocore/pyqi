@@ -10,7 +10,7 @@
 from __future__ import division
 
 __author__ = "Daniel McDonald"
-__copyright__ = "Copyright 2013, The QCLI Project"
+__copyright__ = "Copyright 2013, The pyqi project"
 __credits__ = ["Greg Caporaso", "Daniel McDonald", "Doug Wendel",
                "Jai Ram Rideout"]
 __license__ = "BSD"
@@ -19,41 +19,45 @@ __maintainer__ = "Daniel McDonald"
 __email__ = "wasade@gmail.com"
 
 from unittest import TestCase, main
-from pyqi.core.command import Parameter, Command
+from pyqi.core.command import Parameter, ParameterCollection, Command
 from pyqi.core.exception import IncompetentDeveloperError
 
 class CommandTests(TestCase):
     def test_init(self):
         """Jog the init"""
-        self.assertRaises(NotImplementedError, Command)
+        c = Command()
+        self.assertEqual(len(c.Parameters), 0)
+        with self.assertRaises(NotImplementedError):
+            _ = c()
 
     def test_subclass_init(self):
         """Exercise the subclassing"""
         class foo(Command):
+            Parameters = ParameterCollection([Parameter('a', str, 'help1',
+                                                        Required=True),
+                                              Parameter('b', str, 'help2',
+                                                        Required=False)])
             def run(self, **kwargs):
                 return {}
-            def _get_parameters(self):
-                return [Parameter('a','b','c',True),
-                        Parameter('x','y','z',False)]
 
         obs = foo()
 
-        self.assertEqual(len(obs.Parameters), 3) # include default verbose
-        self.assertEqual(len(obs._get_parameters()), 2)
+        self.assertEqual(len(obs.Parameters), 2)
         self.assertEqual(obs.run(bar={'a':10}), {})
 
 class ParameterTests(TestCase):
     def test_init(self):
         """Jog the init"""
-        obj = Parameter('a','b','c',False)
-        self.assertEqual(obj.Type, 'a')
-        self.assertEqual(obj.Help, 'b')
-        self.assertEqual(obj.Name, 'c')
+        obj = Parameter('a', str, 'help', Required=False)
+        self.assertEqual(obj.Name, 'a')
+        self.assertEqual(obj.DataType, str)
+        self.assertEqual(obj.Description, 'help')
         self.assertEqual(obj.Required, False)
         self.assertEqual(obj.Default, None)
         self.assertEqual(obj.DefaultDescription, None)
-        self.assertRaises(IncompetentDeveloperError, Parameter, 'a','b','c',
-                            True,'x')
+        self.assertRaises(IncompetentDeveloperError, Parameter, 'a', str,
+                          'help', True, 'x')
+
+
 if __name__ == '__main__':
     main()
-

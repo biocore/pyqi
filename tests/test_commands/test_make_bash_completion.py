@@ -11,10 +11,10 @@
 from __future__ import division
 from unittest import TestCase, main
 import pyqi
-from pyqi.commands.make_bash_completion import BashCompletion, \
-        _get_cfg_module, _load_cfg
+from pyqi.commands.make_bash_completion import (BashCompletion,
+                                                _get_cfg_module, _load_cfg)
 from pyqi.interfaces.optparse.config.make_bash_completion import (inputs,
-        outputs, usage_examples)
+                                                                  outputs)
 
 __author__ = "Daniel McDonald"
 __copyright__ = "Copyright 2013, The pyqi Project"
@@ -29,9 +29,10 @@ class BashCompletionTests(TestCase):
         self.assertEqual(_get_cfg_module('pyqi'), pyqi)
 
     def test_load_cfg(self):
-        in_, out_ = _load_cfg('pyqi.interfaces.optparse.config', 'make_bash_completion')
-        self.assertEqual(in_, inputs)
-        self.assertEqual(out_, outputs)
+        i, o = _load_cfg('pyqi.interfaces.optparse.config',
+                         'make_bash_completion')
+        self.assertEqual(i, inputs)
+        self.assertEqual(o, outputs)
     
     def test_init(self):
         obj = BashCompletion()
@@ -59,17 +60,17 @@ outputandstuff = """_pyqi_complete()
   fi  
 
   if [ $COMP_CWORD -eq 1 ]; then
-    COMPREPLY=( $(compgen -W "make_bash_completion make_cli make_command" -- $cur) )
+    COMPREPLY=( $(compgen -W "make_bash_completion make_command make_optparse" -- $cur) )
   elif [ $COMP_CWORD -gt 1 ]; then
     case "$prev" in
              "make_bash_completion")
-        COMPREPLY=( $(compgen -W "--command_config_module --driver_name --output_fp" -- $cur) )
+        COMPREPLY=( $(compgen -W "--command-config-module --driver-name --output-fp" -- $cur) )
         ;;
        "make_command")
-        COMPREPLY=( $(compgen -W "--license --name --copyright --author --func_version --credits --email --testcode --output-fp" -- $cur) )
+        COMPREPLY=( $(compgen -W "--author --command-version --copyright --credits --email --license --name --output-fp" -- $cur) )
         ;;
        "make_optparse")
-        COMPREPLY=( $(compgen -W "--command --mod --output-fp" -- $cur) )
+        COMPREPLY=( $(compgen -W "--command --command-module --output-fp" -- $cur) )
         ;;
 
       *)
