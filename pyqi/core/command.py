@@ -76,10 +76,8 @@ class Parameter(object):
 class ParameterCollection(dict):
     """A collection of parameters with dict like lookup"""
     def __init__(self, Parameters):
-        self.Parameters = Parameters
-        
-        for p in self.Parameters:
-            self[p.Name] = p
+        super(ParameterCollection, self).__init__([(p.Name, p) for p in Parameters])
+        self.__dict__['Parameters'] = Parameters
 
     def __getattr__(self, key):
         try:
@@ -87,8 +85,9 @@ class ParameterCollection(dict):
         except KeyError:
             raise UnknownParameter("Parameter not found: %s" % key)
 
-    ### override setattr and contains to throw a more explicit error than
-    ### keyerror if a parameter doesn't exist?
+    def __setattr__(self, key):
+        raise TypeError("ParameterCollections are immutable")
+    __delattr__ = __setattr__
 
 class Command(object):
     """Base class for ``Command``
