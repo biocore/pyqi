@@ -63,6 +63,8 @@ class ParameterCollectionTests(TestCase):
     def test_getattr(self):
         pc = ParameterCollection([Parameter('foo',str, 'help')])
         self.assertRaises(UnknownParameter, pc.__getitem__, 'bar')
+        self.assertEqual(pc['foo'].Name, 'foo') # make sure we can getitem
+        self.assertRaises(TypeError, pc.__setitem__, 'bar', 10)
 
     def test_setattr(self):
         pass
