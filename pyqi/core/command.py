@@ -22,7 +22,8 @@ import re
 from pyqi.core.log import NullLogger
 from pyqi.core.exception import (IncompetentDeveloperError,
                                  InvalidReturnTypeError,
-                                 UnknownParameter)
+                                 UnknownParameter,
+                                 MissingParameterError)
 
 class Parameter(object):
     """A ``Command`` variable
@@ -112,6 +113,8 @@ class Command(object):
         self_str = str(self.__class__)
         self._logger.info('Starting command: %s' % self_str)
         
+        self._validate_kwargs(kwargs)
+
         try:
             result = self.run(**kwargs)
         except Exception, e:
@@ -128,6 +131,19 @@ class Command(object):
                                          "Results must be stored in a "
                                          "dictionary.")
         return result
+
+    def _validate_kwargs(self, kwargs):
+        """Validate input kwargs prior to executing a ``Command``
+        
+        This method can be overridden by subclasses. The baseclass defines only
+        a basic validation.
+        """
+        self_str = str(self.__class__)
+        for p in self.Parameters.values():
+            if p.Required and p.Name not in kwargs:
+                self._logger.fatal('kwargs do not validate: %s' % self_str)
+                raise MissingParameterError("Missing parameter: %s" % p.Name)
+
 
     def run(self, **kwargs):
         """Exexcute a ``Command``
