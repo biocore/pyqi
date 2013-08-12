@@ -76,7 +76,10 @@ class Parameter(object):
 class ParameterCollection(dict):
     """A collection of parameters with dict like lookup"""
     def __init__(self, Parameters):
+        # populate the internal dict
         super(ParameterCollection, self).__init__([(p.Name, p) for p in Parameters])
+
+        # store the Parameters for direct access
         self.__dict__['Parameters'] = Parameters
 
     def __getattr__(self, key):
