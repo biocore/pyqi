@@ -20,7 +20,8 @@ __email__ = "mcdonadt@colorado.edu"
 
 from unittest import TestCase, main
 from pyqi.core.command import Parameter, ParameterCollection, Command
-from pyqi.core.exception import (IncompetentDeveloperError, UnknownParameter, 
+from pyqi.core.exception import (IncompetentDeveloperError, 
+                                 UnknownParameterError, 
                                  MissingParameterError)
 
 class CommandTests(TestCase):
@@ -93,7 +94,7 @@ class ParameterCollectionTests(TestCase):
         self.pc = ParameterCollection([Parameter('foo',str, 'help')])
     
     def test_getitem(self):
-        self.assertRaises(UnknownParameter, self.pc.__getitem__, 'bar')
+        self.assertRaises(UnknownParameterError, self.pc.__getitem__, 'bar')
         self.assertEqual(self.pc['foo'].Name, 'foo') # make sure we can getitem
 
     def test_setitem(self):

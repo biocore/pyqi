@@ -22,7 +22,7 @@ import re
 from pyqi.core.log import NullLogger
 from pyqi.core.exception import (IncompetentDeveloperError,
                                  InvalidReturnTypeError,
-                                 UnknownParameter,
+                                 UnknownParameterError,
                                  MissingParameterError)
 
 class Parameter(object):
@@ -87,7 +87,7 @@ class ParameterCollection(dict):
         try:
             return super(ParameterCollection, self).__getitem__(key)
         except KeyError:
-            raise UnknownParameter("Parameter not found: %s" % key)
+            raise UnknownParameterError("Parameter not found: %s" % key)
 
     def __setitem__(self, key, val):
         raise TypeError("ParameterCollections are immutable")

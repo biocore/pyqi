@@ -29,6 +29,6 @@ class MissingParameterError(CommandError):
 class InvalidReturnTypeError(IncompetentDeveloperError):
     pass
 
-class UnknownParameter(IncompetentDeveloperError):
+class UnknownParameterError(IncompetentDeveloperError):
     pass
 
