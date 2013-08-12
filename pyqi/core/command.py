@@ -114,6 +114,7 @@ class Command(object):
         self._logger.info('Starting command: %s' % self_str)
         
         self._validate_kwargs(kwargs)
+        self._set_defaults(kwargs)
 
         try:
             result = self.run(**kwargs)
@@ -139,11 +140,24 @@ class Command(object):
         a basic validation.
         """
         self_str = str(self.__class__)
+
+        # check required parameters
         for p in self.Parameters.values():
             if p.Required and p.Name not in kwargs:
                 self._logger.fatal('kwargs do not validate: %s' % self_str)
                 raise MissingParameterError("Missing parameter: %s" % p.Name)
 
+        # make sure we only have things we expect
+        #for opt in kwargs:
+        #    if opt not in self.Parameters:
+        #        self._logger.fatal('Unknown parameter %s' % self_str)
+        #        raise UnknownParameterError("Unknown parameter: %s" % opt)
+                
+    def _set_defaults(self, kwargs):
+        """Set defaults for optional parameters"""
+        for p in self.Parameters.values():
+            if not p.Required and p.Name not in kwargs:
+                kwargs[p.Name] = p.Default
 
     def run(self, **kwargs):
         """Exexcute a ``Command``
