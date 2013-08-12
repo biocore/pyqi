@@ -20,7 +20,7 @@ __email__ = "wasade@gmail.com"
 
 from unittest import TestCase, main
 from pyqi.core.command import Parameter, ParameterCollection, Command
-from pyqi.core.exception import IncompetentDeveloperError
+from pyqi.core.exception import IncompetentDeveloperError, UnknownParameter
 
 class CommandTests(TestCase):
     def test_init(self):
@@ -59,5 +59,12 @@ class ParameterTests(TestCase):
                           'help', True, 'x')
 
 
+class ParameterCollectionTests(TestCase):
+    def test_getattr(self):
+        pc = ParameterCollection([Parameter('foo',str, 'help')])
+        self.assertRaises(UnknownParameter, pc.__getitem__, 'bar')
+
+    def test_setattr(self):
+        pass
 if __name__ == '__main__':
     main()

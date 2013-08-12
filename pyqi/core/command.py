@@ -83,15 +83,15 @@ class ParameterCollection(dict):
         # store the Parameters for direct access
         self.__dict__['Parameters'] = Parameters
 
-    def __getattr__(self, key):
+    def __getitem__(self, key):
         try:
-            return super(ParameterCollection, self).__getattr__(key)
+            return super(ParameterCollection, self).__getitem__(key)
         except KeyError:
             raise UnknownParameter("Parameter not found: %s" % key)
 
-    def __setattr__(self, key):
+    def __setitem__(self, key, val):
         raise TypeError("ParameterCollections are immutable")
-    __delattr__ = __setattr__
+    __delattr__ = __setitem__
 
 class Command(object):
     """Base class for ``Command``
