@@ -25,3 +25,6 @@ class IncompetentDeveloperError(CommandError):
 
 class InvalidReturnTypeError(IncompetentDeveloperError):
     pass
+
+class UnknownParameter(IncompetentDeveloperError):
+    pass

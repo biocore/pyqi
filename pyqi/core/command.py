@@ -21,7 +21,8 @@ __email__ = "gregcaporaso@gmail.com"
 import re
 from pyqi.core.log import NullLogger
 from pyqi.core.exception import (IncompetentDeveloperError,
-                                 InvalidReturnTypeError)
+                                 InvalidReturnTypeError,
+                                 UnknownParameter)
 
 class Parameter(object):
     """A ``Command`` variable
@@ -79,6 +80,12 @@ class ParameterCollection(dict):
         
         for p in self.Parameters:
             self[p.Name] = p
+
+    def __getattr__(self, key):
+        try:
+            return super(ParameterCollection, self).__getattr__(key)
+        except KeyError:
+            raise UnknownParameter("Parameter not found: %s" % key)
 
     ### override setattr and contains to throw a more explicit error than
     ### keyerror if a parameter doesn't exist?
