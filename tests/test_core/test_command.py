@@ -16,13 +16,23 @@ __credits__ = ["Greg Caporaso", "Daniel McDonald", "Doug Wendel",
 __license__ = "BSD"
 __version__ = "0.1.0-dev"
 __maintainer__ = "Daniel McDonald"
-__email__ = "wasade@gmail.com"
+__email__ = "mcdonadt@colorado.edu"
 
 from unittest import TestCase, main
 from pyqi.core.command import Parameter, ParameterCollection, Command
-from pyqi.core.exception import IncompetentDeveloperError, UnknownParameter
+from pyqi.core.exception import (IncompetentDeveloperError, UnknownParameter, 
+                                 MissingParameterError)
 
 class CommandTests(TestCase):
+    def setUp(self):
+        class stubby(Command):
+            Parameters = ParameterCollection([
+                            Parameter('a',int,'', Required=True),
+                            Parameter('b',int,'', Required=False, Default=5)])
+            def run(self, **kwargs):
+                return {}
+        self.stubby = stubby
+
     def test_init(self):
         """Jog the init"""
         c = Command()
@@ -44,6 +54,25 @@ class CommandTests(TestCase):
 
         self.assertEqual(len(obs.Parameters), 2)
         self.assertEqual(obs.run(bar={'a':10}), {})
+
+    def test_validate_kwargs(self):
+        stub = self.stubby()
+        kwargs = {'a':10, 'b':20}
+        
+        # should work
+        stub._validate_kwargs(kwargs)
+
+        kwargs = {'b':20}
+        self.assertRaises(MissingParameterError, stub._validate_kwargs, kwargs)
+
+    def test_set_defaults(self):
+        stub = self.stubby()
+        kwargs = {'a':10}
+        exp = {'a':10,'b':5}
+        
+        stub._set_defaults(kwargs)
+
+        self.assertEqual(kwargs, exp)
 
 class ParameterTests(TestCase):
     def test_init(self):
