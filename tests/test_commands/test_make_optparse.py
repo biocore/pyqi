@@ -45,6 +45,7 @@ win_text = """#!/usr/bin/env python
 from pyqi.core.interfaces.optparse import (OptparseOption,
                                            OptparseUsageExample,
                                            OptparseOption, OptparseResult)
+from pyqi.core.command import make_parameter_collection_lookup_f
 from foobar import CommandConstructor
 
 # If you need access to input or output handlers provided by pyqi, consider
@@ -53,6 +54,9 @@ from foobar import CommandConstructor
 # pyqi.core.interfaces.optparse.output_handler
 # pyqi.interfaces.optparse.input_handler
 # pyqi.interfaces.optparse.output_handler
+
+# Convenience function for looking up parameters by name.
+param_lookup = make_parameter_collection_lookup_f(CommandConstructor)
 
 # Examples of how the command can be used from the command line using an
 # optparse interface.
@@ -66,7 +70,7 @@ usage_examples = [
 # to define options here that do not exist as parameters, e.g., an output file.
 inputs = [
     # An example option that has a direct relationship with a Parameter.
-    # OptparseOption(Parameter=CommandConstructor.Parameters['name_of_a_parameter'],
+    # OptparseOption(Parameter=param_lookup('name_of_a_parameter'),
     #                InputType='existing_filepath', # the optparse type of input
     #                InputHandler=None, # Apply a function to the input value to convert it into the type expected by Parameter.DataType
     #                ShortName='n', # a parameter short name, can be None
@@ -83,7 +87,7 @@ inputs = [
     #                Name='output-fp',
     #                Required=True,
     #                Help='output filepath')
-    OptparseOption(Parameter=CommandConstructor.Parameters['DUN'],
+    OptparseOption(Parameter=param_lookup('DUN'),
                    InputType=<type 'str'>,
                    InputHandler=None, # must be defined if desired
                    ShortName=None), # must be defined if desired
