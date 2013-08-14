@@ -134,5 +134,5 @@ def make_parameter_collection_lookup_f(obj):
     ``obj`` should be a Command (sub)class or instance.
     """
     def lookup_f(name):
-        return obj.ParameterCollection[name]
+        return obj.Parameters[name]
     return lookup_f
