@@ -127,3 +127,12 @@ class Command(object):
         as a result.
         """
         raise NotImplementedError("All subclasses must implement run.")
+
+def make_parameter_collection_lookup_f(obj):
+    """Return a function for convenient parameter lookup.
+
+    ``obj`` should be a Command (sub)class or instance.
+    """
+    def lookup_f(name):
+        return obj.ParameterCollection[name]
+    return lookup_f
