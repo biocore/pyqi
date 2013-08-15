@@ -43,3 +43,15 @@ def write_string(result_key, data, option_value=None):
     f = open(option_value, 'w')
     f.write(data)
     f.close()
+
+def write_list_of_strings(result_key, data, option_value=None):
+    """Write a list of strings to a file"""
+    if option_value is None:
+        raise IncompetentDeveloperError("Cannot write output without a "
+                                        "filepath.")
+
+    if os.path.exists(option_value):
+        raise IOError("Output path '%s' already exists." % option_value)
+    f = open(option_value, 'w')
+    f.write('\n'.join(data))
+    f.close()
