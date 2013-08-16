@@ -77,7 +77,11 @@ class OptparseInterfaceTests(TestCase):
         self.interface = fabulous()
     
     def test_init(self):
-        self.assertRaises(NotImplementedError, OptparseInterface)
+        self.assertRaises(IncompetentDeveloperError, OptparseInterface)
+
+    def test_validate_usage_examples(self):
+        with self.assertRaises(IncompetentDeveloperError):
+            _ = notfabulous()
 
     def test_input_handler(self):
         obs = self.interface._input_handler(['--c','foo'])
@@ -129,6 +133,10 @@ class fabulous(OptparseInterface):
     def _get_outputs(self):
         return [OptparseResult(ResultKey='itsaresult', OutputHandler=oh)]
 
+# Doesn't have any usage examples...
+class notfabulous(fabulous):
+    def _get_usage_examples(self):
+        return []
 
 usage_lines = """usage: %prog [options] {}
 

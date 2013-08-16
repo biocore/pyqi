@@ -32,19 +32,51 @@ class Interface(object):
 
         self.CmdInstance = self.CommandConstructor(**kwargs)
 
+        self._validate_usage_examples(self._get_usage_examples())
+        self._validate_inputs(self._get_inputs())
+        self._validate_outputs(self._get_outputs())
+
     def __call__(self, in_, *args, **kwargs):
         self._the_in_validator(in_)
         cmd_input = self._input_handler(in_, *args, **kwargs)
         return self._output_handler(self.CmdInstance(**cmd_input))
 
+    def _validate_usage_examples(self, usage_examples):
+        """Perform validation on a list of ``InterfaceUsageExample`` objects.
+
+        ``usage_examples`` will be the output of
+        ``self._get_usage_examples()``. Subclasses can override to perform
+        validation that requires a list of all usage examples. Validation that
+        should be performed on a per-usage example basis should instead go into
+        ``InterfaceUsageExample._validate_usage_example``.
+        """
+        pass
+
+    def _validate_inputs(self, inputs):
+        """Perform validation on a list of ``InterfaceOption`` objects.
+
+        ``inputs`` will be the output of ``self._get_inputs()``. Subclasses can
+        override to perform validation that requires a list of all input
+        options. Validation that should be performed on a per-option basis
+        should instead go into ``InterfaceOption._validate_option``.
+        """
+        pass
+
+    def _validate_outputs(self, outputs):
+        """Perform validation on a list of ``InterfaceResult`` objects.
+
+        ``outputs`` will be the output of ``self._get_outputs()``. Subclasses
+        can override to perform validation that requires a list of all
+        interface results. Validation that should be performed on a
+        per-interface result basis should instead go into
+        ``InterfaceResult._validate_result``.
+        """
+        pass
+
     def _the_in_validator(self, in_):
         """The job securator"""
         raise NotImplementedError("All subclasses must implement "
                                   "_the_in_validator.")
-
-    ### _option_factory not necessary, the InterfaceOptions link to 
-    ### Parameters where necessary. OptparseInterface._input_handler needs
-    ### to be smarter though
 
     def _input_handler(self, in_, *args, **kwargs):
         raise NotImplementedError("All subclasses must implement "
