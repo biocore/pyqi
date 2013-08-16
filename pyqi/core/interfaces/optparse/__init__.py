@@ -55,7 +55,8 @@ class OptparseOption(InterfaceOption):
                 convert_to_dashed_name=convert_to_dashed_name)
 
     def _validate_option(self):
-        ### TODO: check InputType and InputAction
+        # optparse takes care of validating InputType, InputAction, and
+        # ShortName, so we don't need any checks here.
         pass
 
     def __str__(self):
