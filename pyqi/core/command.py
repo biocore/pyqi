@@ -76,9 +76,14 @@ class ParameterCollection(dict):
     """A collection of parameters with dict like lookup"""
     def __init__(self, Parameters):
         self.Parameters = Parameters
-        
+
         for p in self.Parameters:
-            self[p.Name] = p
+            if p.Name in self:
+                raise IncompetentDeveloperError("Found duplicate Parameter "
+                                                "name '%s'. Parameter names "
+                                                "must be unique." % p.Name)
+            else:
+                self[p.Name] = p
 
     ### override setattr and contains to throw a more explicit error than
     ### keyerror if a parameter doesn't exist?
