@@ -60,7 +60,14 @@ class Interface(object):
         options. Validation that should be performed on a per-option basis
         should instead go into ``InterfaceOption._validate_option``.
         """
-        pass
+        param_names = [input_.getParameterName()
+                       for input_ in inputs
+                       if input_.getParameterName() is not None]
+
+        if len(param_names) != len(set(param_names)):
+            raise IncompetentDeveloperError("Found more than one "
+                                            "InterfaceOption mapping to the "
+                                            "same Parameter.")
 
     def _validate_outputs(self, outputs):
         """Perform validation on a list of ``InterfaceResult`` objects.
@@ -168,6 +175,12 @@ class InterfaceOption(object):
     def _validate_option(self):
         """Interface specific validation requirements"""
         raise NotImplementedError("Must define in the subclass")
+
+    def getParameterName(self):
+        if self.Parameter is None:
+            return None
+        else:
+            return self.Parameter.Name
 
 class InterfaceResult(object):
     """Describes a result and what to do with it"""

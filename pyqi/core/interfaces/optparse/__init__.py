@@ -65,12 +65,6 @@ class OptparseOption(InterfaceOption):
         else:
             return '-%s/--%s' % (self.ShortName, self.Name)
 
-    def getParameterName(self):
-        if self.Parameter is None:
-            return None
-        else:
-            return self.Parameter.Name
-
     def getOptparseOption(self):
         if self.Required:
             # If the option doesn't already end with [REQUIRED], add it.
