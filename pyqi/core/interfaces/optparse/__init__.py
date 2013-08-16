@@ -55,7 +55,8 @@ class OptparseOption(InterfaceOption):
                 convert_to_dashed_name=convert_to_dashed_name)
 
     def _validate_option(self):
-        ### TODO: check InputType and InputAction
+        # optparse takes care of validating InputType, InputAction, and
+        # ShortName, so we don't need any checks here.
         pass
 
     def __str__(self):
@@ -63,12 +64,6 @@ class OptparseOption(InterfaceOption):
             return '--%s' % self.Name
         else:
             return '-%s/--%s' % (self.ShortName, self.Name)
-
-    def getParameterName(self):
-        if self.Parameter is None:
-            return None
-        else:
-            return self.Parameter.Name
 
     def getOptparseOption(self):
         if self.Required:
@@ -122,15 +117,14 @@ class OptparseInterface(Interface):
     RequiredInputLine = '{} indicates required input (order unimportant)'
     
     def __init__(self, **kwargs):
-        self.BelovedFunctionality = {}
-        self.UsageExamples = []
-        self.UsageExamples.extend(self._get_usage_examples())
+        super(OptparseInterface, self).__init__(**kwargs)
 
-        if len(self.UsageExamples) < 1:
+    def _validate_usage_examples(self, usage_examples):
+        super(OptparseInterface, self)._validate_usage_examples(usage_examples)
+
+        if len(usage_examples) < 1:
             raise IncompetentDeveloperError("There are no usage examples "
                                             "associated with this command.")
-
-        super(OptparseInterface, self).__init__(**kwargs)
 
     def _the_in_validator(self, in_):
         """Validate input coming from the command line"""
@@ -220,7 +214,7 @@ class OptparseInterface(Interface):
                                    for rp in required_options])
 
         formatted_usage_examples = []
-        for usage_example in self.UsageExamples:
+        for usage_example in self._get_usage_examples():
             short_description = usage_example.ShortDesc.strip(':').strip()
             long_description = usage_example.LongDesc.strip(':').strip()
             example = usage_example.Ex.strip()

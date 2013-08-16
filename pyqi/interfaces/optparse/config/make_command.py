@@ -21,7 +21,10 @@ from pyqi.core.interfaces.optparse import (OptparseOption,
                                            OptparseResult,
                                            OptparseUsageExample)
 from pyqi.core.interfaces.optparse.output_handler import write_string
+from pyqi.core.command import make_parameter_collection_lookup_f
 from pyqi.commands.make_command import CommandConstructor
+
+param_lookup = make_parameter_collection_lookup_f(CommandConstructor)
 
 usage_examples = [
     OptparseUsageExample(ShortDesc="Basic Command",
@@ -30,18 +33,18 @@ usage_examples = [
 ]
 
 inputs = [
-    OptparseOption(Parameter=CommandConstructor.Parameters['name'],
+    OptparseOption(Parameter=param_lookup('name'),
                    ShortName='n'),
-    OptparseOption(Parameter=CommandConstructor.Parameters['email'],
+    OptparseOption(Parameter=param_lookup('email'),
                    ShortName='e'),
-    OptparseOption(Parameter=CommandConstructor.Parameters['author'],
+    OptparseOption(Parameter=param_lookup('author'),
                    ShortName='a'),
-    OptparseOption(Parameter=CommandConstructor.Parameters['license'],
+    OptparseOption(Parameter=param_lookup('license'),
                    ShortName='l'),
-    OptparseOption(Parameter=CommandConstructor.Parameters['copyright'],
+    OptparseOption(Parameter=param_lookup('copyright'),
                    ShortName='c'),
-    OptparseOption(Parameter=CommandConstructor.Parameters['command_version']),
-    OptparseOption(Parameter=CommandConstructor.Parameters['credits']),
+    OptparseOption(Parameter=param_lookup('command_version')),
+    OptparseOption(Parameter=param_lookup('credits')),
     OptparseOption(Parameter=None,
                    InputType='new_filepath',
                    ShortName='o',

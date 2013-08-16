@@ -77,7 +77,17 @@ class OptparseInterfaceTests(TestCase):
         self.interface = fabulous()
     
     def test_init(self):
-        self.assertRaises(NotImplementedError, OptparseInterface)
+        self.assertRaises(IncompetentDeveloperError, OptparseInterface)
+
+    def test_validate_usage_examples(self):
+        with self.assertRaises(IncompetentDeveloperError):
+            _ = NoUsageExamples()
+
+    # TODO: this test should be migrated to tests for the Interface baseclass
+    # if/when they exist.
+    def test_validate_inputs(self):
+        with self.assertRaises(IncompetentDeveloperError):
+            _ = DuplicateOptionMappings()
 
     def test_input_handler(self):
         obs = self.interface._input_handler(['--c','foo'])
@@ -129,6 +139,21 @@ class fabulous(OptparseInterface):
     def _get_outputs(self):
         return [OptparseResult(ResultKey='itsaresult', OutputHandler=oh)]
 
+# Doesn't have any usage examples...
+class NoUsageExamples(fabulous):
+    def _get_usage_examples(self):
+        return []
+
+# More than one option mapping to the same Parameter...
+class DuplicateOptionMappings(fabulous):
+    def _get_inputs(self):
+        return [
+            OptparseOption(InputType=str,
+            Parameter=self.CommandConstructor.Parameters['c'], ShortName='n'),
+
+            OptparseOption(Parameter=self.CommandConstructor.Parameters['c'],
+            Name='i-am-a-duplicate')
+        ]
 
 usage_lines = """usage: %prog [options] {}
 

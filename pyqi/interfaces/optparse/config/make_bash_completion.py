@@ -8,12 +8,6 @@
 # The full license is in the file COPYING.txt, distributed with this software.
 #-----------------------------------------------------------------------------
 
-from pyqi.core.interfaces.optparse import (OptparseOption,
-                                           OptparseUsageExample,
-                                           OptparseResult)
-from pyqi.core.interfaces.optparse.output_handler import write_string
-from pyqi.commands.make_bash_completion import CommandConstructor
-
 __author__ = "Daniel McDonald"
 __copyright__ = "Copyright 2013, The pyqi project"
 __credits__ = ["Daniel McDonald", "Jai Ram Rideout", "Doug Wendel", "Greg Caporaso"]
@@ -22,6 +16,15 @@ __version__ = "0.1.0-dev"
 __maintainer__ = "Daniel McDonald"
 __email__ = "mcdonadt@colorado.edu"
 
+from pyqi.core.interfaces.optparse import (OptparseOption,
+                                           OptparseUsageExample,
+                                           OptparseResult)
+from pyqi.core.interfaces.optparse.output_handler import write_string
+from pyqi.core.command import make_parameter_collection_lookup_f
+from pyqi.commands.make_bash_completion import CommandConstructor
+
+param_lookup = make_parameter_collection_lookup_f(CommandConstructor)
+
 usage_examples = [
     OptparseUsageExample(ShortDesc="Create a bash completion script",
                          LongDesc="Create a bash completion script for use with a pyqi driver",
@@ -29,8 +32,8 @@ usage_examples = [
 ]
 
 inputs = [
-    OptparseOption(Parameter=CommandConstructor.Parameters['command_config_module']),
-    OptparseOption(Parameter=CommandConstructor.Parameters['driver_name']),
+    OptparseOption(Parameter=param_lookup('command_config_module')),
+    OptparseOption(Parameter=param_lookup('driver_name')),
     OptparseOption(Parameter=None,
                    InputType='new_filepath',
                    ShortName='o',

@@ -22,7 +22,7 @@ from pyqi.core.command import Command, Parameter, ParameterCollection
 header = """#!/usr/bin/env python
 
 from __future__ import division
-from pyqi.core.command import Command, Parameter
+from pyqi.core.command import Command, Parameter, ParameterCollection
 
 __author__ = "%(author)s"
 __copyright__ = "%(copyright)s"

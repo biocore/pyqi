@@ -25,6 +25,7 @@ header = """#!/usr/bin/env python
 from pyqi.core.interfaces.optparse import (OptparseOption,
                                            OptparseUsageExample,
                                            OptparseOption, OptparseResult)
+from pyqi.core.command import make_parameter_collection_lookup_f
 from %(command_module)s import CommandConstructor
 
 # If you need access to input or output handlers provided by pyqi, consider
@@ -33,6 +34,9 @@ from %(command_module)s import CommandConstructor
 # pyqi.core.interfaces.optparse.output_handler
 # pyqi.interfaces.optparse.input_handler
 # pyqi.interfaces.optparse.output_handler
+
+# Convenience function for looking up parameters by name.
+param_lookup = make_parameter_collection_lookup_f(CommandConstructor)
 
 # Examples of how the command can be used from the command line using an
 # optparse interface.
@@ -46,23 +50,28 @@ usage_examples = [
 # to define options here that do not exist as parameters, e.g., an output file.
 inputs = [
     # An example option that has a direct relationship with a Parameter.
-    # OptparseOption(Parameter=CommandConstructor.Parameters['name_of_a_parameter'],
+    # OptparseOption(Parameter=param_lookup('name_of_a_parameter'),
     #                InputType='existing_filepath', # the optparse type of input
+    #                InputAction='store', # the optparse action
     #                InputHandler=None, # Apply a function to the input value to convert it into the type expected by Parameter.DataType
     #                ShortName='n', # a parameter short name, can be None
-    #                # Name='foo', # implied by Parameter. Can be overwritten here if desired
-    #                # Required=True, # implied by Parameter. Can be promoted by setting True
-    #                # Help, # implied by Parameter.Description. Can be overwritten here if desired
+    #                # Name='foo', # implied by Parameter.Name. Can be overwritten here if desired
+    #                # Required=False, # implied by Parameter.Required. Can be promoted by setting True
+    #                # Help='help', # implied by Parameter.Description. Can be overwritten here if desired
+    #                # Default=None, # implied by Parameter.Default. Can be overwritten here if desired
+    #                # DefaultDescription=None, # implied by Parameter.DefaultDescription. Can be overwritten here if desired
     #                convert_to_dashed_name=True), # whether the Name (either implied by Parameter or defined above) should have underscores converted to dashes when displayed to the user
     #
     # An example option that does not have an associated Parameter.
     # OptparseOption(Parameter=None,
     #                InputType='new_filepath',
+    #                InputAction='store',
     #                InputHandler=None, # we don't need an InputHandler because this option isn't being converted into a format that a Parameter expects
     #                ShortName='o',
     #                Name='output-fp',
     #                Required=True,
     #                Help='output filepath')
+
 %(input_fmt)s
 ]
 
@@ -87,13 +96,19 @@ outputs = [
 """
 
 # Fill out by Parameter, and comment out some of the most common stuff.
-input_fmt = """    OptparseOption(Parameter=CommandConstructor.Parameters['%(name)s'],
+input_fmt = """    OptparseOption(Parameter=param_lookup('%(name)s'),
                    InputType=%(datatype)s,
+                   InputAction='store', # default is 'store', change if desired
                    InputHandler=None, # must be defined if desired
                    ShortName=None), # must be defined if desired
                    # Name='%(name)s', # implied by Parameter
                    # Required=%(required)s, # implied by Parameter
                    # Help='%(help)s', # implied by Parameter
+                   %(default_block)s
+"""
+
+default_block_fmt = """# Default=%(default)s, # implied by Parameter
+                   # DefaultDescription=%(default_description)s, # implied by Parameter
 """
 
 class MakeOptparse(Command):
@@ -111,9 +126,18 @@ class MakeOptparse(Command):
 
         # construct inputs based off of parameters
         for param in kwargs['command'].Parameters.values():
+            if param.Required:
+                default_block = ''
+            else:
+                default_fmt = {
+                        'default': repr(param.Default),
+                        'default_description': repr(param.DefaultDescription)
+                }
+                default_block = default_block_fmt % default_fmt
+
             fmt = {'name':param.Name, 'datatype':param.DataType,
                    'required':str(param.Required),
-                   'help':param.Description}
+                   'help':param.Description, 'default_block':default_block}
             param_formatted.append(input_fmt % fmt)
 
         param_formatted = ''.join(param_formatted)
