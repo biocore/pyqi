@@ -72,28 +72,35 @@ inputs = [
     # An example option that has a direct relationship with a Parameter.
     # OptparseOption(Parameter=param_lookup('name_of_a_parameter'),
     #                InputType='existing_filepath', # the optparse type of input
+    #                InputAction='store', # the optparse action
     #                InputHandler=None, # Apply a function to the input value to convert it into the type expected by Parameter.DataType
     #                ShortName='n', # a parameter short name, can be None
-    #                # Name='foo', # implied by Parameter. Can be overwritten here if desired
-    #                # Required=True, # implied by Parameter. Can be promoted by setting True
-    #                # Help, # implied by Parameter.Description. Can be overwritten here if desired
+    #                # Name='foo', # implied by Parameter.Name. Can be overwritten here if desired
+    #                # Required=False, # implied by Parameter.Required. Can be promoted by setting True
+    #                # Help='help', # implied by Parameter.Description. Can be overwritten here if desired
+    #                # Default=None, # implied by Parameter.Default. Can be overwritten here if desired
+    #                # DefaultDescription=None, # implied by Parameter.DefaultDescription. Can be overwritten here if desired
     #                convert_to_dashed_name=True), # whether the Name (either implied by Parameter or defined above) should have underscores converted to dashes when displayed to the user
     #
     # An example option that does not have an associated Parameter.
     # OptparseOption(Parameter=None,
     #                InputType='new_filepath',
+    #                InputAction='store',
     #                InputHandler=None, # we don't need an InputHandler because this option isn't being converted into a format that a Parameter expects
     #                ShortName='o',
     #                Name='output-fp',
     #                Required=True,
     #                Help='output filepath')
+
     OptparseOption(Parameter=param_lookup('DUN'),
                    InputType=<type 'str'>,
+                   InputAction='store', # default is 'store', change if desired
                    InputHandler=None, # must be defined if desired
                    ShortName=None), # must be defined if desired
                    # Name='DUN', # implied by Parameter
                    # Required=True, # implied by Parameter
                    # Help='', # implied by Parameter
+                   
 
 ]
 
