@@ -123,7 +123,6 @@ class Interface(object):
 
 class InterfaceOption(object):
     """Describes an option and what to do with it"""
-
     def __init__(self, Parameter=None, InputType=None, InputAction=None,
                  InputHandler=None, ShortName=None, Name=None, Required=False,
                  Help=None, Default=None, DefaultDescription=None,

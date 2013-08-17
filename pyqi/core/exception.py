@@ -23,5 +23,12 @@ class CommandError(Exception):
 class IncompetentDeveloperError(CommandError):
     pass
 
+class MissingParameterError(CommandError):
+    pass
+
 class InvalidReturnTypeError(IncompetentDeveloperError):
     pass
+
+class UnknownParameterError(IncompetentDeveloperError):
+    pass
+

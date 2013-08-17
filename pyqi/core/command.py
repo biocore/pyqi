@@ -21,7 +21,9 @@ __email__ = "gregcaporaso@gmail.com"
 import re
 from pyqi.core.log import NullLogger
 from pyqi.core.exception import (IncompetentDeveloperError,
-                                 InvalidReturnTypeError)
+                                 InvalidReturnTypeError,
+                                 UnknownParameterError,
+                                 MissingParameterError)
 
 class Parameter(object):
     """A ``Command`` variable
@@ -83,10 +85,17 @@ class ParameterCollection(dict):
                                                 "name '%s'. Parameter names "
                                                 "must be unique." % p.Name)
             else:
-                self[p.Name] = p
+                super(ParameterCollection, self).__setitem__(p.Name, p)
 
-    ### override setattr and contains to throw a more explicit error than
-    ### keyerror if a parameter doesn't exist?
+    def __getitem__(self, key):
+        try:
+            return super(ParameterCollection, self).__getitem__(key)
+        except KeyError:
+            raise UnknownParameterError("Parameter not found: %s" % key)
+
+    def __setitem__(self, key, val):
+        raise TypeError("ParameterCollections are immutable")
+    __delattr__ = __setitem__
 
 class Command(object):
     """Base class for ``Command``
@@ -108,6 +117,9 @@ class Command(object):
         self_str = str(self.__class__)
         self._logger.info('Starting command: %s' % self_str)
         
+        self._validate_kwargs(kwargs)
+        self._set_defaults(kwargs)
+
         try:
             result = self.run(**kwargs)
         except Exception, e:
@@ -124,6 +136,32 @@ class Command(object):
                                          "Results must be stored in a "
                                          "dictionary.")
         return result
+
+    def _validate_kwargs(self, kwargs):
+        """Validate input kwargs prior to executing a ``Command``
+        
+        This method can be overridden by subclasses. The baseclass defines only
+        a basic validation.
+        """
+        self_str = str(self.__class__)
+
+        # check required parameters
+        for p in self.Parameters.values():
+            if p.Required and p.Name not in kwargs:
+                self._logger.fatal('Missing required parameter %s in %s' % (p.Name, self_str))
+                raise MissingParameterError("Missing required parameter %s in %s" % (p.Name, self_str))
+
+        # make sure we only have things we expect
+        for opt in kwargs:
+            if opt not in self.Parameters:
+                self._logger.fatal('Unknown parameter %s in %s' % (opt, self_str))
+                raise UnknownParameterError("Unknown parameter %s in %s" % (opt, self_str))
+                
+    def _set_defaults(self, kwargs):
+        """Set defaults for optional parameters"""
+        for p in self.Parameters.values():
+            if not p.Required and p.Name not in kwargs:
+                kwargs[p.Name] = p.Default
 
     def run(self, **kwargs):
         """Exexcute a ``Command``
