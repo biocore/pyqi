@@ -37,10 +37,7 @@ def usage(opts):
     term_width = 80
     indent = 3
 
-    print "usage: %s <command> [<args>]" % argv[0]
-    print
-    print "The currently available commands are:"
-
+    cmds_and_desc = []
     for c in command_names:
         cmd_cfg = get_cmd_cfg(c, opts)
         desc = cmd_cfg.CommandConstructor.BriefDescription
