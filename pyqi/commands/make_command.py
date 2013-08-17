@@ -18,7 +18,7 @@ __maintainer__ = "Daniel McDonald"
 __email__ = "mcdonadt@colorado.edu"
 
 from pyqi.core.command import Command, Parameter, ParameterCollection
-from numpy import array
+
 header = """#!/usr/bin/env python
 
 from __future__ import division
@@ -91,7 +91,7 @@ class MakeCommand(Command):
         Parameter(Name='credits', DataType=str,
                   Description='comma-separated list of other authors',
                   Required=False, Default=''),
-        Parameter(Name='testcode', DataType=bool,
+        Parameter(Name='test_code', DataType=bool,
                   Description='create stubbed out test code',
                   Required=False, Default=False)
     ])
@@ -115,7 +115,7 @@ class MakeCommand(Command):
 
         result_lines = [header % head]
         
-        if kwargs['testcode']:
+        if kwargs['test_code']:
             result_lines.append(test_fmt % {'name':kwargs['name']})
         else:
             result_lines.append(command_imports)
