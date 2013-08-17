@@ -17,6 +17,10 @@ __version__ = "0.1.0-dev"
 __maintainer__ = "Greg Caporaso"
 __email__ = "gregcaporaso@gmail.com"
 
+import importlib
+from ConfigParser import SafeConfigParser
+from glob import glob
+from os.path import basename, dirname, expanduser, join
 from pyqi.core.exception import IncompetentDeveloperError
 
 class Interface(object):
@@ -32,19 +36,58 @@ class Interface(object):
 
         self.CmdInstance = self.CommandConstructor(**kwargs)
 
+        self._validate_usage_examples(self._get_usage_examples())
+        self._validate_inputs(self._get_inputs())
+        self._validate_outputs(self._get_outputs())
+
     def __call__(self, in_, *args, **kwargs):
         self._the_in_validator(in_)
         cmd_input = self._input_handler(in_, *args, **kwargs)
         return self._output_handler(self.CmdInstance(**cmd_input))
 
+    def _validate_usage_examples(self, usage_examples):
+        """Perform validation on a list of ``InterfaceUsageExample`` objects.
+
+        ``usage_examples`` will be the output of
+        ``self._get_usage_examples()``. Subclasses can override to perform
+        validation that requires a list of all usage examples. Validation that
+        should be performed on a per-usage example basis should instead go into
+        ``InterfaceUsageExample._validate_usage_example``.
+        """
+        pass
+
+    def _validate_inputs(self, inputs):
+        """Perform validation on a list of ``InterfaceOption`` objects.
+
+        ``inputs`` will be the output of ``self._get_inputs()``. Subclasses can
+        override to perform validation that requires a list of all input
+        options. Validation that should be performed on a per-option basis
+        should instead go into ``InterfaceOption._validate_option``.
+        """
+        param_names = [input_.getParameterName()
+                       for input_ in inputs
+                       if input_.getParameterName() is not None]
+
+        if len(param_names) != len(set(param_names)):
+            raise IncompetentDeveloperError("Found more than one "
+                                            "InterfaceOption mapping to the "
+                                            "same Parameter.")
+
+    def _validate_outputs(self, outputs):
+        """Perform validation on a list of ``InterfaceResult`` objects.
+
+        ``outputs`` will be the output of ``self._get_outputs()``. Subclasses
+        can override to perform validation that requires a list of all
+        interface results. Validation that should be performed on a
+        per-interface result basis should instead go into
+        ``InterfaceResult._validate_result``.
+        """
+        pass
+
     def _the_in_validator(self, in_):
         """The job securator"""
         raise NotImplementedError("All subclasses must implement "
                                   "_the_in_validator.")
-
-    ### _option_factory not necessary, the InterfaceOptions link to 
-    ### Parameters where necessary. OptparseInterface._input_handler needs
-    ### to be smarter though
 
     def _input_handler(self, in_, *args, **kwargs):
         raise NotImplementedError("All subclasses must implement "
@@ -136,6 +179,12 @@ class InterfaceOption(object):
         """Interface specific validation requirements"""
         raise NotImplementedError("Must define in the subclass")
 
+    def getParameterName(self):
+        if self.Parameter is None:
+            return None
+        else:
+            return self.Parameter.Name
+
 class InterfaceResult(object):
     """Describes a result and what to do with it"""
 
@@ -162,3 +211,41 @@ class InterfaceUsageExample(object):
     def _validate_usage_example(self):
         """Interface specific usage example validation"""
         raise NotImplementedError("Must define in the subclass")
+
+def get_config_base_name(executable_name):
+    """Return the python module path to the command config dir.
+
+    Module path returned as a string.
+    """
+    # Check if there is a configuration and load the config base.
+    c = SafeConfigParser()
+
+    try:
+        c.readfp(open(expanduser(join('~', '.pyqi', executable_name)), 'U'))
+    except IOError:
+        config_base_name = 'pyqi.interfaces.optparse.config'
+    else:
+        config_base_name = c.get('driver', 'config_base')
+
+    return config_base_name
+
+def get_command_names(config_base_name):
+    """Return a list of available command names.
+
+    Command names are strings and are returned in alphabetical order.
+    ``config_base_name`` must be the python module path to a directory
+    containing config files.
+    """
+    # Load the interface configuration base.
+    try:
+        config_base_module = importlib.import_module(config_base_name)
+    except ImportError:
+        raise ImportError("Unable to load base config module: %s" %
+                          config_base_name)
+
+    config_base_dir = dirname(config_base_module.__file__)
+
+    # from http://stackoverflow.com/questions/1057431/loading-all-modules-in-a-folder-in-python
+    return sorted([basename(f)[:-3]
+                   for f in glob(join(config_base_dir, '*.py'))
+                   if not basename(f).startswith('__init__')])

@@ -21,6 +21,9 @@ from pyqi.core.command import Command, Parameter, ParameterCollection
 from numpy import array
 header = """#!/usr/bin/env python
 
+from __future__ import division
+from pyqi.core.command import Command, Parameter, ParameterCollection
+
 __author__ = "%(author)s"
 __copyright__ = "%(copyright)s"
 __credits__ = [%(credits)s]

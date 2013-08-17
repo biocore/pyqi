@@ -77,11 +77,15 @@ class Parameter(object):
 class ParameterCollection(dict):
     """A collection of parameters with dict like lookup"""
     def __init__(self, Parameters):
-        # populate the internal dict
-        super(ParameterCollection, self).__init__([(p.Name, p) for p in Parameters])
+        self.Parameters = Parameters
 
-        # store the Parameters for direct access
-        self.__dict__['Parameters'] = Parameters
+        for p in self.Parameters:
+            if p.Name in self:
+                raise IncompetentDeveloperError("Found duplicate Parameter "
+                                                "name '%s'. Parameter names "
+                                                "must be unique." % p.Name)
+            else:
+                self[p.Name] = p
 
     def __getitem__(self, key):
         try:
@@ -166,3 +170,12 @@ class Command(object):
         as a result.
         """
         raise NotImplementedError("All subclasses must implement run.")
+
+def make_parameter_collection_lookup_f(obj):
+    """Return a function for convenient parameter lookup.
+
+    ``obj`` should be a Command (sub)class or instance.
+    """
+    def lookup_f(name):
+        return obj.Parameters[name]
+    return lookup_f

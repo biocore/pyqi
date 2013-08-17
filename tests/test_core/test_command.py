@@ -88,6 +88,22 @@ class ParameterTests(TestCase):
         self.assertRaises(IncompetentDeveloperError, Parameter, 'a', str,
                           'help', True, 'x')
 
+class ParameterCollectionTests(TestCase):
+    def test_init(self):
+        """Jog the init"""
+        params = [Parameter('a', str, 'help', Required=False),
+                  Parameter('b', float, 'help2', Required=True)]
+        obj = ParameterCollection(params)
+
+        self.assertEqual(obj.Parameters, params)
+        self.assertEqual(obj['a'], params[0])
+        self.assertEqual(obj['b'], params[1])
+
+        # Duplicate Parameter names.
+        params.append(Parameter('a', int, 'help3'))
+        with self.assertRaises(IncompetentDeveloperError):
+            _ = ParameterCollection(params)
+
 
 class ParameterCollectionTests(TestCase):
     def setUp(self):

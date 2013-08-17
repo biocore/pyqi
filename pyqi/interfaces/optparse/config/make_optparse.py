@@ -17,13 +17,15 @@ __version__ = "0.1.0-dev"
 __maintainer__ = "Daniel McDonald"
 __email__ = "mcdonadt@colorado.edu"
 
-
 from pyqi.core.command import Command
 from pyqi.core.interfaces.optparse import (OptparseOption, OptparseUsageExample,
     OptparseResult)
 from pyqi.core.interfaces.optparse.output_handler import write_string
 from pyqi.core.interfaces.optparse.input_handler import command_handler
+from pyqi.core.command import make_parameter_collection_lookup_f
 from pyqi.commands.make_optparse import CommandConstructor
+
+param_lookup = make_parameter_collection_lookup_f(CommandConstructor)
 
 usage_examples = [
     OptparseUsageExample(ShortDesc="Fill in an optparse config template",
@@ -32,10 +34,10 @@ usage_examples = [
 ]
 
 inputs = [
-    OptparseOption(Parameter=CommandConstructor.Parameters['command'],
+    OptparseOption(Parameter=param_lookup('command'),
                    ShortName='c',
                    InputHandler=command_handler),
-    OptparseOption(Parameter=CommandConstructor.Parameters['command_module'],
+    OptparseOption(Parameter=param_lookup('command_module'),
                    ShortName='m'),
     OptparseOption(Parameter=None,
                    InputType='new_filepath',
