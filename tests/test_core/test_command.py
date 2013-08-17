@@ -89,6 +89,9 @@ class ParameterTests(TestCase):
                           'help', True, 'x')
 
 class ParameterCollectionTests(TestCase):
+    def setUp(self):
+        self.pc = ParameterCollection([Parameter('foo',str, 'help')])
+    
     def test_init(self):
         """Jog the init"""
         params = [Parameter('a', str, 'help', Required=False),
@@ -104,11 +107,6 @@ class ParameterCollectionTests(TestCase):
         with self.assertRaises(IncompetentDeveloperError):
             _ = ParameterCollection(params)
 
-
-class ParameterCollectionTests(TestCase):
-    def setUp(self):
-        self.pc = ParameterCollection([Parameter('foo',str, 'help')])
-    
     def test_getitem(self):
         self.assertRaises(UnknownParameterError, self.pc.__getitem__, 'bar')
         self.assertEqual(self.pc['foo'].Name, 'foo') # make sure we can getitem
