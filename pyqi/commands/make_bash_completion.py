@@ -9,8 +9,6 @@
 #-----------------------------------------------------------------------------
 
 from __future__ import division
-from pyqi.core.command import Command, Parameter, ParameterCollection
-import importlib
 
 __author__ = "Daniel McDonald"
 __copyright__ = "Copyright 2013, The pyqi project"
@@ -19,6 +17,10 @@ __license__ = "BSD"
 __version__ = "0.1.0-dev"
 __maintainer__ = "Daniel McDonald"
 __email__ = "mcdonadt@colorado.edu"
+
+import importlib
+from pyqi.core.command import Command, Parameter, ParameterCollection
+from pyqi.core.interface import get_command_names
 
 def _get_cfg_module(desc):
     """Load a module"""
@@ -80,10 +82,11 @@ class BashCompletion(Command):
         driver = kwargs['driver_name']
         cfg_mod_path = kwargs['command_config_module']
         cfg_mod = _get_cfg_module(cfg_mod_path)
-        command_list = ' '.join(cfg_mod.__all__[:])
+        command_names = get_command_names(cfg_mod_path)
+        command_list = ' '.join(command_names)
 
         commands = []
-        for cmd in cfg_mod.__all__:
+        for cmd in command_names:
             inputs, outputs = _load_cfg(cfg_mod_path, cmd)
 
             command_options = []

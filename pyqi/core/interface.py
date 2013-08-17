@@ -17,6 +17,10 @@ __version__ = "0.1.0-dev"
 __maintainer__ = "Greg Caporaso"
 __email__ = "gregcaporaso@gmail.com"
 
+import importlib
+from ConfigParser import SafeConfigParser
+from glob import glob
+from os.path import basename, dirname, expanduser, join
 from pyqi.core.exception import IncompetentDeveloperError
 
 class Interface(object):
@@ -208,3 +212,41 @@ class InterfaceUsageExample(object):
     def _validate_usage_example(self):
         """Interface specific usage example validation"""
         raise NotImplementedError("Must define in the subclass")
+
+def get_config_base_name(executable_name):
+    """Return the python module path to the command config dir.
+
+    Module path returned as a string.
+    """
+    # Check if there is a configuration and load the config base.
+    c = SafeConfigParser()
+
+    try:
+        c.readfp(open(expanduser(join('~', '.pyqi', executable_name)), 'U'))
+    except IOError:
+        config_base_name = 'pyqi.interfaces.optparse.config'
+    else:
+        config_base_name = c.get('driver', 'config_base')
+
+    return config_base_name
+
+def get_command_names(config_base_name):
+    """Return a list of available command names.
+
+    Command names are strings and are returned in alphabetical order.
+    ``config_base_name`` must be the python module path to a directory
+    containing config files.
+    """
+    # Load the interface configuration base.
+    try:
+        config_base_module = importlib.import_module(config_base_name)
+    except ImportError:
+        raise ImportError("Unable to load base config module: %s" %
+                          config_base_name)
+
+    config_base_dir = dirname(config_base_module.__file__)
+
+    # from http://stackoverflow.com/questions/1057431/loading-all-modules-in-a-folder-in-python
+    return sorted([basename(f)[:-3]
+                   for f in glob(join(config_base_dir, '*.py'))
+                   if not basename(f).startswith('__init__')])

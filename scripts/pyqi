@@ -17,32 +17,18 @@ __version__ = "0.1.0-dev"
 __maintainer__ = "Daniel McDonald"
 __email__ = "mcdonadt@colorado.edu"
 
-from sys import argv, exit, stderr
-from pyqi.core.interfaces.optparse import optparse_main, optparse_factory
 import importlib
-from os.path import basename, expanduser
-from ConfigParser import SafeConfigParser
+from os.path import basename
+from sys import argv, exit, stderr
+from pyqi.core.interface import get_command_names, get_config_base_name
+from pyqi.core.interfaces.optparse import optparse_main, optparse_factory
 
 ### we actually have some flexibility here to make the driver interface agnostic as well
 
 # drop any path fluff
 argv[0] = basename(argv[0])
-
-# check if there is a configuration and load the cfg base
-c = SafeConfigParser()
-try:
-    c.readfp(open(expanduser('~/.pyqi/%s' % argv[0])))
-except IOError:
-    CFG_BASE = 'pyqi.interfaces.optparse.config'
-else:
-    CFG_BASE = c.get('driver', 'cfg_base')
-
-# load the cli configuration base
-try:
-    cfg = importlib.import_module(CFG_BASE)
-except ImportError:
-    stderr.write("Unable to read CFG_BASE: %s\n" % CFG_BASE)
-    exit(1)
+config_base_name = get_config_base_name(argv[0])
+command_names = get_command_names(config_base_name)
 
 def usage(opts):
     """Modeled after git..."""
@@ -52,8 +38,8 @@ def usage(opts):
     print "usage: %s <command> [<args>]" % argv[0]
     print
     print "The currently available commands are:"
-    
-    for c in cfg.__all__:
+
+    for c in command_names:
         cmd_cfg = get_cmd_cfg(c, opts)
         desc = cmd_cfg.CommandConstructor.BriefDescription
         if len(desc) > desc_limit:
@@ -72,15 +58,12 @@ def unknown_command(cmd):
 
 def cmd_exists(cmd):
     """Check if a ``Command`` configuration exists"""
-    if cmd in cfg.__all_lookup__:
-        return True
-    else:
-        return False
+    return cmd in command_names
 
 def get_cmd_cfg(cmd, opts):
     """Get the configuration for a ``Command``"""
     try:
-        cmd_cfg = importlib.import_module('.'.join([CFG_BASE, cmd]))
+        cmd_cfg = importlib.import_module('.'.join([config_base_name, cmd]))
     except ImportError, e:
         stderr.write("Unable to import the command configuration for %s.\n" % cmd)
         if opts['--verbose']:
