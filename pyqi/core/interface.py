@@ -214,6 +214,10 @@ class InterfaceUsageExample(object):
         raise NotImplementedError("Must define in the subclass")
 
 def get_config_base_name(executable_name):
+    """Return the python module path to the command config dir.
+
+    Module path returned as a string.
+    """
     # Check if there is a configuration and load the config base.
     c = SafeConfigParser()
 
@@ -227,6 +231,12 @@ def get_config_base_name(executable_name):
     return config_base_name
 
 def get_command_names(config_base_name):
+    """Return a list of available command names.
+
+    Command names are strings and are returned in alphabetical order.
+    ``config_base_name`` must be the python module path to a directory
+    containing config files.
+    """
     # Load the interface configuration base.
     try:
         config_base_module = importlib.import_module(config_base_name)
