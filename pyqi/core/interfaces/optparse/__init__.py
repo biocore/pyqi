@@ -180,11 +180,13 @@ class OptparseInterface(Interface):
 
         # Test that all required options were provided.
         if required_opts:
-            required_option_ids = [o.dest for o in required.option_list]
-            for required_option_id in required_option_ids:
-                if getattr(opts,required_option_id) == None:
-                    parser.error('Required option --%s omitted.' %
-                                 required_option_id)
+            # dest may be different from the original option name because
+            # optparse converts names from dashed to underscored.
+            required_option_ids = [(o.dest, o.get_opt_string())
+                                   for o in required.option_list]
+            for required_dest, required_name in required_option_ids:
+                if getattr(opts, required_dest) is None:
+                    parser.error('Required option %s omitted.' % required_name)
 
         # Build up command input dictionary. This will be passed to
         # Command.__call__ as kwargs.
