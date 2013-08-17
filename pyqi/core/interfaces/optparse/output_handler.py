@@ -33,25 +33,33 @@ from pyqi.core.exception import IncompetentDeveloperError
 import os
 
 def write_string(result_key, data, option_value=None):
-    """Write a string to a file"""
+    """Write a string to a file.
+    
+    A newline will be added to the end of the file.
+    """
     if option_value is None:
         raise IncompetentDeveloperError("Cannot write output without a "
                                         "filepath.")
 
     if os.path.exists(option_value):
         raise IOError("Output path '%s' already exists." % option_value)
-    f = open(option_value, 'w')
-    f.write(data)
-    f.close()
+
+    with open(option_value, 'w') as f:
+        f.write(data)
+        f.write('\n')
 
 def write_list_of_strings(result_key, data, option_value=None):
-    """Write a list of strings to a file"""
+    """Write a list of strings to a file, one per line.
+    
+    A newline will be added to the end of the file.
+    """
     if option_value is None:
         raise IncompetentDeveloperError("Cannot write output without a "
                                         "filepath.")
 
     if os.path.exists(option_value):
         raise IOError("Output path '%s' already exists." % option_value)
-    f = open(option_value, 'w')
-    f.write('\n'.join(data))
-    f.close()
+
+    with open(option_value, 'w') as f:
+        f.write('\n'.join(data))
+        f.write('\n')

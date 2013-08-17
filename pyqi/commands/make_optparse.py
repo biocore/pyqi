@@ -22,8 +22,7 @@ __email__ = "mcdonadt@colorado.edu"
 
 header = """#!/usr/bin/env python
 
-from pyqi.core.interfaces.optparse import (OptparseOption,
-                                           OptparseUsageExample,
+from pyqi.core.interfaces.optparse import (OptparseUsageExample,
                                            OptparseOption, OptparseResult)
 from pyqi.core.command import make_parameter_collection_lookup_f
 from %(command_module)s import CommandConstructor
