@@ -144,14 +144,14 @@ class Command(object):
         # check required parameters
         for p in self.Parameters.values():
             if p.Required and p.Name not in kwargs:
-                self._logger.fatal('kwargs do not validate: %s' % self_str)
-                raise MissingParameterError("Missing parameter: %s" % p.Name)
+                self._logger.fatal('Missing required parameter: %s' % p.Name)
+                raise MissingParameterError("Missing required parameter: %s" % p.Name)
 
         # make sure we only have things we expect
-        #for opt in kwargs:
-        #    if opt not in self.Parameters:
-        #        self._logger.fatal('Unknown parameter %s' % self_str)
-        #        raise UnknownParameterError("Unknown parameter: %s" % opt)
+        for opt in kwargs:
+            if opt not in self.Parameters:
+                self._logger.fatal('Unknown parameter %s' % self_str)
+                raise UnknownParameterError("Unknown parameter: %s" % opt)
                 
     def _set_defaults(self, kwargs):
         """Set defaults for optional parameters"""

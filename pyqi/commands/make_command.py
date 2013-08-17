@@ -18,7 +18,7 @@ __maintainer__ = "Daniel McDonald"
 __email__ = "mcdonadt@colorado.edu"
 
 from pyqi.core.command import Command, Parameter, ParameterCollection
-
+from numpy import array
 header = """#!/usr/bin/env python
 
 __author__ = "%(author)s"
@@ -87,7 +87,10 @@ class MakeCommand(Command):
                   Description='the Command version', Required=True),
         Parameter(Name='credits', DataType=str,
                   Description='comma-separated list of other authors',
-                  Required=False, Default='')
+                  Required=False, Default=''),
+        Parameter(Name='testcode', DataType=bool,
+                  Description='create stubbed out test code',
+                  Required=False, Default=False)
     ])
 
     def run(self, **kwargs):
@@ -114,7 +117,7 @@ class MakeCommand(Command):
         output = {}
         output['result'] = ''.join(result_lines)
 
-        if 'testcode' in kwargs:
+        if kwargs['testcode']:
             result_lines = [header % head]
             result_lines.append(test_fmt % {'name':kwargs['name']})
             output['result_testcode'] = ''.join(result_lines)

@@ -42,6 +42,7 @@ inputs = [
                    ShortName='c'),
     OptparseOption(Parameter=CommandConstructor.Parameters['command_version']),
     OptparseOption(Parameter=CommandConstructor.Parameters['credits']),
+    OptparseOption(Parameter=CommandConstructor.Parameters['testcode']),
     OptparseOption(Parameter=None,
                    InputType='new_filepath',
                    ShortName='o',
