@@ -43,6 +43,7 @@ inputs = [
                    ShortName='l'),
     OptparseOption(Parameter=param_lookup('copyright'),
                    ShortName='c'),
+    OptparseOption(Parameter=param_lookup('test_code')),
     OptparseOption(Parameter=param_lookup('command_version')),
     OptparseOption(Parameter=param_lookup('credits')),
     OptparseOption(Parameter=None,

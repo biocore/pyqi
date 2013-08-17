@@ -31,14 +31,15 @@ class MakeOptparseTests(TestCase):
     def test_run(self):
         obj = MakeOptparse()
         exp = win_text
+        
+        pc = Parameter(Name='DUN', Required=True, DataType=str, Description="")
 
         class stubby:
-            Parameters = ParameterCollection([Parameter(Name='DUN',
-                    Required=True, DataType=str, Description='')])
+            Parameters = ParameterCollection([pc])
 
         obs = obj.run(**{'command_module':'foobar', 'command':stubby()})
-        self.assertEqual(obs['result'], exp)
-
+        
+        self.assertEqual(obs['result'], exp) 
 
 win_text = """#!/usr/bin/env python
 
@@ -123,7 +124,6 @@ outputs = [
     #                OutputHandler=print_string)
 ]
 """
-
 
 if __name__ == '__main__':
     main()

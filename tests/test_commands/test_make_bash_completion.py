@@ -41,7 +41,11 @@ class BashCompletionTests(TestCase):
         params = {'command_config_module':'pyqi.interfaces.optparse.config',
                   'driver_name':'pyqi'}
         obs = BashCompletion().run(**params)
-        self.assertEqual(obs, {'result':outputandstuff})    
+        
+        # output is dependent on the commands and options, this is not a good
+        # test. 
+        #self.assertEqual(obs, {'result':outputandstuff})    
+        self.fail("need more sane test that is independent of changes in commands/options")
 
 outputandstuff = """_pyqi_complete()
 {

@@ -34,6 +34,10 @@ __email__ = "%(email)s"
 
 """
 
+command_imports = """from __future__ import division
+from pyqi.core.command import Command, Parameter
+"""
+
 command_format = """class %s(Command):
     BriefDescription = "FILL IN A 1 SENTENCE DESCRIPTION"
     LongDescription = "GO INTO MORE DETAIL"
@@ -54,6 +58,20 @@ command_format = """class %s(Command):
 CommandConstructor = %s
 """
 
+test_fmt = """from unittest import TestCase, main
+from FILL IN MODULE PATH import %(name)s
+
+class %(name)sTests(TestCase):
+    def setUp(self):
+        self.cmd_obj = %(name)s()
+
+    def test_run(self):
+        self.fail()
+
+if __name__ == '__main__':
+    main()
+"""
+
 class MakeCommand(Command):
     BriefDescription = "Construct a stubbed out Command object"
     LongDescription = """This command is intended to construct the basics of a Command object so that a developer can dive straight into the implementation of the command"""
@@ -72,7 +90,10 @@ class MakeCommand(Command):
                   Description='the Command version', Required=True),
         Parameter(Name='credits', DataType=str,
                   Description='comma-separated list of other authors',
-                  Required=False, Default='')
+                  Required=False, Default=''),
+        Parameter(Name='test_code', DataType=bool,
+                  Description='create stubbed out test code',
+                  Required=False, Default=False)
     ])
 
     def run(self, **kwargs):
@@ -93,8 +114,16 @@ class MakeCommand(Command):
         head['credits'] = ', '.join(map(f, credits))
 
         result_lines = [header % head]
-        result_lines.append(command_format % (kwargs['name'], kwargs['name']))
+        
+        if kwargs['test_code']:
+            result_lines.append(test_fmt % {'name':kwargs['name']})
+        else:
+            result_lines.append(command_imports)
+            result_lines.append(command_format % (kwargs['name'], kwargs['name']))
 
-        return {'result':''.join(result_lines)}
+        output = {}
+        output['result'] = ''.join(result_lines)
+
+        return output
 
 CommandConstructor = MakeCommand

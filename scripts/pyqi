@@ -18,10 +18,11 @@ __maintainer__ = "Daniel McDonald"
 __email__ = "mcdonadt@colorado.edu"
 
 import importlib
-from os.path import basename
 from sys import argv, exit, stderr
 from pyqi.core.interface import get_command_names, get_config_base_name
 from pyqi.core.interfaces.optparse import optparse_main, optparse_factory
+from os.path import basename
+from string import ljust 
 
 ### we actually have some flexibility here to make the driver interface agnostic as well
 
@@ -33,7 +34,8 @@ command_names = get_command_names(config_base_name)
 def usage(opts):
     """Modeled after git..."""
     # limit to a reasonable number of characters
-    desc_limit = 70 
+    term_width = 80
+    indent = 3
 
     print "usage: %s <command> [<args>]" % argv[0]
     print
@@ -42,11 +44,23 @@ def usage(opts):
     for c in command_names:
         cmd_cfg = get_cmd_cfg(c, opts)
         desc = cmd_cfg.CommandConstructor.BriefDescription
-        if len(desc) > desc_limit:
-            print ''.join(['   ', c, '\t', desc[:desc_limit], '...'])
-        else:
-            print ''.join(['   ', c, '\t', desc])
+        cmds_and_desc.append((c, desc))
 
+    # determine widths
+    max_cmd = max(map(lambda x: len(x[0]), cmds_and_desc))
+    desc_limit = term_width - (indent + max_cmd + indent)
+    cmd_end = indent + max_cmd + indent
+
+    print "usage: %s <command> [<args>]" % argv[0]
+    print
+    print "The currently available commands are:"
+    
+    # format:
+    # indent command indent description
+    for c,desc in cmds_and_desc:
+        cmd_formatted = ljust(''.join([' ' * indent, c]), cmd_end)
+        print ''.join([cmd_formatted, desc[:desc_limit]])
+    
     print
     print "See '%s help <command>' for more information on a specific command." % argv[0]
     exit(0)
