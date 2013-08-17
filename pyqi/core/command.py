@@ -85,7 +85,7 @@ class ParameterCollection(dict):
                                                 "name '%s'. Parameter names "
                                                 "must be unique." % p.Name)
             else:
-                self[p.Name] = p
+                super(ParameterCollection, self).__setitem__(p.Name, p)
 
     def __getitem__(self, key):
         try:
