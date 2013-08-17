@@ -21,8 +21,7 @@ import importlib
 from sys import argv, exit, stderr
 from pyqi.core.interface import get_command_names, get_config_base_name
 from pyqi.core.interfaces.optparse import optparse_main, optparse_factory
-from os.path import basename, expanduser
-from ConfigParser import SafeConfigParser
+from os.path import basename
 from string import ljust 
 
 ### we actually have some flexibility here to make the driver interface agnostic as well

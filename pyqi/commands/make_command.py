@@ -114,16 +114,15 @@ class MakeCommand(Command):
         head['credits'] = ', '.join(map(f, credits))
 
         result_lines = [header % head]
-        result_lines.append(command_imports)
-        result_lines.append(command_format % (kwargs['name'], kwargs['name']))
+        
+        if kwargs['testcode']:
+            result_lines.append(test_fmt % {'name':kwargs['name']})
+        else:
+            result_lines.append(command_imports)
+            result_lines.append(command_format % (kwargs['name'], kwargs['name']))
 
         output = {}
         output['result'] = ''.join(result_lines)
-
-        if kwargs['testcode']:
-            result_lines = [header % head]
-            result_lines.append(test_fmt % {'name':kwargs['name']})
-            output['result_testcode'] = ''.join(result_lines)
 
         return output
 
