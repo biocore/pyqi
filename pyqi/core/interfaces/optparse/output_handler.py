@@ -63,3 +63,11 @@ def write_list_of_strings(result_key, data, option_value=None):
     with open(option_value, 'w') as f:
         f.write('\n'.join(data))
         f.write('\n')
+
+def print_list_of_strings(result_key, data, option_value=None):
+    """Print a list of strings to stdout, one per line.
+
+    ``result_key`` and ``option_value`` are ignored.
+    """
+    for line in data:
+        print line
