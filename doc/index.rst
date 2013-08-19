@@ -21,7 +21,7 @@ pyqi's only requirement is a working Python 2.7 installation.
 How do I start using pyqi?
 --------------------------
 
-Get started with our tutorials. These tell you :ref:`how to stub and build new commands <defining-new-commands>` and :ref:`how to stub and build new interfaces <defining-new-interfaces>`, and provide suggestions on :ref:`how to organize your project's repository to look like other repositories that make use of pyqi <organizing-your-repository>`. For advanced users, you can next learn about :ref:`how to define new interface types <defining-new-interface-types>` (though this is not something that is ever required).
+We've compiled everything you need to know into a series of :ref:`Getting Started <getting-started>` tutorials. These documents progress linearly through :ref:`how to stub and build new commands <defining-new-commands>` and :ref:`how to stub and build new interfaces <defining-new-interfaces>`. We then provide suggestions on :ref:`how to organize your project's repository to look like other repositories that make use of pyqi <organizing-your-repository>`. For advanced users, you can then learn about :ref:`how to define new interface types <defining-new-interface-types>` (though this is not something that is ever required for most users).
 
 How do I get help with pyqi?
 ----------------------------
