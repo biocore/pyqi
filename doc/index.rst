@@ -21,7 +21,7 @@ pyqi's only requirement is a working Python 2.7 installation.
 How do I start using pyqi?
 --------------------------
 
-Get started with our tutorials. These tell you how to organize your project to make use of pyqi, how to stub and build new commands, and how to stub and build new interfaces.
+Get started with our tutorials. These tell you :ref:`how to stub and build new commands <defining-new-commands>` and :ref:`how to stub and build new interfaces <defining-new-interfaces>`, and provide suggestions on :ref:`how to organize your project's repository to look like other repositories that make use of pyqi <organizing-your-repository>`. For advanced users, you can next learn about :ref:`how to define new interface types <defining-new-interface-types>` (though this is not something that is ever required).
 
 How do I get help with pyqi?
 ----------------------------
@@ -31,9 +31,9 @@ For now, please direct questions to gregcaporaso@gmail.com. Please report bugs a
 I'm sold. Can I help develop pyqi?
 ----------------------------------
 
-pyqi is open source software, available under the BSD license.
+Yes! pyqi is open source software, available under the BSD license.
 
-Development is primarily occurring in the `Caporaso Lab <http://www.caporaso.us>`_ (Northern Arizona University, Argonne National Labs) and `Knight Lab <https://knightlab.colorado.edu/>`_  (University of Colorado, Howard Hughes Medical Institute), but the goal is for pyqi to be a very open development effort. We accept code submissions as `pull requests <https://help.github.com/articles/using-pull-requests>`_.
+Development is primarily occurring in the `Caporaso Lab <http://www.caporaso.us>`_ (Northern Arizona University; Argonne National Laboratories) and `Knight Lab <https://knightlab.colorado.edu/>`_  (University of Colorado; Howard Hughes Medical Institute), but the goal is for pyqi to be a very open development effort. We accept code submissions as `pull requests <https://help.github.com/articles/using-pull-requests>`_.
 
 All source code is hosted in the `pyqi GitHub repository <https://github.com/bipy/pyqi/>`_.
 
