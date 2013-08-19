@@ -2,12 +2,40 @@
 Documentation
 =============
 
-About pyqi
-----------
+What is pyqi?
+-------------
 
-pyqi (canonically pronounced *pie chee*) is designed to support wrapping general commands in multiple types of interfaces, including at the command line, HTML, and API levels. We're currently in the early stages of development, and there is a lot to be done. We're very interested in having beta users, and we fully embrace collaborative development, so if you're interested in using or developing pyqi, you should get in touch.
+pyqi (canonically pronounced *pie chee*) is designed to support wrapping general *commands* in multiple types of *interfaces*, including at the command line, HTML, and API levels. 
+
+Why is pyqi and why should I care?
+----------------------------------
+
+pyqi allows you to write your command once, and easily make it accessible to different users through different interfaces. In the context of pyqi, a command is a class that knows how to perform some function, and an interface is a light wrapper around that command that makes it accessible to users.
+
+After defining and testing your command, you can configure different types of interfaces. This enables, for example, basic users to access your command through an HTML interface running on top of a local server, power or cluster users to access your command through the command line, and developers to access your command through an API. Because pyqi's interfaces are light wrappers around your underlying command, all of these users will be guaranteed to be accessing the same underlying functionality.
+
+pyqi is currently in the early stages of development, and there is a lot to be done. We're very interested in having beta users, and we fully embrace collaborative development, so if you're interested in using or developing pyqi, you should get in touch.
 
 pyqi's only requirement is a working Python 2.7 installation.
+
+How do I start using pyqi?
+--------------------------
+
+Get started with our tutorials. These tell you how to organize your project to make use of pyqi, how to stub and build new commands, and how to stub and build new interfaces.
+
+How do I get help with pyqi?
+----------------------------
+
+For now, please direct questions to gregcaporaso@gmail.com. Please report bugs and feature requests on the `pyqi issue tracker <https://github.com/bipy/pyqi/issues>`_.
+
+I'm sold. Can I help develop pyqi?
+----------------------------------
+
+pyqi is open source software, available under the BSD license.
+
+Development is primarily occurring in the `Caporaso <http://www.caporaso.us>`_ and `Knight <https://knightlab.colorado.edu/>`_ labs (at Northern Arizona University and University of Colorado, respectively), but the goal is for this to be a very open development effort. We accept code submissions as `pull requests <https://help.github.com/articles/using-pull-requests>`_.
+
+All source code is hosted in the `pyqi GitHub repository <https://github.com/bipy/pyqi/>`_.
 
 Documentation index
 -------------------
@@ -20,17 +48,4 @@ Documentation index
    guidelines/index.rst
    scripts/index.rst
 
-Getting involved in development
--------------------------------
-
-pyqi is open source software, available under the BSD license.
-
-Development is primarily occurring in the [Caporaso](www.caporaso.us) and [Knight](https://knightlab.colorado.edu/) labs (at Northern Arizona University and University of Colorado, respectively), but the goal is for this to be a very open development effort. We accept code submissions as [pull requests](https://help.github.com/articles/using-pull-requests).
-
-All source code is hosted in the `pyqi GitHub repository <https://github.com/bipy/pyqi/>`_.
-
-Getting help with pyqi
-----------------------
-
-For now, please direct questions to gregcaporaso@gmail.com. Please report bugs and feature requests on the `pyqi issue tracker <https://github.com/bipy/pyqi/issues>`_.
 
