@@ -1,18 +1,18 @@
 
-Documentation
-=============
+Introduction
+============
 
 What is pyqi?
 -------------
 
 pyqi (canonically pronounced *pie chee*) is designed to support wrapping general *commands* in multiple types of *interfaces*, including at the command line, HTML, and API levels. 
 
-Why is pyqi and why should I care?
-----------------------------------
+Why should I care?
+------------------
 
-pyqi allows you to write your command once, and easily make it accessible to different users through different interfaces. In the context of pyqi, a command is a class that knows how to perform some function, and an interface is a light wrapper around that command that makes it accessible to users.
+pyqi allows you to write your command once, and easily make it accessible to different types of users through different types of interfaces. In the context of pyqi, a command is a class that knows how to perform some function, and an interface is a light wrapper around that command that makes it accessible to users.
 
-After defining and testing your command, you can configure different types of interfaces. This enables, for example, basic users to access your command through an HTML interface running on top of a local server, power or cluster users to access your command through the command line, and developers to access your command through an API. Because pyqi's interfaces are light wrappers around your underlying command, all of these users will be guaranteed to be accessing the same underlying functionality.
+After defining and testing your command, you can **configure different types of interfaces**. This enables, for example, basic users to access your command through an **HTML interface** running on a local server, power or cluster users to access your command through a **command line interface**, and developers to access your command through an **application programmer interface (API)**. Because pyqi's interfaces are light wrappers around your underlying command, **users of each of these interfaces will be guaranteed to be accessing the same underlying functionality**.
 
 pyqi is currently in the early stages of development, and there is a lot to be done. We're very interested in having beta users, and we fully embrace collaborative development, so if you're interested in using or developing pyqi, you should get in touch.
 
@@ -33,7 +33,7 @@ I'm sold. Can I help develop pyqi?
 
 pyqi is open source software, available under the BSD license.
 
-Development is primarily occurring in the `Caporaso <http://www.caporaso.us>`_ and `Knight <https://knightlab.colorado.edu/>`_ labs (at Northern Arizona University and University of Colorado, respectively), but the goal is for this to be a very open development effort. We accept code submissions as `pull requests <https://help.github.com/articles/using-pull-requests>`_.
+Development is primarily occurring in the `Caporaso Lab <http://www.caporaso.us>`_ (Northern Arizona University, Argonne National Labs) and `Knight Lab <https://knightlab.colorado.edu/>`_  (University of Colorado, Howard Hughes Medical Institute), but the goal is for pyqi to be a very open development effort. We accept code submissions as `pull requests <https://help.github.com/articles/using-pull-requests>`_.
 
 All source code is hosted in the `pyqi GitHub repository <https://github.com/bipy/pyqi/>`_.
 
