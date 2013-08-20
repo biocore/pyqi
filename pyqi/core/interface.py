@@ -212,23 +212,6 @@ class InterfaceUsageExample(object):
         """Interface specific usage example validation"""
         raise NotImplementedError("Must define in the subclass")
 
-def get_config_base_name(executable_name):
-    """Return the python module path to the command config dir.
-
-    Module path returned as a string.
-    """
-    # Check if there is a configuration and load the config base.
-    c = SafeConfigParser()
-
-    try:
-        c.readfp(open(expanduser(join('~', '.pyqi', executable_name)), 'U'))
-    except IOError:
-        config_base_name = 'pyqi.interfaces.optparse.config'
-    else:
-        config_base_name = c.get('driver', 'config_base')
-
-    return config_base_name
-
 def get_command_names(config_base_name):
     """Return a list of available command names.
 

@@ -19,17 +19,9 @@ __maintainer__ = "Jai Ram Rideout"
 __email__ = "jai.rideout@gmail.com"
 
 from unittest import TestCase, main
-from pyqi.core.interface import get_config_base_name, get_command_names
+from pyqi.core.interface import get_command_names
 
 class TopLevelTests(TestCase):
-    def test_get_config_base_name(self):
-        """Test that config dir module name is correctly returned."""
-        exp = 'pyqi.interfaces.optparse.config'
-        obs = get_config_base_name('this-executable-should-not-exist-and-if-'
-                                   'it-does-the-user-deserves-to-have-this-'
-                                   'test-fail')
-        self.assertEqual(obs, exp)
-
     def test_get_command_names(self):
         """Test that command names are returned from a config directory."""
         exp = ['make_bash_completion', 'make_command', 'make_optparse']
