@@ -21,7 +21,19 @@ As an example, we'll define a new Command that provides a summary of a collectio
    
    defining_new_commands.rst
    defining_new_interfaces.rst
+
+.. _using-pyqi-in-your-project:
+
+Using pyqi in your project
+--------------------------
+
+After you've experimented with defining a toy pyqi ``Command``, its API, and an ``OptparseInterface``, you are ready to start thinking about integrating pyqi into your project. This section of the documentation begins by providing suggestions for organizing your code to match best with the organization of pyqi and projects that use pyqi. We then cover how to define a command line driver (similar to the ``pyqi`` command) that can be used with your optparse interfaces, to customize how your users will interact with your project. 
+
+.. toctree::
+   :maxdepth: 2
+   
    organizing_your_repository.rst
+   defining_your_command_driver.rst
 
 Advanced topics
 ---------------
