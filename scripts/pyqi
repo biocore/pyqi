@@ -64,13 +64,18 @@ def usage(opts):
 
 def get_cmd_cfg(cmd, opts):
     """Get the configuration for a ``Command``"""
-    # try to import from the current working directory first
-    try:
-        return importlib.import_module(cmd)
-    except ImportError, e:
-        pass
+    if opts['--cwd']:
+        # import from the current working directory if --cwd
+        try:
+            return importlib.import_module(cmd)
+        except ImportError, e:
+            stderr.write("Unable to import the command configuration for %s.\n" % cmd)
+            if opts['--verbose']:
+                stderr.write(str(e))
+                stderr.write('\n')
+            exit(1)
 
-    # then try to import from the current configuration directory
+    # otherwise look in the command config directory
     try:
         cmd_cfg = importlib.import_module('.'.join([config_base_name, cmd]))
     except ImportError, e:
@@ -93,7 +98,7 @@ def help_(cmd, opts):
     optparse_main(cmd_obj, ['help','-h'])
 
 if __name__ == '__main__':
-    opts = {'--verbose':False}
+    opts = {'--verbose':False, '--cwd':False}
 
     if len(argv) == 1:
         usage(opts)
