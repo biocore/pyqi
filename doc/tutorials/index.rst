@@ -35,7 +35,9 @@ After you've experimented with defining a toy pyqi ``Command``, its API, and an 
    organizing_your_repository.rst
    defining_your_command_driver.rst
 
+.. _advanced-topics:
+
 Advanced topics
 ---------------
 
-
+As the project continues to come together we'll include tutorials covering topics such as how to define new interface types. However, given the early state that we're currently in, these would be likely to change a lot, so we recommend that if you are interested in developing new interface types now, that you get in touch (you can e-mail gregcaporaso@gmail.com for now) to discuss what you'd like to do, and possibly get involved with development of pyqi if our goals align. 
