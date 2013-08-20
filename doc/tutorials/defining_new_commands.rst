@@ -3,8 +3,6 @@
 Defining new commands
 =====================
 
-
-
 Stubbing a new command
 ----------------------
 
