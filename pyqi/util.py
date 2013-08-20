@@ -24,7 +24,10 @@ __maintainer__ = "Greg Caporaso"
 __email__ = "gregcaporaso@gmail.com"
 
 from os import remove
+from os.path import split, splitext
+from sys import stdout, stderr
 from subprocess import Popen, PIPE, STDOUT
+from pyqi.core.log import StdErrLogger
 
 def pyqi_system_call(cmd, shell=True):
     """Call cmd and return (stdout, stderr, return_value).
@@ -62,4 +65,34 @@ def remove_files(list_of_filepaths, error_on_missing=True):
 
     if error_on_missing and missing:
         raise OSError, "Some filepaths were not accessible: %s" % '\t'.join(missing)
-        
+
+def old_to_new_command(driver_name, project_title, local_argv):
+    """Deprecate an old-style script.
+
+    Will only work if the old-style script name matches a command name, and if
+    all option names are the same between old and new.
+
+    Use like this (put in the script you want to deprecate):
+
+        #!/usr/bin/env python
+        import sys
+        from pyqi.util import old_to_new_command
+
+        sys.exit(old_to_new_command('biom', 'BIOM', sys.argv))
+    """
+    logger = StdErrLogger()
+
+    cmd_name = splitext(split(local_argv[0])[1])[0]
+    base_cmd = "%s %s" % (driver_name, cmd_name)
+    command = '%s %s' % (base_cmd, ' '.join(local_argv[1:]))
+
+    logger.info("This is a new-style %s script. You should now call it with: "
+                "%s" % (project_title, base_cmd))
+    logger.info("Calling: %s " % command)
+
+    result_stdout, result_stderr, result_retval = pyqi_system_call(command)
+
+    stdout.write(result_stdout)
+    stderr.write(result_stderr)
+
+    return result_retval
