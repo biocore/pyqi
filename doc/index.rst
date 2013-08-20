@@ -28,6 +28,8 @@ How do I get help with pyqi?
 
 For now, please direct questions to gregcaporaso@gmail.com. Please report bugs and feature requests on the `pyqi issue tracker <https://github.com/bipy/pyqi/issues>`_.
 
+.. _contributing-to-pyqi:
+
 I'm sold. Can I help develop pyqi?
 ----------------------------------
 
