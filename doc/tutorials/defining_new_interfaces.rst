@@ -5,7 +5,7 @@ Defining new interfaces
 
 After defining a new ``Command`` and its API, as covered in :ref:`defining-new-commands`, you're ready to create a first user interface for that command. In this tutorial we'll define a command line interface for the ``SequenceCollectionSummarizer`` command. 
 
-The main differences that need to be handled when defining a command line interface are that we'll want the user to provide their sequence collection on the command line, and we'll want to write the output to a file path that the user specifies on the command line. This is different than what happens in ``SequenceCollectionSummarizer``, where the input and output are python objects. This is a very important distinction - since our derived ``Commands`` are meant to be interface-independent, they should not do things like require files as input. In some rare circumstances, it may be required for a ``Command`` to write files as its output.
+The main differences that need to be handled when defining a command line interface are that we'll want the user to provide their sequence collection on the command line, and we'll want to write the output to a file path that the user specifies on the command line. This is different than what happens in ``SequenceCollectionSummarizer``, where the input and output are python objects. This is a very important distinction - since our derived ``Commands`` are meant to be interface-independent, they should not do things like require files as input. In some rare circumstances, it may be required for a ``Command`` to write files as its output (for example, if storing the output in memory is intractable).
 
 pyqi currently provides support for building command line interfaces based on python's `optparse <http://docs.python.org/2/library/optparse.html>`_ module. Your interface will ultimately be an instance of ``pyqi.interfaces.optparse.OptparseInterface``, but the interface class itself is generated dynamically. As a developer, you only define the configuration for the interface via an *interface configuration file* (which is a valid python file) - you won't actually define the interface class itself. If this sounds confusing, just get started - it's easier than it sounds.
 
@@ -262,15 +262,23 @@ At this stage we've configured our interface. The final interface configuration 
 
 	ADD CODE WHEN IT'S TESTED
 
-To test this interface, you can now run the following::
+To run this, there are a couple of additional things you need to do. First, you need to confirm that the directory where you've written these files is accessible via your ``PYTHONPATH``. For example, if you've been working in ``$HOME/code/pyqi_experiments/``, you should have ``$HOME/code/`` in your ``PYTHONPATH``. You can add that as follows::
 	
-	pyqi summarize_sequence_collection -h
+	export PYTHONPATH=$HOME/code/:$PYTHONPATH
+
+Next, so you can import from that directory, it'll need to have an ``__init__.py`` file. That file can be empty, but does need to exist. You can do this as follows::
+	
+	touch $HOME/code/pyqi_experiments/__init__.py
+
+Now you're ready to apply this interface. You should now be able to run the following::
+	
+	pyqi --command-config-module pyqi_experiments -- summarize_sequence_collection -h
 
 This will print the help text associated with the summarize_sequence_collection ``Command`` and ``Interface`` combination. You can now test your interface by applying it to some sequence collection as follows::
 
-	pyqi summarize_sequence_collection -i seqs.fna -o seqs.summary.txt
+	pyqi --command-config-module pyqi_experiments -- summarize_sequence_collection -i seqs.fna -o seqs.summary.txt
 
-.. warning:: THIS CODE CURRENTLY DOES NOT WORK! DANIEL IS LOOKING INTO WHAT IT WOULD TAKE TO BE ABLE TO RUN INTERFACES THIS WAY.
+Calling your command via the pyqi driver itself, as we're doing here, is a little clunky. Creating a project-specific driver however is very simple (it's a two-line shell script) and covered in :ref:`defining-your-command-driver`.
 
 Thoughts and guidelines on designing command line interfaces
 ------------------------------------------------------------
