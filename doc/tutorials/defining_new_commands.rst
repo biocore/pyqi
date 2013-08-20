@@ -6,11 +6,11 @@ Defining new commands
 Stubbing a new command
 ----------------------
 
-After installing pyqi, you can easily stub new commands using ``pyqi make_command``. You can get usage information by calling::
+After installing pyqi, you can easily stub (i.e., create templates for) new commands using ``pyqi make_command``. You can get usage information by calling::
 
 	pyqi make_command -h
 
-To create our sequence collection summarizer, we can start by creating a ``SequenceCollectionSummarizer`` class::
+To create our sequence collection summarizer, we can start by stubbing a ``SequenceCollectionSummarizer`` class::
 
 	pyqi make_command -n SequenceCollectionSummarizer -a "Greg Caporaso" -c "Copyright 2013, Greg Caporaso" -e "gregcaporaso@gmail.com" -l BSD --command-version 0.0.1 -o sequence_collection_summarizer.py
 
@@ -54,11 +54,11 @@ If you run this command locally, substituting your own name and email address wh
 Defining a command
 ------------------
 
-There are several values that you'll need to fill in to define your command based on the stub that is created by ``make_command``. The first, which are the easiest, are ``BriefDescription`` and ``LongDescription``. ``BriefDescription`` should be a one sentence description of your command, and ``LongDescription`` should be a more detail explanation (usually 2-3 sentences). 
+There are several values that you'll need to fill in to define your command based on the stub that is created by ``make_command``. The first, which are the easiest, are ``BriefDescription`` and ``LongDescription``. ``BriefDescription`` should be a one sentence description of your command, and ``LongDescription`` should be a more detail explanation (usually 2-3 sentences). These are used in auto-generated documentation.
 
-Next, you'll need to define the parameters that your new command can take. Each of these parameters will be an instance of the pyqi.core.command.Parameter class.
+Next, you'll need to define the parameters that your new command can take. Each of these parameters will be an instance of the ``pyqi.core.command.Parameter`` class.
 
-For our command, we'll define one required parameter and one optional parameter. The required parameter will be called ``seqs``, and will be a list of tuples of (sequence identifier, sequence) pairs. For example::
+Our ``SequenceCollectionSummarizer`` command will take one required parameter and one optional parameter. The required parameter will be called ``seqs``, and will be a list (or some other iterable type) of tuples of (sequence identifier, sequence) pairs. For example::
 
 	[('sequence1','ACCGTGGACCAA'),('sequence2','TGTGGA'), ...]
 
@@ -71,11 +71,11 @@ The optional parameter will be called ``suppress_length_summary``, and if passed
 
 	Parameter(Name='suppress_length_summary', DataType=bool,
 	         Description='do not generate summary information on the sequence lengths', 
-	         Required=False,Default=False)
+	         Required=False, Default=False)
 
-The only additional ``Parameter`` that is passed here, relative to our ``seqs`` parameter, is ``Default``. Because this parameter isn't required, it's necessary to give it a default value here.
+The only additional ``Parameter`` that is passed here, relative to our ``seqs`` parameter, is ``Default``. Because this parameter isn't required, it's necessary to give it a default value here. All of the ``Parameters`` should be included in a ``pyqi.core.command.ParameterCollection`` object (as in the stubbed file).
 
-Next, you'll need to define what your command will actually do. This is done in the ``run`` method, and all results are returned in a dictionary. The run method for our ``SequenceCollectionSummarizer`` object would look like the following::
+Next, we'll need to define what our ``Command`` will actually do. This is done in the ``run`` method, and all results are returned in a dictionary. The run method for our ``SequenceCollectionSummarizer`` object would look like the following::
 
 	def run(self, **kwargs):
 	    """
@@ -97,10 +97,12 @@ Next, you'll need to define what your command will actually do. This is done in 
 	            'min-length':min_length,
 	            'max-length':max_length}
 
-A complete example command
+In practice, if your ``Command`` is more complex than our ``SequenceCollectionSummarizer`` (which it probably is), you can define other methods that are called by ``run``. These should likely be private methods.
+
+A complete example Command
 --------------------------
 
-The following illustrates a complete file defining a new pyqi Command::
+The following illustrates a complete python file defining a new pyqi ``Command``::
 
 	#!/usr/bin/env python
 
@@ -117,7 +119,7 @@ The following illustrates a complete file defining a new pyqi Command::
 
 	class SequenceCollectionSummarizer(Command):
 	    BriefDescription = "Generate summary statistics on a collection of sequences."
-	    LongDescription = "Provided the number of sequences, the minimum sequence length, and the maximum sequence length given a collection of sequences. Sequences should be provided as a list (or generator) of tuples of (sequence id, sequence) pairs."
+	    LongDescription = "Provide the number of sequences, the minimum sequence length, and the maximum sequence length given a collection of sequences. Sequences should be provided as a list (or other iterable object) of tuples of (sequence id, sequence) pairs."
 	    Parameters = ParameterCollection([
 	        Parameter(Name='seqs', DataType=list,
 	                  Description='sequences to be summarized', Required=True),
@@ -148,7 +150,7 @@ The following illustrates a complete file defining a new pyqi Command::
 
 	CommandConstructor = SequenceCollectionSummarizer
 
-At this stage you have defined a new command its API. To access the API in the python terminal, you could do the following::
+At this stage you have defined a new command and its API. To access the API in the python terminal, you could do the following::
 
 	# Import your new class
 	>>> from sequence_collection_summarizer import SequenceCollectionSummarizer
