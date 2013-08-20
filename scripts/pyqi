@@ -62,17 +62,15 @@ def usage(opts):
     print "See '%s help <command>' for more information on a specific command." % argv[0]
     exit(0)
 
-def unknown_command(cmd):
-    """Handle an unknown command"""
-    stderr.write("Unknown command: %s\n" % cmd)
-    exit(1)
-
-def cmd_exists(cmd):
-    """Check if a ``Command`` configuration exists"""
-    return cmd in command_names
-
 def get_cmd_cfg(cmd, opts):
     """Get the configuration for a ``Command``"""
+    # try to import from the current working directory first
+    try:
+        return importlib.import_module(cmd)
+    except ImportError, e:
+        pass
+
+    # then try to import from the current configuration directory
     try:
         cmd_cfg = importlib.import_module('.'.join([config_base_name, cmd]))
     except ImportError, e:
@@ -121,16 +119,10 @@ if __name__ == '__main__':
         # this voodoo is to coerce optparse/argparse to dump the program name
         # at usage and examples correctly.
         argv[0] = ' '.join([argv[0], argv[2]])
-        if cmd_exists(help_cmd):
-            help_(help_cmd, opts)
-        else:
-            unknown_command(help_cmd)
+        help_(help_cmd, opts)
     else:
         # see the note about crying about tears.
         argv[0] = ' '.join([argv[0], argv[1]])
-
-    if not cmd_exists(cmd):
-        unknown_command(cmd)
 
     cmd_obj = get_cmd_obj(cmd, opts)
     
