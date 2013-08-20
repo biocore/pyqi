@@ -373,6 +373,8 @@ At this stage we've fully configured our interface. The final interface configur
 
 	]
 
+.. _running-our-command:
+
 Running our Command via its OptparseInterface
 ---------------------------------------------
 

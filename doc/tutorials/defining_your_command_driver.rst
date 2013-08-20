@@ -1,1 +1,25 @@
 .. _defining-your-command-driver:
+
+Defining your command driver
+============================
+
+It's possible to run your ``Commands`` using the ``pyqi`` command, as illustrated in :ref:`running-our-command`, but that mechanism is clunky and not how you'd want your users to interact with your project. To handle this more gracefully, you can create a shell script that can be distributed with your package and used as the primary driver for all ``OptparseInterfaces``. 
+
+To do this, create a new file named as you'd like your users to access your code. For example, the driver for the ``biom-format`` package is called ``biom``, and the driver for the ``pyqi`` package is called ``pyqi``. In this example our driver name will be ``my-project``. Add the following to that file, replacing ``my-project`` with your driver name::
+
+	#!/bin/sh
+	exec pyqi --driver-name my-project --command-config-module my-project.interfaces.optparse.config -- "$@"
+
+The value passed with ``--command-config-module`` must be the directory where the ``OptparseInterface`` configuration files can be found. If you followed the suggestions in :ref:`organizing-your-repository` the above should work. 
+
+You'll next need to ensure that the directory containing this driver file is in your ``PATH`` environment variable. Again, if you followed the recommendations in :ref:`organizing-your-repository` and if your project directory is under ``$HOME/code``, you can do this by running::
+
+	export PATH=$HOME/code/my-project/scripts/:$PATH
+
+You should now be able to run::
+	
+	my-project -h
+
+To see a list of the commands that are available via the driver script, which will be all of the ``Commands`` for which you've defined ``OptparseInterfaces``. If one of these commands is called ``my-command``, you can now run it as follows to get the help text associated with that command::
+	
+	my-project my-command -h
