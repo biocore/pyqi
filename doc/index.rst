@@ -4,7 +4,7 @@ Introduction
 What is pyqi?
 -------------
 
-pyqi (canonically pronounced *pie chee*) is designed to support wrapping general *commands* in multiple types of *interfaces*, including at the command line, HTML, and API levels. 
+pyqi (canonically pronounced *pie chee*) is a Python framework designed to support wrapping general *commands* in multiple types of *interfaces*, including at the command line, HTML, and API levels. 
 
 Why should I care?
 ------------------
