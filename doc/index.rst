@@ -1,4 +1,3 @@
-
 Introduction
 ============
 
@@ -21,7 +20,13 @@ pyqi's only requirement is a working Python 2.7 installation.
 How do I start using pyqi?
 --------------------------
 
-We've compiled tutorials to help you figure out what you need to evaluate the utility of pyqi, and then integrate pyqi into your project. The :ref:`Getting Started <getting-started>` series of tutorials progress linearly through :ref:`how to stub and build new commands <defining-new-commands>` and :ref:`how to stub and build new interfaces <defining-new-interfaces>`. These will give you an idea of what pyqi is capable of and how it works. The :ref:`using-pyqi-in-your-project` series of tutorials then give you an idea of how you could integrate pyqi into your project. This includes suggestions on :ref:`how to organize your project's repository to look like other repositories that make use of pyqi <organizing-your-repository>`, and how to define a driver script (similar to the ``pyci`` command) that will give your users access to the commands in your project. As the pyqi project stabilizes, we'll include additional :ref:`documentation for advanced developers <advanced-topics>`, who are interested in things like defining new interface types (though this is not something that is ever required for most users).
+Our tutorials are designed to help you evaluate the utility of pyqi, and then integrate pyqi into your project. 
+
+The :ref:`Getting Started <getting-started>` series of tutorials progress linearly through :ref:`how to stub and build new commands <defining-new-commands>` and :ref:`how to stub and build new interfaces <defining-new-interfaces>`. These will give you an idea of what pyqi is capable of and how it works. 
+
+The :ref:`using-pyqi-in-your-project` series of tutorials will then give you an idea of how you could integrate pyqi into your project. This includes suggestions on :ref:`how to organize your project's repository to look like other repositories that make use of pyqi <organizing-your-repository>`, and :ref:`how to define a driver script <defining-your-command-driver>` (similar to the ``pyqi`` command which you'll become familiar with in the :ref:`Getting Started <getting-started>` tutorials) that will give your users access to the commands in your project. 
+
+As the pyqi project stabilizes, we'll include additional :ref:`documentation for advanced developers <advanced-topics>`, who are interested in things like defining new interface types (though this is not something that is ever required for most developers).
 
 How do I get help with pyqi?
 ----------------------------
@@ -30,24 +35,13 @@ For now, please direct questions to gregcaporaso@gmail.com. Please report bugs a
 
 .. _contributing-to-pyqi:
 
-I'm sold. Can I help develop pyqi?
-----------------------------------
+Can I help develop pyqi?
+------------------------
 
 Yes! pyqi is open source software, available under the BSD license.
 
 Development is primarily occurring in the `Caporaso Lab <http://www.caporaso.us>`_ (Northern Arizona University; Argonne National Laboratories) and `Knight Lab <https://knightlab.colorado.edu/>`_  (University of Colorado; Howard Hughes Medical Institute), but the goal is for pyqi to be a very open development effort. We accept code submissions as `pull requests <https://help.github.com/articles/using-pull-requests>`_.
 
 All source code is hosted in the `pyqi GitHub repository <https://github.com/bipy/pyqi/>`_.
-
-Documentation index
--------------------
-
-.. toctree::
-   :maxdepth: 2
-
-   install/index.rst
-   tutorials/index.rst
-   guidelines/index.rst
-   scripts/index.rst
 
 
