@@ -61,8 +61,9 @@ def write_list_of_strings(result_key, data, option_value=None):
         raise IOError("Output path '%s' already exists." % option_value)
 
     with open(option_value, 'w') as f:
-        f.write('\n'.join(data))
-        f.write('\n')
+        for line in data:
+            f.write(line)
+            f.write('\n')
 
 def print_list_of_strings(result_key, data, option_value=None):
     """Print a list of strings to stdout, one per line.
