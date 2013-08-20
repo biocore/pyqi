@@ -12,11 +12,11 @@ pyqi currently provides support for building command line interfaces based on py
 Stubbing a new command line interface
 -------------------------------------
 
-pyqi provides a command, ``make_optparse``, that allows developers to easily define their optparse interface configuration files. After installing pyqi, you can get usage information by calling::
+pyqi provides a command, ``make_optparse``, that allows developers to easily stub (i.e., create templates for) their optparse interface configuration files. After installing pyqi, you can get usage information by calling::
 
 	pyqi make_optparse -h
 
-To create your interface, you'll need to pass the ``Command`` as a fully specified python import (**WHAT DO YOU CALL THAT**), the name of the module where that ``Command`` is defined, and the path where the new configuration file should be written. For example, to create a stub for an optparse interface for our ``SequenceCollectionSummarizer`` command, you could run the following::
+To create your interface, you'll need to pass the ``Command`` as a fully specified python module name, the name of the module where that ``Command`` is defined, and the path where the new configuration file should be written. For example, to create a stub for an ``OptparseInterface`` for our ``SequenceCollectionSummarizer`` command, you could run the following::
 
 	pyqi make_optparse -c sequence_collection_summarizer.SequenceCollectionSummarizer -m sequence_collection_summarizer -o summarize_sequence_collection.py
 
@@ -118,12 +118,12 @@ The resulting file will look something like this::
 	]
 
 
-There are three specific things that we'll need to fill in here to define the optparse interface for our SequenceCollectionSummarizer command. These are the ``inputs``, the ``outputs``, and the ``usage_examples``. We'll also need to define some input and output handlers to tell the OptparseInterface how to take input from the command line and turn it into something that the command can use, and to take output from the command and turn it into something a command line user will want. The following sections describe each of these steps.
+There are three lists of values that we'll need to populate here to define the optparse interface for our ``SequenceCollectionSummarizer`` command. These are the ``inputs``, the ``outputs``, and the ``usage_examples``. We'll also need to define an input handler and an output handler to tell the ``OptparseInterface`` how to take input from the command line and turn it into something that ``SequenceCollectionSummarizer`` can use, and to take output from ``SequenceCollectionSummarizer`` and turn it into something a command line user will want. The following sections describe each of these steps.
 
 Defining usage examples
 -----------------------
 
-The first thing to do when defining the optparse interface for our ``SequenceCollectionSummarizer`` command is define a set of usage examples. While this documentation step may seem like something you'd want to do last, it's really helpful to do first to get you thinking about how you'd like to interact with your command from the command line. 
+The first thing to do when defining the ``OptparseInterface`` for our ``SequenceCollectionSummarizer`` command is define a set of usage examples. While in practice this documentation step may seem like something you'd want to do last, it's really helpful to do first to get you thinking about how you'd like to interact with your command from the command line. 
 
 Usage examples are defined as instances of the ``pyqi.interface.optparse.UsageExample`` class, and are instantiated with three parameters: ``ShortDescription``, ``LongDescription``, and ``Ex``. ``Ex`` is the usage example itself, ``ShortDescription`` is a one sentence description of what ``Ex`` will do, and ``LongDescription`` elaborates on what ``Ex`` does. Find the ``usage_examples`` list in your new ``summarize_sequence_collection.py`` file, and replace its definition with::
 
@@ -136,16 +136,18 @@ Usage examples are defined as instances of the ``pyqi.interface.optparse.UsageEx
 	                         Ex="%prog -i seqs.fna -o seqs.summary.txt --suppress-length-summary")
 	]
 
-Here we define two usage examples, each of which gives us an idea about how we want our script to behave: we want it to take an ``input_fp``, an ``output_fp``, and an optional parameter called ``suppress-length-summary``. 
+Here we define two usage examples, each of which gives us an idea about how we want our script to behave: we want it to take an ``i`` parameter (where the user passes their input file name), an ``o`` parameter (where the user passes their output file name), and an optional parameter called ``suppress-length-summary`` which controls some of the script behavior. 
 
- .. warning:: You shouldn't ever include the name of the script when defining ``UsageExample.Ex``, but instead include the text ``%prog``. This will be automatically replaced with the script name, so if you ever change the name of the script in the future, the change will take affect in all of your usage examples.
+ .. warning:: You shouldn't ever include the name of the script when defining ``UsageExample.Ex``, but instead include the text ``%prog``. This will be automatically replaced with the script name, so if you ever change the name of the script in the future, the change will take affect in all of your usage examples with you having to remember to update them.
 
 Defining inputs
 ---------------
 
-Next we'll define the list of ``inputs`` that should be associated with our interface. Each of these inputs will be an instance of a ``pyqi.core.interface.optparse.OptparseOption`` object. These will roughly map on to the ``Parameters`` that we defined for ``SequenceCollectionSummarizer``, but there are usually additional interface options as we'll see here. 
+Next we'll define the list of ``inputs`` that should be associated with our ``OptparseInterface``. Each of these inputs will be an instance of a ``pyqi.core.interface.optparse.OptparseOption`` object. These will roughly map on to the ``Parameters`` that we defined for ``SequenceCollectionSummarizer``, but there are usually additional interface options relative to command parameters, as we'll see here. 
 
-For the ``OptparseOptions`` that map onto ``Parameters`` directly, you can look up the corresponding ``Parameter`` in the ``param_lookup`` dictionary (which is created for you), and most of the information in the ``OptparseOption`` will be auto-populated for you. Additionally, ``pyqi make_optparse`` will fill in as much information as possible for each ``OptparseOption`` that corresponds to an existing ``Parameter``. In our example, you'll notice that there are two ``OptparseOptions`` that are already defined. There are a few values that may need to be changed here. In almost all cases, you'll need to change the ``InputType``, which is set to the ``Parameter`` type by default, but should be updated to the ``optparse`` type. You can find discussion of these types in the :ref:`optparse type definitions <optparse-types>` section. Note that the ``InputType`` should be ``None`` for command line flags, as the type is described the value that is passed via that option, and command line flags don't take an option. The other value that often will need to be changed is ``InputHandler``, which tells ``OptparseInterface`` how to transform the ``OptparseOption`` into the corresponding ``Parameter``. In our case, for our ``seqs`` ``OptparseOption``, that involves converting a file path into a list of tuples of (sequence id, sequence) pairs. First let's define the ``OptparseOptions``, and then we'll define a new ``InputHandler``.
+For the ``OptparseOptions`` that map onto ``Parameters`` directly, you can look up the corresponding ``Parameter`` in the ``param_lookup`` dictionary (which is created for you by ``make_optparse``), and most of the information in the ``OptparseOption`` will be auto-populated for you. ``make_optparse`` will actually fill in as much information as possible for each ``OptparseOption`` that corresponds to an existing ``Parameter``. 
+
+In our example, you'll notice that there are two ``OptparseOptions`` that are already defined. There are a few values that may need to be changed here. In almost all cases, you'll need to change the ``InputType``, which is set to the ``Parameter``' ``DataType`` value by default, but should be updated to the ``optparse`` type. You can find discussion of these types in the :ref:`optparse type definitions <optparse-types>` section (**NEED TO WRITE THIS SECTION!!**). Note that the ``InputType`` should be ``None`` for command line flags, as the type describes the value that is passed via that option, and command line flags don't take a value. The other value that often will need to be changed is ``InputHandler``, which tells ``OptparseInterface`` how to transform the ``OptparseOption`` into the corresponding ``Parameter``. In our case, for our ``seqs`` ``OptparseOption``, that involves converting a file path into a list of tuples of (sequence id, sequence) pairs. First let's define the ``OptparseOptions``, and then we'll define a new ``InputHandler``.
 
 The ``OptparseOptions`` corresponding to the existing ``Parameters`` should look like this::
 
@@ -164,9 +166,9 @@ The ``OptparseOptions`` corresponding to the existing ``Parameters`` should look
 	                   ShortName=None),
 	]
 
-These definitions are exactly as generated by ``make_optparse``, except that many of the comments have been removed, and we've modified the ``InputTypes`` and the ``InputHandler`` for our ``seqs`` option. In the :ref:`next section <defining-input-handlers>` we'll define this new ``parse_fasta`` input handler that we've set ``InputHandler`` to, but first let's add one more OptparseOption which is specific to our command line interface.
+These definitions are exactly as generated by ``make_optparse``, except that many of the comments have been removed, and we've modified the ``InputTypes`` and the ``InputHandler`` for our ``seqs`` option. In the :ref:`next section <defining-input-handlers>` we'll define this new ``parse_fasta`` input handler, but first we'll add one more OptparseOption which is specific to our command line interface.
 
-The output from our ``SequenceCollectionSummarizer`` is a dictionary, where some of the values are integers and some of the values may be ``None``. Generally a command line user will want to have information printed to stdout or to file. We'll define our interface so that the output is written to file with some basic formatting put in place. To do this, we need to define a new OptparseOption to allow the user to specify the path where output should be written. This ``OptparseOption`` does not map onto one of our existing ``Parameters``. This option should be defined as follows::
+The output from our ``SequenceCollectionSummarizer`` is a dictionary, where some of the values are integers and some of the values may be ``None``. Generally a command line user will want to have information printed to stdout or to file. We'll define our interface so that the output is written to file with some basic formatting put in place. To do this, we need to define a new OptparseOption to allow the user to specify the path where output should be written. This ``OptparseOption`` does not map onto one of our existing ``Parameters``, and should be defined as follows::
 
 	OptparseOption(Parameter=None,
 	               InputType='new_filepath',
@@ -176,14 +178,16 @@ The output from our ``SequenceCollectionSummarizer`` is a dictionary, where some
 	               Required=True,
 	               Help='path where output should be written')
 
-You should include this option definition in the ``inputs`` list to define the three options for our command line interface.
+Notice the ``Parameter=None`` parameter here: this indicates that this ``OptparseOption`` does not correspond to one of the ``SequenceCollectionSummarizer`` parameters. 
+
+You should include this ``OptparseOption`` definition in the ``inputs`` list to define the three options for our command line interface.
 
 .. _defining-input-handlers:
 
 Defining input handlers
 -----------------------
 
-Input handlers tell the ``OptparseInterface`` class how to take input from the command line and get it into the form that the ``Command`` is expecting. In our case, the user will be providing a filepath on the command line, and our ``SequenceCollectionSummarizer`` expects to receive a list of tuples of (sequence id, sequence) pairs. Our input handler is therefore a simple fasta parser. We can define this as follows::
+Input handlers tell the ``OptparseInterface`` class how to take input from the command line and get it into the form that the ``Command`` is expecting. In our case, the user will be providing a filepath on the command line, and our ``SequenceCollectionSummarizer`` expects to receive a list (or other iterable object) of tuples of (sequence id, sequence) pairs. Our input handler is therefore a simple fasta parser, which is a `generator <http://docs.python.org/2/tutorial/classes.html#generators>`_ of (sequence id, sequence) tuples. We can define this as follows::
 
 	def parse_fasta(fp):
 	    """
@@ -212,12 +216,12 @@ Input handlers tell the ``OptparseInterface`` class how to take input from the c
 	            seq.append(line)
 	    yield seq_id, ''.join(seq)
 
-The definition can go in the interface configuration file that we've been working on in this tutorial. Alternatively, if your input handler is generally useful for your project you can centralize it within your project (see :ref:`organizing-your-repository`), or if you think it's generally useful for pyqi users, you should consider submitting it to the pyqi project :ref:`contributing it to pyqi <contributing-to-pyqi>`.
+This definition can go in the interface configuration file that we've been working on in this tutorial. Alternatively, if your input handler is generally useful for your project you can centralize it within your project (see :ref:`organizing-your-repository`), or if you think it's generally useful for pyqi users, you should consider submitting it to the pyqi project :ref:`contributing it to pyqi <contributing-to-pyqi>`.
 
 Defining outputs
 ----------------
 
-The last thing we need to do is define which of the outputs that are generated by ``SequenceCollectionSummarizer`` are things we care about with this interface, and tell the ``Interface`` how to handle those. We do this by defining the ``outputs`` list. In our case, we'll want to write all of the values that are not ``None`` to the file path specified by the user with ``output-fp``. To do that, we need to handle three possible outputs, so we'll define those outputs and write an output handler. You should start with the stubbed ``outputs`` list to define how you want to handle each of the parameters. We'll do this as follows::
+The last thing we need to do is define which of the outputs generated by ``SequenceCollectionSummarizer`` are things we care about with this interface, and tell our ``OptparseInterface`` how to handle those. We do this by defining the ``outputs`` list of ``pyqi.core.interfaces.optparse.OptparseResult`` objects. In our case, we'll want to write all of the values that are not ``None`` to the file path specified by the user with ``output-fp``. To do that, we need to handle three possible outputs, so we'll define those outputs and write an output handler. You should start with the stubbed ``outputs`` list to define how you want to handle each of the parameters. We'll do this as follows::
 
 	outputs = [
 	    OptparseResult(ResultKey='num-seqs',
@@ -230,11 +234,14 @@ The last thing we need to do is define which of the outputs that are generated b
 	                   OutputHandler=append_datum_to_file,
 	                   OptionName='output-fp'), 
 
-	] 
+	]
 
-In this case, each of our OptparseResults are associated with a single ``OptionName``, ``output-fp``. We do this because each of these should be written to the same file, but in practice each of these could be associated with different ``OptionNames`` (e.g., if each should be written to a different file), or ``OptionName=None``, if (for example) a particular result should be written to standard out or standard error. 
+In this case, each of our ``OptparseResults`` are associated with a single ``OptionName``: ``output-fp``. We do this because each of these should be written to the same file, but in practice each of these could be associated with different ``OptionNames`` (e.g., if each should be written to a different file), or ``OptionName=None``, if (for example) a particular result should be written to stdout or stderr. We'll next define the new output handler, ``append_datum_to_file``, used by each of these ``OptparseResult`` objects.
 
-Each of these ``OptparseResult`` objects uses the same ``OutputHandler``, which we need to define now. This should take the result and write it to the file specified by the user as ``output-fp``. This should look like the following::
+Defining output handlers
+-----------------------
+
+Each of these ``OptparseResult`` objects uses the same ``OutputHandler``, which we need to define now. This will take the result and write it to the file specified by the user as ``output-fp``. This should look like the following::
 
 	def append_datum_to_file(result_key, data, option_value=None):
 	    """Append summary information to a file.
@@ -243,42 +250,164 @@ Each of these ``OptparseResult`` objects uses the same ``OutputHandler``, which 
 	    if data is None:
 	        return
     
-	    # alert the developer that they did something wrong if 
+	    # If option_value is None when this output handler is called, 
+	    # the interface developer did something wrong when defining
+	    # the OptparseResults. Politely alert the developer that
 	    # this output handler isn't associated with an option
-	    # (it needs to be associated with an output file path)
+	    # (it needs to be associated with an output file path).
 	    if option_value is None:
-	        raise IncompetentDeveloperError("Cannot write output without a "
-	                                        "filepath.")
+	        raise IncompetentDeveloperError(
+	         "Cannot write output without a filepath.")
     
 	    # open the output file for appending, and write the 
 	    # summary information to a single tab-separated line
 	    with open(option_value, 'a') as f:
 	        f.write('%s\t%d\n' % (result_key, data))
 
-Putting it all together
------------------------
+Complete OptparseInterface configuration file
+---------------------------------------------
 
-At this stage we've configured our interface. The final interface configuration file should look like this::
+At this stage we've fully configured our interface. The final interface configuration file should look like this::
 
-	ADD CODE WHEN IT'S TESTED
+	#!/usr/bin/env python
+
+	from pyqi.core.interfaces.optparse import (OptparseUsageExample,
+	                                           OptparseOption, OptparseResult)
+	from pyqi.core.command import make_parameter_collection_lookup_f
+	from sequence_collection_summarizer import CommandConstructor
+	from pyqi.core.exception import IncompetentDeveloperError
+	import os
+
+	param_lookup = make_parameter_collection_lookup_f(CommandConstructor)
+
+	def parse_fasta(fp):
+	    """
+	       fp: path to a fasta-formatted file
+       
+	       This function is a fasta record generator, yielding 
+	        (sequence id, sequence) pairs when provided with a 
+	        valid fasta file.
+       
+	       NO ERROR CHECKING IS PERFORMED!
+	    """
+	    # Always open files for reading in python using mode 'U'
+	    # to correctly handle different types of line breaks
+	    f = open(fp,'U')
+	    seq_id = None
+	    seq = []
+	    for line in f:
+	        line = line.strip()
+	        if line.startswith('>'):
+	            if len(seq) != 0:
+	                # we've completed a fasta record
+	                yield seq_id, ''.join(seq)
+	            seq_id = line[1:]
+	            seq = []
+	        else:
+	            seq.append(line)
+	    yield seq_id, ''.join(seq)
+
+	def append_datum_to_file(result_key, data, option_value=None):
+	    """Append summary information to a file.
+	    """
+	    # don't do anything if data is None
+	    if data is None:
+	        return
+    
+	    # If option_value is None when this output handler is called, 
+	    # the interface developer did something wrong when defining
+	    # the OptparseResults. Politely alert the developer that
+	    # this output handler isn't associated with an option
+	    # (it needs to be associated with an output file path).
+	    if option_value is None:
+	        raise IncompetentDeveloperError(
+	         "Cannot write output without a filepath.")
+    
+	    # open the output file for appending, and write the 
+	    # summary information to a single tab-separated line
+	    with open(option_value, 'a') as f:
+	        f.write('%s\t%d\n' % (result_key, data))
+
+	usage_examples = [
+	    OptparseUsageExample(ShortDesc="Summarize the input sequence collection and write the result to file.",
+	                         LongDesc="Read the file specified by -i, and compute the number of sequences in the file, and the minimum and maximum sequence lengths. Write all of that information to path specified by -o.",
+	                         Ex="%prog -i seqs.fna -o seqs.summary.txt"),
+	    OptparseUsageExample(ShortDesc="Summarize the input sequence collection and write the result to file, excluding information on sequence lengths.",
+	                         LongDesc="Read the file specified by -i, compute the number of sequences in the file, and write that information to path specified by -o.",
+	                         Ex="%prog -i seqs.fna -o seqs.summary.txt --suppress-length-summary")
+	]
+
+	inputs = [
+
+	    OptparseOption(Parameter=param_lookup('seqs'),
+	                   InputType='existing_filepath',
+	                   InputAction='store',
+	                   InputHandler=parse_fasta,
+	                   ShortName='i'),
+                   
+	    OptparseOption(Parameter=param_lookup('suppress_length_summary'),
+	                   InputType=None,
+	                   InputAction='store_true',
+	                   InputHandler=None,
+	                   ShortName=None),
+
+	    OptparseOption(Parameter=None,
+	                   InputType='new_filepath',
+	                   InputAction='store',
+	                   ShortName='o',
+	                   Name='output-fp',
+	                   Required=True,
+	                   Help='path where output should be written')
+	]
+
+	outputs = [
+	    OptparseResult(ResultKey='num-seqs',
+	                   OutputHandler=append_datum_to_file,
+	                   OptionName='output-fp'), 
+	    OptparseResult(ResultKey='min-length',
+	                   OutputHandler=append_datum_to_file,
+	                   OptionName='output-fp'), 
+	    OptparseResult(ResultKey='max-length',
+	                   OutputHandler=append_datum_to_file,
+	                   OptionName='output-fp'), 
+
+	]
+
+Running our Command via its OptparseInterface
+---------------------------------------------
 
 To run this, there are a couple of additional things you need to do. First, you need to confirm that the directory where you've written these files is accessible via your ``PYTHONPATH``. For example, if you've been working in ``$HOME/code/pyqi_experiments/``, you should have ``$HOME/code/`` in your ``PYTHONPATH``. You can add that as follows::
 	
 	export PYTHONPATH=$HOME/code/:$PYTHONPATH
 
-Next, so you can import from that directory, it'll need to have an ``__init__.py`` file. That file can be empty, but does need to exist. You can do this as follows::
+Next, so you can import from that directory, it'll need to contain an ``__init__.py`` file. That file can be empty, but it does need to exist. You can do this as follows::
 	
 	touch $HOME/code/pyqi_experiments/__init__.py
 
-Now you're ready to apply this interface. You should now be able to run the following::
+Now we're ready to run our ``Command`` via its ``OptparseInterface``. You can do this as follows::
 	
 	pyqi --command-config-module pyqi_experiments -- summarize_sequence_collection -h
 
-This will print the help text associated with the summarize_sequence_collection ``Command`` and ``Interface`` combination. You can now test your interface by applying it to some sequence collection as follows::
+This will print the help text associated with ``summarize_sequence_collection``. You can then test it by applying it to some sequence collection as follows::
 
 	pyqi --command-config-module pyqi_experiments -- summarize_sequence_collection -i seqs.fna -o seqs.summary.txt
 
-Calling your command via the pyqi driver itself, as we're doing here, is a little clunky. Creating a project-specific driver however is very simple (it's a two-line shell script) and covered in :ref:`defining-your-command-driver`.
+If ``seqs.fna`` contains the following::
+
+	>s1
+	ACCTTTAACC
+	>s2
+	CCGG
+	>s3
+	AAAAAAAAAAAAAAAAAAAAAAAAAAA
+
+The resulting ``seqs.summary.txt`` should contain the following lines::
+
+	num-seqs	3
+	min-length	4
+	max-length	27
+
+Calling your command via the pyqi driver itself, as we're doing here, is a little clunky. Creating a project-specific driver however is very simple (it's a two-line shell script) and is covered in :ref:`defining-your-command-driver`.
 
 Thoughts and guidelines on designing command line interfaces
 ------------------------------------------------------------
