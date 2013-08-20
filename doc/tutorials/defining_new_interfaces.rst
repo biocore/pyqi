@@ -127,19 +127,52 @@ Defining usage examples
 
 The first thing to do when defining the optparse interface for our ``SequenceCollectionSummarizer`` command is define a set of usage examples. While this documentation step may seem like something you'd want to do last, it's really helpful to do first to get you thinking about how you'd like to interact with your command from the command line. 
 
-Usage examples are defined as instances of the ``pyqi.interface.optparse.UsageExample`` class, and are instantiated with three parameters: ``ShortDescription``, ``LongDescription``, and ``Ex``. ``Ex`` is the usage example itself; ``ShortDescription`` is a one sentence description of what ``Ex`` will do, and ``LongDescription`` elaborates on what ``Ex`` does. Find the ``usage_examples`` list in your new ``summarize_sequence_collection.py`` file, and replace its definition with::
+Usage examples are defined as instances of the ``pyqi.interface.optparse.UsageExample`` class, and are instantiated with three parameters: ``ShortDescription``, ``LongDescription``, and ``Ex``. ``Ex`` is the usage example itself, ``ShortDescription`` is a one sentence description of what ``Ex`` will do, and ``LongDescription`` elaborates on what ``Ex`` does. Find the ``usage_examples`` list in your new ``summarize_sequence_collection.py`` file, and replace its definition with::
 
 	usage_examples = [
 	    OptparseUsageExample(ShortDesc="Summarize the input sequence collection and write the result to file.",
-	                         LongDesc="Read the file at input_fp, and compute the number of sequences in the file, as well as the minimum and maximum sequence lengths. Write all of that information to output_fp.",
-	                         Ex="%prog --input_fp seqs.fna --output_fp seqs.summary.txt"),
+	                         LongDesc="Read the file specified by -i, and compute the number of sequences in the file, and the minimum and maximum sequence lengths. Write all of that information to path specified by -o.",
+	                         Ex="%prog -i seqs.fna -o seqs.summary.txt"),
 	    OptparseUsageExample(ShortDesc="Summarize the input sequence collection and write the result to file, excluding information on sequence lengths.",
-	                         LongDesc="Read the file at input_fp, and compute the number of sequences in the file. Write that information to output_fp.",
-	                         Ex="%prog --input_fp seqs.fna --output_fp seqs.summary.txt --suppress-length-summary")
+	                         LongDesc="Read the file specified by -i, compute the number of sequences in the file, and write that information to path specified by -o.",
+	                         Ex="%prog -i seqs.fna -o seqs.summary.txt --suppress-length-summary")
 	]
 
 Here we define two usage examples, each of which gives us an idea about how we want our script to behave: we want it to take an ``input_fp``, an ``output_fp``, and an optional parameter called ``suppress-length-summary``. 
 
- .. warning:: Don't ever include the name of the script when defining ``UsageExample.Ex``, but instead include the text ``%prog``. This will be automatically replaced with the script name, so if you ever change the name of the script in the future, the change will take affect in all of your usage examples.
+ .. warning:: You shouldn't ever include the name of the script when defining ``UsageExample.Ex``, but instead include the text ``%prog``. This will be automatically replaced with the script name, so if you ever change the name of the script in the future, the change will take affect in all of your usage examples.
+
+Defining inputs
+---------------
+
+Next we'll define the list of ``inputs`` that should be associated with our interface. Each of these inputs will be an instance of a ``pyqi.core.interface.optparse.OptparseOption`` object. These will roughly map on to the ``Parameters`` that we defined for ``SequenceCollectionSummarizer``, but there are usually additional interface options as we'll see here. 
+
+For the ``OptparseOptions`` that map onto ``Parameters`` directly, you can look up the corresponding ``Parameter`` in the ``param_lookup`` dictionary (which is created for you), and most of the information in the ``OptparseOption`` will be auto-populated for you. Additionally, ``pyqi make_optparse`` will fill in as much information as possible for each ``OptparseOption`` that corresponds to an existing ``Parameter``. In our example, you'll notice that there are two ``OptparseOptions`` that are already defined. There are a few values that may need to be changed here. In almost all cases, you'll need to change the ``InputType``, which is set to the ``Parameter`` type by default, but should be updated to the ``optparse`` type. You can find discussion of these types in the :ref:`optparse type definitions <optparse-types>` section. Note that the ``InputType`` should be ``None`` for command line flags, as the type is described the value that is passed via that option, and command line flags don't take an option. The other value that often will need to be changed is ``InputHandler``, which tells ``OptparseInterface`` how to transform the ``OptparseOption`` into the corresponding ``Parameter``. In our case, for our ``seqs`` ``OptparseOption``, that involves converting a file path into a list of tuples of (sequence id, sequence) pairs. First let's define the ``OptparseOptions``, and then we'll define a new ``InputHandler``.
+
+The ``OptparseOptions`` corresponding to the existing ``Parameters`` should look like this:
+
+	inputs = [
+
+	    OptparseOption(Parameter=param_lookup('seqs'),
+	                   InputType='existing_filepath',
+	                   InputAction='store',
+	                   InputHandler=parse_fasta,
+	                   ShortName='i'),
+                   
+	    OptparseOption(Parameter=param_lookup('suppress_length_summary'),
+	                   InputType=None,
+	                   InputAction='store_true',
+	                   InputHandler=None,
+	                   ShortName=None),
+	]
+
+These definitions are exactly as generated by ``make_optparse``, except that many of the comments have been removed, and we've modified the ``InputTypes`` and the ``InputHandler`` for our ``seqs`` option. We'll next define this new ``parse_fasta`` input handler that we've set ``InputHandler`` to. 
+
+Defining input handlers
+-----------------------
+
+Input handlers tell the interface how 
+
+
 
 
