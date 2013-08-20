@@ -144,9 +144,9 @@ class OptparseInterface(Interface):
         # Instantiate the command line parser object
         parser = OptionParser(usage=usage, version=version)
 
-        # If no arguments were provided, print the help string (unless the
-        # caller specified not to).
-        if self.HelpOnNoArguments and len(in_) == 0:
+        # If the command has required options and no input arguments were
+        # provided, print the help string.
+        if len(required_opts) > 0 and self.HelpOnNoArguments and len(in_) == 0:
             parser.print_usage()
             return parser.exit(-1)
 

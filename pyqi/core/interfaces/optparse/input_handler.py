@@ -42,3 +42,16 @@ def file_reading_handler(option_value=None):
     if option_value is not None:
         result = open(option_value, 'U')
     return result
+
+def load_file_lines(option_value):
+    """Return a list of strings, one per line in the file.
+
+    Each line will have leading and trailing whitespace stripped from it.
+    """
+    with open(option_value, 'U') as f:
+        return [line.strip() for line in f]
+
+def load_file_contents(option_value):
+    """Return the contents of a file as a single string."""
+    with open(option_value, 'U') as f:
+        return f.read()
