@@ -270,6 +270,11 @@ This will print the help text associated with the summarize_sequence_collection 
 
 	pyqi summarize_sequence_collection -i seqs.fna -o seqs.summary.txt
 
-.. warning:: THIS CODE CURRENTLY DOES NOT WORK! DANIEL IS LOOKING INTO WHAT IT WOULD TAKE TO BE ABLE TO RUN INTERFACES THIS WAY. 
+.. warning:: THIS CODE CURRENTLY DOES NOT WORK! DANIEL IS LOOKING INTO WHAT IT WOULD TAKE TO BE ABLE TO RUN INTERFACES THIS WAY.
+
+Thoughts and guidelines on designing command line interfaces
+------------------------------------------------------------
+
+Based on our experiences developing command line interfaces for `QIIME <http://www.qiime.org>`_, we've compiled some thoughts on best practices, which you can find in :ref:`optparse-guidelines`. 
 
 

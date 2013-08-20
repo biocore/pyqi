@@ -1,7 +1,9 @@
+.. _optparse-guidelines:
+
 Guidelines for creating pyqi-based OptParse interfaces
 ==========================================================
 
-This document covers some general suggestions for OptParse interfaces interfaces with pyqi. These ideas have evolved from our experiences with `QIIME <http://www.qiime.org>`_, but ideally this document will evolve with time so if you have suggestions for things that should be included please consider submitting them as a `pull request <https://help.github.com/articles/using-pull-requests>`_.  
+This document covers some general suggestions for ``OptparseInterfaces`` with pyqi. These ideas have evolved from our experiences with `QIIME <http://www.qiime.org>`_. Ideally this document will continue evolve with time, so if you have suggestions for things that should be included please consider submitting them as a `pull request <https://help.github.com/articles/using-pull-requests>`_.  
 
 **Design convenient command line interfaces.** The goal of your interface is to make things easy for the user (who is often you). This section covers some guidelines for how to do that.
 
