@@ -14,7 +14,7 @@ Getting started: defining new commands and interfaces using pyqi
 
 This section of the documentation covers how to define a new ``Command``, its API, and its command line interface. You should work through these documents in order.
 
-As an example, we'll define a new Command that provides a summary of a collection of biological sequences. We should be able to pass the sequences to the Command as a list of tuples, and the result from the command should contain the number of input sequences, the minimum sequence length, and the maximum sequence length. We'll use this example through-out this section of the tutorial.
+As an example, we'll define a new ``Command`` that provides a summary of a collection of biological sequences. We'll be able to pass the sequences to the ``Command`` as a list of tuples, and the result from the command will the number of sequences in the collection, the minimum sequence length, and the maximum sequence length. We'll then wrap that ``Command`` in an ``OptparseInterface``, which will allow users to access it from the command line providing a fasta file as input and having a summary written to file as output.
 
 .. toctree::
    :maxdepth: 2
@@ -40,4 +40,4 @@ After you've experimented with defining a toy pyqi ``Command``, its API, and an 
 Advanced topics
 ---------------
 
-As the project continues to come together we'll include tutorials covering topics such as how to define new interface types. However, given the early state that we're currently in, these would be likely to change a lot, so we recommend that if you are interested in developing new interface types now, that you get in touch (you can e-mail gregcaporaso@gmail.com for now) to discuss what you'd like to do, and possibly get involved with development of pyqi if our goals align. 
+As pyqi continues to come together we'll include tutorials covering topics such as how to define new interface types. However, given the early state of development that we're currently in, these would be likely to change a lot, so we recommend that if you are interested in developing new interface types now, that you get in touch (you can e-mail gregcaporaso@gmail.com for now) to discuss what you'd like to do, and possibly get involved with development of pyqi if our goals align. 
