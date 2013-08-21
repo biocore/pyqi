@@ -7,6 +7,11 @@
 pyqi tutorials
 ==================
 
+Installing pyqi
+---------------
+
+Before working through the tutorials below you'll need to have a working installation of pyqi (it's really easy to install). See our :ref:`install instructions <install-index>` before you get started.
+
 .. _getting-started:
 
 Getting started: defining new commands and interfaces using pyqi

@@ -6,6 +6,8 @@ What is pyqi?
 
 pyqi (canonically pronounced *pie chee*) is a Python framework designed to support wrapping general *commands* in multiple types of *interfaces*, including at the command line, HTML, and API levels. 
 
+pyqi's only requirement is a working Python 2.7 installation.
+
 Why should I care?
 ------------------
 
@@ -15,12 +17,11 @@ After defining and testing your command, you can **configure different types of 
 
 pyqi is currently in the early stages of development, and there is a lot to be done. We're very interested in having beta users, and we fully embrace collaborative development, so if you're interested in using or developing pyqi, you should get in touch.
 
-pyqi's only requirement is a working Python 2.7 installation.
 
 How do I start using pyqi?
 --------------------------
 
-Our tutorials are designed to help you evaluate the utility of pyqi, and then integrate pyqi into your project. 
+First, install pyqi (it's easy) by following our :ref:`install instructions <install-index>`. Then, you can start working through our tutorials, which are designed to help you evaluate the utility of pyqi, and then integrate pyqi into your project.
 
 The :ref:`Getting Started <getting-started>` series of tutorials progress linearly through :ref:`how to stub and build new commands <defining-new-commands>` and :ref:`how to stub and build new interfaces <defining-new-interfaces>`. These will give you an idea of what pyqi is capable of and how it works. 
 
@@ -38,10 +39,8 @@ For now, please direct questions to gregcaporaso@gmail.com. Please report bugs a
 Can I help develop pyqi?
 ------------------------
 
-Yes! pyqi is open source software, available under the BSD license.
+Yes! pyqi is open source software, available under the BSD license. All source code is hosted in the `pyqi GitHub repository <https://github.com/bipy/pyqi/>`_.
 
 Development is primarily occurring in the `Caporaso Lab <http://www.caporaso.us>`_ (Northern Arizona University; Argonne National Laboratories) and `Knight Lab <https://knightlab.colorado.edu/>`_  (University of Colorado; Howard Hughes Medical Institute), but the goal is for pyqi to be a very open development effort. We accept code submissions as `pull requests <https://help.github.com/articles/using-pull-requests>`_.
-
-All source code is hosted in the `pyqi GitHub repository <https://github.com/bipy/pyqi/>`_.
 
 

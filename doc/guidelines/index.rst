@@ -1,4 +1,4 @@
-.. _guidelines_index:
+.. _guidelines-index:
 
 pyqi coding guidelines
 ======================
