@@ -33,7 +33,7 @@ class Parameter(object):
     """
 
     def __init__(self, Name, DataType, Description, Required=False,
-                 Default=None, DefaultDescription=None):
+                 Default=None, DefaultDescription=None, ValidateValue=None):
         """
         
         ``Name`` should be a valid Python name so that users can supply either
@@ -41,6 +41,9 @@ class Parameter(object):
 
         ``DataType`` specifies the type that the input must be. The input
         should be an instance of type ``DataType``.
+
+        ``ValidateValue`` can be set as a function that will validate the 
+        value associated with a ``Parameter``.
         """
         if not self._is_valid_name(Name):
             raise IncompetentDeveloperError("Parameter '%s' is not a valid "
@@ -60,6 +63,7 @@ class Parameter(object):
         self.Required = Required
         self.Default = Default
         self.DefaultDescription = DefaultDescription
+        self.ValidateValue = ValidateValue
 
     def _is_valid_name(self, name):
         return name == self._pythonize(name)
@@ -151,12 +155,17 @@ class Command(object):
                 self._logger.fatal('Missing required parameter %s in %s' % (p.Name, self_str))
                 raise MissingParameterError("Missing required parameter %s in %s" % (p.Name, self_str))
 
+            if p.Name in kwargs and p.ValidateValue:
+                if not p.ValidateValue(kwargs[p.Name]):
+                    self._logger.fatal("Parameter %s cannot take value %s in %s" % (p.Name, kwargs[p.Name], self_str))
+                    raise ValueError("Parameter %s cannot take value %s in %s" % (p.Name, kwargs[p.Name], self_str))
+
         # make sure we only have things we expect
         for opt in kwargs:
             if opt not in self.Parameters:
                 self._logger.fatal('Unknown parameter %s in %s' % (opt, self_str))
                 raise UnknownParameterError("Unknown parameter %s in %s" % (opt, self_str))
-                
+        
     def _set_defaults(self, kwargs):
         """Set defaults for optional parameters"""
         for p in self.Parameters.values():
