@@ -3,9 +3,12 @@
 Defining your command driver
 ============================
 
-It's possible to run your ``Commands`` using the ``pyqi`` command, as illustrated in :ref:`running-our-command`, but that mechanism is clunky and not how you'd want your users to interact with your project. To handle this more gracefully, you can create a shell script that can be distributed with your package and used as the primary driver for all ``OptparseInterfaces``. 
+It's possible to run your ``OptparseInterfaces`` using the ``pyqi`` command, as illustrated in :ref:`running-our-command`, but that mechanism is clunky and not how you'd want your users to interact with your software. To handle this more gracefully, you can create a shell script that can be distributed with your package and used as the primary driver for all ``OptparseInterfaces``. 
 
-To do this, create a new file named as you'd like your users to access your code. For example, the driver for the ``biom-format`` package is called ``biom``, and the driver for the ``pyqi`` package is called ``pyqi``. In this example our driver name will be ``my-project``. Add the following to that file, replacing ``my-project`` with your driver name::
+Creating the driver shell script
+--------------------------------
+
+To define a driver command for your project, create a new file named as you'd like your users to access your code. For example, the driver for the ``biom-format`` package is called ``biom``, and the driver for the ``pyqi`` package is called ``pyqi``. In this example our driver name will be ``my-project``. Add the following two lines to that file, replacing ``my-project`` with your driver name::
 
 	#!/bin/sh
 	exec pyqi --driver-name my-project --command-config-module my-project.interfaces.optparse.config -- "$@"
@@ -20,6 +23,13 @@ You should now be able to run::
 	
 	my-project -h
 
-To see a list of the commands that are available via the driver script, which will be all of the ``Commands`` for which you've defined ``OptparseInterfaces``. If one of these commands is called ``my-command``, you can now run it as follows to get the help text associated with that command::
+This will print a list of the commands that are available via the driver script, which will be all of the ``Commands`` for which you've defined ``OptparseInterfaces``. If one of these commands is called ``my-command``, you can now run it as follows to get the help text associated with that command::
 	
 	my-project my-command -h
+
+Configuring bash completion
+---------------------------
+
+You can additionally enable tab-completion of command names and options. 
+
+**NEED TO FILL THIS SECTION IN**
