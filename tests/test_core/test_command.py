@@ -29,7 +29,9 @@ class CommandTests(TestCase):
         class stubby(Command):
             Parameters = ParameterCollection([
                             Parameter('a',int,'', Required=True),
-                            Parameter('b',int,'', Required=False, Default=5)])
+                            Parameter('b',int,'', Required=False, Default=5),
+                            Parameter('c',int,'', Required=False, Default=10,
+                                      ValidateValue=lambda x: x == 10)])
             def run(self, **kwargs):
                 return {}
         self.stubby = stubby
@@ -65,11 +67,16 @@ class CommandTests(TestCase):
 
         kwargs = {'b':20}
         self.assertRaises(MissingParameterError, stub._validate_kwargs, kwargs)
+        
+        kwargs = {'a':10, 'b':20, 'c':10}
+        stub._validate_kwargs(kwargs)
+        kwargs = {'a':10, 'b':20, 'c':20}
+        self.assertRaises(ValueError, stub._validate_kwargs, kwargs)
 
     def test_set_defaults(self):
         stub = self.stubby()
         kwargs = {'a':10}
-        exp = {'a':10,'b':5}
+        exp = {'a':10,'b':5,'c':10}
         
         stub._set_defaults(kwargs)
 
