@@ -138,7 +138,7 @@ Usage examples are defined as instances of the ``pyqi.interface.optparse.UsageEx
 
 Here we define two usage examples, each of which gives us an idea about how we want our script to behave: we want it to take an ``i`` parameter (where the user passes their input file name), an ``o`` parameter (where the user passes their output file name), and an optional parameter called ``suppress-length-summary`` which controls some of the script behavior. 
 
- .. warning:: You shouldn't ever include the name of the script when defining ``UsageExample.Ex``, but instead include the text ``%prog``. This will be automatically replaced with the script name, so if you ever change the name of the script in the future, the change will take affect in all of your usage examples with you having to remember to update them.
+ .. warning:: You shouldn't ever include the name of the script when defining ``UsageExample.Ex``, but instead include the text ``%prog``. This will be automatically replaced with the script name, so if you ever change the name of the script in the future, the change will take effect in all of your usage examples without you having to remember to update them.
 
 Defining inputs
 ---------------
@@ -215,6 +215,7 @@ Input handlers tell the ``OptparseInterface`` class how to take input from the c
 	        else:
 	            seq.append(line)
 	    yield seq_id, ''.join(seq)
+	    f.close()
 
 This definition can go in the interface configuration file that we've been working on in this tutorial. Alternatively, if your input handler is generally useful for your project you can centralize it within your project (see :ref:`organizing-your-repository`), or if you think it's generally useful for pyqi users, you should consider submitting it to the pyqi project :ref:`contributing it to pyqi <contributing-to-pyqi>`.
 
