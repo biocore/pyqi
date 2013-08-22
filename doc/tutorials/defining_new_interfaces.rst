@@ -118,7 +118,7 @@ The resulting file will look something like this::
 	]
 
 
-There are three lists of values that we'll need to populate here to define the optparse interface for our ``SequenceCollectionSummarizer`` command. These are the ``inputs``, the ``outputs``, and the ``usage_examples``. We'll also need to define an input handler and an output handler to tell the ``OptparseInterface`` how to take input from the command line and turn it into something that ``SequenceCollectionSummarizer`` can use, and to take output from ``SequenceCollectionSummarizer`` and turn it into something a command line user will want. The following sections describe each of these steps.
+There are three lists of values that we'll need to populate here to define the optparse interface for our ``SequenceCollectionSummarizer`` command. These are the ``inputs``, the ``outputs``, and the ``usage_examples``. We'll also need to define an input handler and an output handler to tell the ``OptparseInterface`` how to take input from the command line and turn it into something that ``SequenceCollectionSummarizer`` can use, and to take output from ``SequenceCollectionSummarizer`` and turn it into something a command line user will want. ``make_optparse`` will auto-populate the ``inputs`` based on the ``Parameters``, but some changes will usually be required (detailed below). The following sections describe each of these steps.
 
 Defining usage examples
 -----------------------
