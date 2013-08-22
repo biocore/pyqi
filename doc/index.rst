@@ -11,7 +11,7 @@ pyqi's only requirement is a working Python 2.7 installation.
 Why should I care?
 ------------------
 
-pyqi allows you to write your command once, and easily make it accessible to different types of users through different types of interfaces. In the context of pyqi, a command is a class that knows how to perform some function, and an interface is a light wrapper around that command that makes it accessible to users.
+pyqi allows you to write your command once, and easily make it accessible to different types of users through different types of interfaces. In the context of pyqi, **a command is a class that takes some inputs, performs some function, and produces some outputs**. An interface is a light wrapper around that command that makes it accessible to users.
 
 After defining and testing your command, you can **configure different types of interfaces**. This enables, for example, basic users to access your command through an **HTML interface** running on a local server, power or cluster users to access your command through a **command line interface**, and developers to access your command through an **application programmer interface (API)**. Because pyqi's interfaces are light wrappers around your underlying command, **users of each of these interfaces will be guaranteed to be accessing the same underlying functionality**.
 
@@ -27,7 +27,7 @@ The :ref:`Getting Started <getting-started>` series of tutorials progress linear
 
 The :ref:`using-pyqi-in-your-project` series of tutorials will then give you an idea of how you could integrate pyqi into your project. This includes suggestions on :ref:`how to organize your project's repository to look like other repositories that make use of pyqi <organizing-your-repository>`, and :ref:`how to define a driver script <defining-your-command-driver>` (similar to the ``pyqi`` command which you'll become familiar with in the :ref:`Getting Started <getting-started>` tutorials) that will give your users access to the commands in your project. 
 
-As the pyqi project stabilizes, we'll include additional :ref:`documentation for advanced developers <advanced-topics>`, who are interested in things like defining new interface types (though this is not something that is ever required for most developers).
+As the pyqi project matures, we'll include additional :ref:`documentation for advanced developers <advanced-topics>`, who are interested in things like defining new interface types (though this is not something that is ever required for most developers).
 
 How do I get help with pyqi?
 ----------------------------
