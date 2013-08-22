@@ -5,7 +5,7 @@ Defining new interfaces
 
 After defining a new ``Command`` and its API, as covered in :ref:`defining-new-commands`, you're ready to create a first user interface for that command. In this tutorial we'll define a command line interface for the ``SequenceCollectionSummarizer`` command. 
 
-The main differences that need to be handled when defining a command line interface are that we'll want the user to provide their sequence collection on the command line, and we'll want to write the output to a file path that the user specifies on the command line. This is different than what happens in ``SequenceCollectionSummarizer``, where the input and output are python objects. This is a very important distinction - since our derived ``Commands`` are meant to be interface-independent, they should not do things like require files as input. In some rare circumstances, it may be required for a ``Command`` to write files as its output (for example, if storing the output in memory is intractable).
+The main differences that need to be handled when defining a command line interface are that we'll want the user to provide their sequence collection on the command line, and we'll want to write the output to a filepath that the user specifies on the command line. This is different than what happens in ``SequenceCollectionSummarizer``, where the input and output are python objects. This is a very important distinction - since our derived ``Commands`` are meant to be interface-independent, they should not do things like require files as input. In some rare circumstances, it may be required for a ``Command`` to write files as its output (for example, if storing the output in memory is intractable).
 
 pyqi currently provides support for building command line interfaces based on python's `optparse <http://docs.python.org/2/library/optparse.html>`_ module. Your interface will ultimately be an instance of ``pyqi.interfaces.optparse.OptparseInterface``, but the interface class itself is generated dynamically. As a developer, you only define the configuration for the interface via an *interface configuration file* (which is a valid python file) - you won't actually define the interface class itself. If this sounds confusing, just get started - it's easier than it sounds.
 
@@ -147,7 +147,7 @@ Next we'll define the list of ``inputs`` that should be associated with our ``Op
 
 For the ``OptparseOptions`` that map onto ``Parameters`` directly, you can look up the corresponding ``Parameter`` in the ``param_lookup`` dictionary (which is created for you by ``make_optparse``), and most of the information in the ``OptparseOption`` will be auto-populated for you. ``make_optparse`` will actually fill in as much information as possible for each ``OptparseOption`` that corresponds to an existing ``Parameter``. 
 
-In our example, you'll notice that there are two ``OptparseOptions`` that are already defined. There are a few values that may need to be changed here. In almost all cases, you'll need to change the ``InputType``, which is set to the ``Parameter``' ``DataType`` value by default, but should be updated to the ``optparse`` type. You can find discussion of these types in the :ref:`optparse type definitions <optparse-types>` section (**NEED TO WRITE THIS SECTION!!**). Note that the ``InputType`` should be ``None`` for command line flags, as the type describes the value that is passed via that option, and command line flags don't take a value. The other value that often will need to be changed is ``InputHandler``, which tells ``OptparseInterface`` how to transform the ``OptparseOption`` into the corresponding ``Parameter``. In our case, for our ``seqs`` ``OptparseOption``, that involves converting a file path into a list of tuples of (sequence id, sequence) pairs. First let's define the ``OptparseOptions``, and then we'll define a new ``InputHandler``.
+In our example, you'll notice that there are two ``OptparseOptions`` that are already defined. There are a few values that may need to be changed here. In almost all cases, you'll need to change the ``InputType``, which is set to the ``Parameter``' ``DataType`` value by default, but should be updated to the ``optparse`` type. You can find discussion of these types in the :ref:`optparse type definitions <optparse-types>` section (**NEED TO WRITE THIS SECTION!!**). Note that the ``InputType`` should be ``None`` for command line flags, as the type describes the value that is passed via that option, and command line flags don't take a value. The other value that often will need to be changed is ``InputHandler``, which tells ``OptparseInterface`` how to transform the ``OptparseOption`` into the corresponding ``Parameter``. In our case, for our ``seqs`` ``OptparseOption``, that involves converting a filepath into a list of tuples of (sequence id, sequence) pairs. First let's define the ``OptparseOptions``, and then we'll define a new ``InputHandler``.
 
 The ``OptparseOptions`` corresponding to the existing ``Parameters`` should look like this::
 
@@ -221,7 +221,7 @@ This definition can go in the interface configuration file that we've been worki
 Defining outputs
 ----------------
 
-The last thing we need to do is define which of the outputs generated by ``SequenceCollectionSummarizer`` are things we care about with this interface, and tell our ``OptparseInterface`` how to handle those. We do this by defining the ``outputs`` list of ``pyqi.core.interfaces.optparse.OptparseResult`` objects. In our case, we'll want to write all of the values that are not ``None`` to the file path specified by the user with ``output-fp``. To do that, we need to handle three possible outputs, so we'll define those outputs and write an output handler. You should start with the stubbed ``outputs`` list to define how you want to handle each of the parameters. We'll do this as follows::
+The last thing we need to do is define which of the outputs generated by ``SequenceCollectionSummarizer`` are things we care about with this interface, and tell our ``OptparseInterface`` how to handle those. We do this by defining the ``outputs`` list of ``pyqi.core.interfaces.optparse.OptparseResult`` objects. In our case, we'll want to write all of the values that are not ``None`` to the filepath specified by the user with ``output-fp``. To do that, we need to handle three possible outputs, so we'll define those outputs and write an output handler. You should start with the stubbed ``outputs`` list to define how you want to handle each of the parameters. We'll do this as follows::
 
 	outputs = [
 	    OptparseResult(ResultKey='num-seqs',
@@ -254,7 +254,7 @@ Each of these ``OptparseResult`` objects uses the same ``OutputHandler``, which 
 	    # the interface developer did something wrong when defining
 	    # the OptparseResults. Politely alert the developer that
 	    # this output handler isn't associated with an option
-	    # (it needs to be associated with an output file path).
+	    # (it needs to be associated with an output filepath).
 	    if option_value is None:
 	        raise IncompetentDeveloperError(
 	         "Cannot write output without a filepath.")
@@ -318,7 +318,7 @@ At this stage we've fully configured our interface. The final interface configur
 	    # the interface developer did something wrong when defining
 	    # the OptparseResults. Politely alert the developer that
 	    # this output handler isn't associated with an option
-	    # (it needs to be associated with an output file path).
+	    # (it needs to be associated with an output filepath).
 	    if option_value is None:
 	        raise IncompetentDeveloperError(
 	         "Cannot write output without a filepath.")
