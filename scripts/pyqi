@@ -18,6 +18,7 @@ __maintainer__ = "Daniel McDonald"
 __email__ = "mcdonadt@colorado.edu"
 
 import importlib
+import textwrap
 from sys import argv, exit, stderr
 from pyqi.core.interface import get_command_names
 from pyqi.core.interfaces.optparse import optparse_main, optparse_factory
@@ -26,12 +27,12 @@ from string import ljust
 
 ### we actually have some flexibility here to make the driver interface agnostic as well
 
+TERM_WIDTH = 80
+INDENT = 3
+
 def usage(cmd_cfg_mod, command_names):
     """Modeled after git..."""
     # limit to a reasonable number of characters
-    term_width = 80
-    indent = 3
-
     valid_cmds = []
     invalid_cmds = []
     for c in command_names:
@@ -45,8 +46,8 @@ def usage(cmd_cfg_mod, command_names):
 
     # determine widths
     max_cmd = max(map(lambda x: len(x[0]), valid_cmds + invalid_cmds))
-    desc_limit = term_width - (indent + max_cmd + indent)
-    cmd_end = indent + max_cmd + indent
+    desc_limit = TERM_WIDTH - (INDENT + max_cmd + INDENT)
+    cmd_end = INDENT + max_cmd + INDENT
 
     print "usage: %s <command> [<args>]" % argv[0]
     print
@@ -55,7 +56,7 @@ def usage(cmd_cfg_mod, command_names):
     # format:
     # indent command indent description
     for c, desc in valid_cmds:
-        cmd_formatted = ljust(''.join([' ' * indent, c]), cmd_end)
+        cmd_formatted = ljust(''.join([' ' * INDENT, c]), cmd_end)
         print ''.join([cmd_formatted, desc[:desc_limit]])
 
     if invalid_cmds:
@@ -63,7 +64,7 @@ def usage(cmd_cfg_mod, command_names):
         print "The following commands could not be loaded:"
 
         for c, error_msg in invalid_cmds:
-            cmd_formatted = ljust(''.join([' ' * indent, c]), cmd_end)
+            cmd_formatted = ljust(''.join([' ' * INDENT, c]), cmd_end)
             print ''.join([cmd_formatted, 'Error: %s' % error_msg])
 
     print
@@ -100,6 +101,18 @@ def help_(cmd_cfg_mod, cmd):
     cmd_obj = get_cmd_obj(cmd_cfg_mod, cmd)
     optparse_main(cmd_obj, ['help', '-h'])
 
+def assert_command_exists(command_name, command_names, driver_name):
+    if command_name not in command_names:
+        error_msg = '\n'.join(textwrap.wrap("Unrecognized command %s. Please "
+                                            "make sure that you didn't make a "
+                                            "typo in the command name." %
+                                            command_name, TERM_WIDTH))
+        error_msg += '\n\n'
+        error_msg += '\n'.join(textwrap.wrap("To see a list of all available "
+                                             "commands, run the following "
+                                             "command:", TERM_WIDTH))
+        stderr.write("%s\n\n%s%s\n\n" % (error_msg, ' ' * INDENT, driver_name))
+        exit(1)
 
 if __name__ == '__main__':
     driver_name = 'pyqi'
@@ -158,6 +171,7 @@ if __name__ == '__main__':
                 usage(cmd_cfg_mod, command_names)
 
             help_cmd = argv[2]
+            assert_command_exists(help_cmd, command_names, driver_name)
 
             # tears. 
             # .
@@ -166,6 +180,8 @@ if __name__ == '__main__':
             argv[0] = ' '.join([driver_name, help_cmd])
             help_(cmd_cfg_mod, help_cmd)
         else:
+            assert_command_exists(cmd_name, command_names, driver_name)
+
             # see the note about crying about tears.
             argv[0] = ' '.join([driver_name, cmd_name])
             cmd_obj = get_cmd_obj(cmd_cfg_mod, cmd_name)
