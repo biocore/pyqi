@@ -105,7 +105,7 @@ Next, we'll need to define what our ``Command`` will actually do. This is done i
 
 In practice, if your ``Command`` is more complex than our ``SequenceCollectionSummarizer`` (which it probably is), you can define other methods that are called by ``run``. These should likely be private methods.
 
-.. note:: ``kwargs`` is validated prior to ``run`` being called, so that any required kwargs that are missing will raise an error, and any optional kwargs that are missing will have their default values filled in. To customize the validation that is performed on ``kwargs`` for your ``Command`` you should override ``_validate_kwargs`` in your ``Command``.
+.. note:: ``kwargs`` is validated prior to ``run`` being called, so that any required ``kwargs`` that are missing will raise an error, and any optional ``kwargs`` that are missing will have their default values filled in. To customize the validation that is performed on ``kwargs`` for your ``Command`` you should override ``_validate_kwargs`` in your ``Command``.
 
 A complete example Command
 --------------------------
