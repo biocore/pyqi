@@ -1,6 +1,6 @@
 .. _optparse-guidelines:
 
-Guidelines for creating pyqi-based OptParse interfaces
+Guidelines for creating pyqi-based optparse interfaces
 ==========================================================
 
 This document covers some general suggestions for ``OptparseInterfaces`` with pyqi. These ideas have evolved from our experiences with `QIIME <http://www.qiime.org>`_. Ideally this document will continue to evolve with time, so if you have suggestions for things that should be included please consider submitting them as a `pull request <https://help.github.com/articles/using-pull-requests>`_.  
