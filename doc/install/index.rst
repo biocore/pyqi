@@ -11,3 +11,20 @@ pyqi has no dependencies outside of Python, so installing is easy.
  * To use the latest development version of pyqi you can download it from our `GitHub repository <https://github.com/bipy/pyqi>`_ using ``git clone git@github.com:bipy/pyqi.git``. After downloading, change to the new ``pyqi`` directory.
 
 * Next, run ``python setup.py install``. That's it!
+
+Finally, you can optionally enable bash completion for pyqi scripts, meaning that when you start typing the name of a command or an option, you can hit the tab key to complete it without typing the full name, if the name is unique. There are two steps in enabling tab completion. First, you'll need to generate the tab completion file, and then you'll need to edit your ``$HOME/.bash_profile`` file. 
+
+To create the tab completion file for ``pyqi``, run the following commands after following the above installation steps::
+
+	mkdir ~/.bash_completion.d
+	pyqi make_bash_completion --command-config-module pyqi.interfaces.optparse.config --driver-name pyqi -o ~/.bash_completion.d/pyqi
+
+Then, add the following lines to your ``$HOME/.bash_profile`` file::
+
+	# enable bash completion for pyqi-based scripts
+	for f in ~/.bash_completion.d/*;
+	do
+	   source $f;
+	done
+
+When you open a new terminal, tab completion should work for the ``pyqi`` commands and their options. You can test this by typing ``pyqi make_c`` and then hitting the tab key (there should be no space after ``pyqi make_c``).
