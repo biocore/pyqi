@@ -36,6 +36,19 @@ The command names that you pass to the driver (``my_command``, in this example) 
 Configuring bash completion
 ---------------------------
 
-You can additionally enable tab-completion of command names and options. 
+One very useful feature for your driver script is to enable tab-completion of commands and command line options (meaning that when a user starts typing the name of a command or an option, they can hit the tab key to complete it without typing the full name, if the name is unique). pyqi facilitates this with the ``pyqi make_bash_completion`` command. There are two steps in enabling tab completion. First, you'll need to generate the tab completion file, and then you'll need to edit your ``$HOME/.bash_profile`` file. 
 
-**NEED TO FILL THIS SECTION IN**
+To create the tab completion file for ``my_project``, run the following commands (again, this is assuming that your ``OptparseInterface`` config files are located as described in :ref:`organizing-your-repository`)::
+
+	mkdir ~/.bash_completion.d
+	pyqi make_bash_completion --command-config-module my_project.interfaces.optparse.config --driver-name my_project -o ~/.bash_completion.d/my_project
+
+Then, add the following lines to your ``$HOME/.bash_profile`` file::
+
+	# enable bash completion for pyqi-based scripts
+	for f in ~/.bash_completion.d/*;
+	do
+	   source $f;
+	done
+
+When you open a new terminal, tab completion should work for the ``my_project`` commands and their options.
