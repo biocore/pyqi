@@ -20,9 +20,7 @@ __email__ = "mcdonadt@colorado.edu"
 from pyqi.core.command import Command, Parameter, ParameterCollection
 
 header = """#!/usr/bin/env python
-
 from __future__ import division
-from pyqi.core.command import Command, Parameter, ParameterCollection
 
 __author__ = "%(author)s"
 __copyright__ = "%(copyright)s"
@@ -34,8 +32,7 @@ __email__ = "%(email)s"
 
 """
 
-command_imports = """from __future__ import division
-from pyqi.core.command import Command, Parameter
+command_imports = """from pyqi.core.command import Command, Parameter, ParameterCollection
 """
 
 command_format = """class %s(Command):
@@ -55,8 +52,7 @@ command_format = """class %s(Command):
         #         'result_2': "Some output bits"}
         raise NotImplementedError("You must define this method")
 
-CommandConstructor = %s
-"""
+CommandConstructor = %s"""
 
 test_fmt = """from unittest import TestCase, main
 from FILL IN MODULE PATH import %(name)s
@@ -69,8 +65,7 @@ class %(name)sTests(TestCase):
         self.fail()
 
 if __name__ == '__main__':
-    main()
-"""
+    main()"""
 
 class MakeCommand(Command):
     BriefDescription = "Construct a stubbed out Command object"
@@ -119,6 +114,7 @@ class MakeCommand(Command):
             result_lines.append(test_fmt % {'name':kwargs['name']})
         else:
             result_lines.append(command_imports)
+            result_lines.append('\n')
             result_lines.append(command_format % (kwargs['name'], kwargs['name']))
 
         output = {}
