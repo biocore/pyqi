@@ -9,6 +9,7 @@
 #-----------------------------------------------------------------------------
 
 from __future__ import division
+from operator import attrgetter
 from pyqi.core.command import Command, Parameter, ParameterCollection
 
 __author__ = "Daniel McDonald"
@@ -97,7 +98,7 @@ outputs = [
 # Fill out by Parameter, and comment out some of the most common stuff.
 input_fmt = """    OptparseOption(Parameter=param_lookup('%(name)s'),
                    InputType=%(datatype)s,
-                   InputAction='store', # default is 'store', change if desired
+                   InputAction='%(action)s', # default is 'store', change if desired
                    InputHandler=None, # must be defined if desired
                    ShortName=None), # must be defined if desired
                    # Name='%(name)s', # implied by Parameter
@@ -124,7 +125,8 @@ class MakeOptparse(Command):
         param_formatted = []
 
         # construct inputs based off of parameters
-        for param in kwargs['command'].Parameters.values():
+        for param in sorted(kwargs['command'].Parameters.values(),
+                            key=attrgetter('Name')):
             if param.Required:
                 default_block = ''
             else:
@@ -134,7 +136,14 @@ class MakeOptparse(Command):
                 }
                 default_block = default_block_fmt % default_fmt
 
-            fmt = {'name':param.Name, 'datatype':param.DataType,
+            if param.DataType is bool:
+                action = 'store_true'
+                data_type = None
+            else:
+                action = 'store'
+                data_type = param.DataType
+
+            fmt = {'name':param.Name, 'datatype':data_type, 'action':action,
                    'required':str(param.Required),
                    'help':param.Description, 'default_block':default_block}
             param_formatted.append(input_fmt % fmt)

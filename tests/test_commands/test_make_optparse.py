@@ -33,12 +33,15 @@ class MakeOptparseTests(TestCase):
         exp = win_text
         
         pc = Parameter(Name='DUN', Required=True, DataType=str, Description="")
+        bool_param = Parameter(Name='imabool', DataType=bool,
+                               Description='zero or one', Required=False)
 
         class stubby:
-            Parameters = ParameterCollection([pc])
+            Parameters = ParameterCollection([pc, bool_param])
 
         obs = obj.run(**{'command_module':'foobar', 'command':stubby()})
         
+        print obs['result']
         self.assertEqual(obs['result'], exp) 
 
 win_text = """#!/usr/bin/env python
@@ -101,6 +104,17 @@ inputs = [
                    # Required=True, # implied by Parameter
                    # Help='', # implied by Parameter
                    
+    OptparseOption(Parameter=param_lookup('imabool'),
+                   InputType=None,
+                   InputAction='store_true', # default is 'store', change if desired
+                   InputHandler=None, # must be defined if desired
+                   ShortName=None), # must be defined if desired
+                   # Name='imabool', # implied by Parameter
+                   # Required=False, # implied by Parameter
+                   # Help='zero or one', # implied by Parameter
+                   # Default=None, # implied by Parameter
+                   # DefaultDescription=None, # implied by Parameter
+
 
 ]
 
