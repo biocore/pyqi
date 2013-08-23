@@ -51,4 +51,4 @@ Then, add the following lines to your ``$HOME/.bash_profile`` file::
 	   source $f;
 	done
 
-When you open a new terminal, tab completion should work for the my_project commands and their options.
+When you open a new terminal, tab completion should work for the ``my_project`` commands and their options.
