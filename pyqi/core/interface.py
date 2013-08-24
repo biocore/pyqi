@@ -18,6 +18,7 @@ __maintainer__ = "Greg Caporaso"
 __email__ = "gregcaporaso@gmail.com"
 
 import importlib
+from sys import exit, stderr
 from ConfigParser import SafeConfigParser
 from glob import glob
 from os.path import basename, dirname, expanduser, join
@@ -229,6 +230,47 @@ def get_command_names(config_base_name):
     config_base_dir = dirname(config_base_module.__file__)
 
     # from http://stackoverflow.com/questions/1057431/loading-all-modules-in-a-folder-in-python
-    return sorted([basename(f)[:-3]
-                   for f in glob(join(config_base_dir, '*.py'))
-                   if not basename(f).startswith('__init__')])
+    command_names = CommandList()
+    for f in glob(join(config_base_dir, '*.py')):
+        command_name = basename(f)
+
+        if not command_name.startswith('__init__'):
+            command_names.append(command_name[:-3])
+    command_names.sort()
+
+    return command_names
+
+def get_command_config(command_config_module, cmd, exit_on_failure=True):
+    """Get the configuration for a ``Command``"""
+    cmd_cfg = None
+    error_msg = None
+    python_cmd_name = cmd.replace('-', '_')
+
+    try:
+        cmd_cfg = importlib.import_module('.'.join([command_config_module,
+                                                    python_cmd_name]))
+    except ImportError, e:
+        error_msg = str(e)
+
+        if exit_on_failure:
+            stderr.write("Unable to import the command configuration for "
+                         "%s:\n" % cmd)
+            stderr.write(error_msg)
+            stderr.write('\n')
+            exit(1)
+
+    return cmd_cfg, error_msg
+
+class CommandList(list):
+    def __init__(self):
+        super(CommandList, self).__init__()
+
+    def append(self, item):
+        super(CommandList, self).append(self._convert_to_dashed_name(item))
+
+    def __contains__(self, item):
+        return super(CommandList,
+                     self).__contains__(self._convert_to_dashed_name(item))
+
+    def _convert_to_dashed_name(self, name):
+        return name.replace('_', '-')

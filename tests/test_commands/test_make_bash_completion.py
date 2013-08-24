@@ -11,10 +11,7 @@
 from __future__ import division
 from unittest import TestCase, main
 import pyqi
-from pyqi.commands.make_bash_completion import (BashCompletion,
-                                                _get_cfg_module, _load_cfg)
-from pyqi.interfaces.optparse.config.make_bash_completion import (inputs,
-                                                                  outputs)
+from pyqi.commands.make_bash_completion import BashCompletion, _get_cfg_module
 
 __author__ = "Daniel McDonald"
 __copyright__ = "Copyright 2013, The pyqi project"
@@ -28,12 +25,6 @@ class BashCompletionTests(TestCase):
     def test_get_cfg_module(self):
         self.assertEqual(_get_cfg_module('pyqi'), pyqi)
 
-    def test_load_cfg(self):
-        i, o = _load_cfg('pyqi.interfaces.optparse.config',
-                         'make_bash_completion')
-        self.assertEqual(i, inputs)
-        self.assertEqual(o, outputs)
-    
     def test_init(self):
         obj = BashCompletion()
 

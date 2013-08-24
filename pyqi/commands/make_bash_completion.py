@@ -20,19 +20,12 @@ __email__ = "mcdonadt@colorado.edu"
 
 import importlib
 from pyqi.core.command import Command, Parameter, ParameterCollection
-from pyqi.core.interface import get_command_names
+from pyqi.core.interface import get_command_names, get_command_config
 
 def _get_cfg_module(desc):
     """Load a module"""
     mod = importlib.import_module(desc)
     return mod
-
-def _load_cfg(mod, cmd):
-    """Load some variables from a module"""
-    foo = __import__(mod, fromlist=[cmd])
-    actual_cmd_mod = getattr(foo, cmd)
-    return (getattr(actual_cmd_mod, 'inputs'), 
-            getattr(actual_cmd_mod, 'outputs'))
 
 # Based on http://stackoverflow.com/questions/5302650/multi-level-bash-completion
 script_fmt = """_%(driver)s_complete()
@@ -87,16 +80,19 @@ class BashCompletion(Command):
 
         commands = []
         for cmd in command_names:
-            inputs, outputs = _load_cfg(cfg_mod_path, cmd)
+            cmd_cfg, _ = get_command_config(cfg_mod_path, cmd,
+                                            exit_on_failure=False)
 
-            command_options = []
-            command_options.extend(sorted(['--%s' % p.Name for p in inputs]))
-            opts = ' '.join(command_options)
+            if cmd_cfg is not None:
+                command_options = []
+                command_options.extend(
+                        sorted(['--%s' % p.Name for p in cmd_cfg.inputs]))
+                opts = ' '.join(command_options)
 
-            commands.append(command_fmt % {'command':cmd, 'options':opts})
+                commands.append(command_fmt % {'command':cmd, 'options':opts})
 
         all_commands = ''.join(commands)
-        return {'result':script_fmt % {'driver':driver, 
+        return {'result':script_fmt % {'driver':driver,
                                        'commands':all_commands,
                                        'command_list':command_list}}
 

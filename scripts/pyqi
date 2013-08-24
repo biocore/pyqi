@@ -20,7 +20,7 @@ __email__ = "mcdonadt@colorado.edu"
 import importlib
 import textwrap
 from sys import argv, exit, stderr
-from pyqi.core.interface import get_command_names
+from pyqi.core.interface import get_command_names, get_command_config
 from pyqi.core.interfaces.optparse import optparse_main, optparse_factory
 from os.path import basename
 from string import ljust 
@@ -36,7 +36,8 @@ def usage(cmd_cfg_mod, command_names):
     valid_cmds = []
     invalid_cmds = []
     for c in command_names:
-        cmd_cfg, error_msg = get_cmd_cfg(cmd_cfg_mod, c, exit_on_failure=False)
+        cmd_cfg, error_msg = get_command_config(cmd_cfg_mod, c,
+                                                exit_on_failure=False)
 
         if cmd_cfg is None:
             invalid_cmds.append((c, error_msg))
@@ -71,28 +72,9 @@ def usage(cmd_cfg_mod, command_names):
     print "See '%s help <command>' for more information on a specific command." % argv[0]
     exit(0)
 
-def get_cmd_cfg(cmd_cfg_mod, cmd, exit_on_failure=True):
-    """Get the configuration for a ``Command``"""
-    cmd_cfg = None
-    error_msg = None
-
-    try:
-        cmd_cfg = importlib.import_module('.'.join([cmd_cfg_mod, cmd]))
-    except ImportError, e:
-        error_msg = str(e)
-
-        if exit_on_failure:
-            stderr.write("Unable to import the command configuration for "
-                         "%s:\n" % cmd)
-            stderr.write(error_msg)
-            stderr.write('\n')
-            exit(1)
-
-    return cmd_cfg, error_msg
-
 def get_cmd_obj(cmd_cfg_mod, cmd):
     """Get a ``Command`` object"""
-    cmd_cfg, _ = get_cmd_cfg(cmd_cfg_mod, cmd)
+    cmd_cfg, _ = get_command_config(cmd_cfg_mod, cmd)
     return optparse_factory(cmd_cfg.CommandConstructor, cmd_cfg.usage_examples, 
                             cmd_cfg.inputs, cmd_cfg.outputs)
 
@@ -113,6 +95,7 @@ def assert_command_exists(command_name, command_names, driver_name):
                                              "command:", TERM_WIDTH))
         stderr.write("%s\n\n%s%s\n\n" % (error_msg, ' ' * INDENT, driver_name))
         exit(1)
+
 
 if __name__ == '__main__':
     driver_name = 'pyqi'
