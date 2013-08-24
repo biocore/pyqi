@@ -19,18 +19,34 @@ __maintainer__ = "Jai Ram Rideout"
 __email__ = "jai.rideout@gmail.com"
 
 from unittest import TestCase, main
-from pyqi.core.interface import get_command_names
+from pyqi.core.interface import get_command_names, get_command_config
+import pyqi.interfaces.optparse.config.make_bash_completion
 
 class TopLevelTests(TestCase):
     def test_get_command_names(self):
         """Test that command names are returned from a config directory."""
-        exp = ['make_bash_completion', 'make_command', 'make_optparse']
+        exp = ['make-bash-completion', 'make-command', 'make-optparse']
         obs = get_command_names('pyqi.interfaces.optparse.config')
         self.assertEqual(obs, exp)
 
         # Invalid config dir.
         with self.assertRaises(ImportError):
             _ = get_command_names('foo.bar.baz-aar')
+
+    def test_get_command_config(self):
+        """Test successful and unsuccessful module loading."""
+        cmd_cfg, error_msg = get_command_config(
+                'pyqi.interfaces.optparse.config', 'make_bash_completion')
+        self.assertEqual(cmd_cfg,
+                         pyqi.interfaces.optparse.config.make_bash_completion)
+        self.assertEqual(error_msg, None)
+
+        cmd_cfg, error_msg = get_command_config(
+                'hopefully.nonexistent.python.module', 'umm',
+                exit_on_failure=False)
+        self.assertEqual(cmd_cfg, None)
+        self.assertEqual(error_msg, 'No module named hopefully.nonexistent.'
+                                    'python.module.umm')
 
 
 if __name__ == '__main__':
