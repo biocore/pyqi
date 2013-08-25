@@ -41,7 +41,6 @@ class MakeOptparseTests(TestCase):
 
         obs = obj.run(**{'command_module':'foobar', 'command':stubby()})
         
-        print obs['result']
         self.assertEqual(obs['result'], exp) 
 
 win_text = """#!/usr/bin/env python
