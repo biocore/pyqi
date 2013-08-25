@@ -29,7 +29,6 @@ __license__ = "%(license)s"
 __version__ = "%(version)s"
 __maintainer__ = "%(author)s"
 __email__ = "%(email)s"
-
 """
 
 class CodeHeaderGenerator(Command):
