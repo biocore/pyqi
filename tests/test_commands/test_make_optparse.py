@@ -23,13 +23,9 @@ __email__ = "mcdonadt@colorado.edu"
 
 class MakeOptparseTests(TestCase):
     def setUp(self):
-        pass
-
-    def test_init(self):
-        obj = MakeOptparse()
+        self.cmd = MakeOptparse()
 
     def test_run(self):
-        obj = MakeOptparse()
         exp = win_text
         
         pc = Parameter(Name='DUN', Required=True, DataType=str, Description="")
@@ -39,11 +35,27 @@ class MakeOptparseTests(TestCase):
         class stubby:
             Parameters = ParameterCollection([pc, bool_param])
 
-        obs = obj.run(**{'command_module':'foobar', 'command':stubby()})
-        
-        self.assertEqual(obs['result'], exp) 
+        obs = self.cmd(**{'command_module':'foobar',
+                          'command':stubby(),
+                          'author': 'bob',
+                          'email': 'bob@bob.bob',
+                          'license': 'very permissive license',
+                          'copyright': 'what\'s that?',
+                          'version': '1.0'
+        })
+
+        self.assertEqual('\n'.join(obs['result']), exp)
 
 win_text = """#!/usr/bin/env python
+from __future__ import division
+
+__author__ = "bob"
+__copyright__ = "what's that?"
+__credits__ = ["bob"]
+__license__ = "very permissive license"
+__version__ = "1.0"
+__maintainer__ = "bob"
+__email__ = "bob@bob.bob"
 
 from pyqi.core.interfaces.optparse import (OptparseUsageExample,
                                            OptparseOption, OptparseResult)
@@ -134,8 +146,7 @@ outputs = [
     # An example option that does not map to a result key.
     # OptparseResult(ResultKey='some_other_result',
     #                OutputHandler=print_string)
-]
-"""
+]"""
 
 if __name__ == '__main__':
     main()
