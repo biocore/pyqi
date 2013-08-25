@@ -21,9 +21,7 @@ To create our sequence collection summarizer, we can start by stubbing a ``Seque
 If you run this command locally, substituting your own name and email address where applicable, you'll have a new file called ``sequence_collection_summarizer.py``, which will look roughly like the following::
 
 	#!/usr/bin/env python
-
 	from __future__ import division
-	from pyqi.core.command import Command, Parameter, ParameterCollection
 
 	__author__ = "Greg Caporaso"
 	__copyright__ = "Copyright 2013, Greg Caporaso"
@@ -33,8 +31,7 @@ If you run this command locally, substituting your own name and email address wh
 	__maintainer__ = "Greg Caporaso"
 	__email__ = "gregcaporaso@gmail.com"
 
-	from __future__ import division
-	from pyqi.core.command import Command, Parameter
+	from pyqi.core.command import Command, Parameter, ParameterCollection
 
 	class SequenceCollectionSummarizer(Command):
 	    BriefDescription = "FILL IN A 1 SENTENCE DESCRIPTION"
@@ -113,9 +110,7 @@ A complete example Command
 The following illustrates a complete python file defining a new pyqi ``Command``::
 
 	#!/usr/bin/env python
-
 	from __future__ import division
-	from pyqi.core.command import Command, Parameter, ParameterCollection
 
 	__author__ = "Greg Caporaso"
 	__copyright__ = "Copyright 2013, Greg Caporaso"
@@ -124,6 +119,8 @@ The following illustrates a complete python file defining a new pyqi ``Command``
 	__version__ = "0.0.1"
 	__maintainer__ = "Greg Caporaso"
 	__email__ = "gregcaporaso@gmail.com"
+
+	from pyqi.core.command import Command, Parameter, ParameterCollection
 
 	class SequenceCollectionSummarizer(Command):
 	    BriefDescription = "Generate summary statistics on a collection of sequences."

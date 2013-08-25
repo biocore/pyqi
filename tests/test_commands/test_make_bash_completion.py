@@ -105,7 +105,7 @@ outputandstuff = """_pyqi_complete()
         COMPREPLY=( $(compgen -W "--command-config-module --driver-name --output-fp" -- $cur) )
         ;;
        "make-optparse")
-        COMPREPLY=( $(compgen -W "--command --command-module --output-fp" -- $cur) )
+        COMPREPLY=( $(compgen -W "--author --command --command-module --config-version --copyright --credits --email --license --output-fp" -- $cur) )
         ;;
 
       *)

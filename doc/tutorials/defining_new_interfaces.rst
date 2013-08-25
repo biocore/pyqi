@@ -16,15 +16,24 @@ pyqi provides a command, ``make_optparse``, that allows developers to easily stu
 
 	pyqi make_optparse -h
 
-To create your interface, you'll need to pass the ``Command`` as a fully specified python module name, the name of the module where that ``Command`` is defined, and the path where the new configuration file should be written. For example, to create a stub for an ``OptparseInterface`` for our ``SequenceCollectionSummarizer`` command, you could run the following::
+To create your interface, you'll need to pass the ``Command`` as a fully specified python module name, the name of the module where that ``Command`` is defined, ownership information (e.g., author name, copyright, license, etc.) and the path where the new configuration file should be written. For example, to create a stub for an ``OptparseInterface`` for our ``SequenceCollectionSummarizer`` command, you could run the following::
 
-	pyqi make_optparse -c sequence_collection_summarizer.SequenceCollectionSummarizer -m sequence_collection_summarizer -o summarize_sequence_collection.py
+	pyqi make_optparse -c sequence_collection_summarizer.SequenceCollectionSummarizer -m sequence_collection_summarizer -a "Greg Caporaso" --copyright "Copyright 2013, Greg Caporaso" -e "gregcaporaso@gmail.com" -l BSD --config-version 0.0.1 -o summarize_sequence_collection.py
 
 .. warning:: For the above command to work, the directory containing ``sequence_collection_summarizer.py`` will need to be in your ``$PYTHONPATH``. 
 
 The resulting file will look something like this::
 
 	#!/usr/bin/env python
+	from __future__ import division
+
+	__author__ = "Greg Caporaso"
+	__copyright__ = "Copyright 2013, Greg Caporaso"
+	__credits__ = ["Greg Caporaso"]
+	__license__ = "BSD"
+	__version__ = "0.0.1"
+	__maintainer__ = "Greg Caporaso"
+	__email__ = "gregcaporaso@gmail.com"
 
 	from pyqi.core.interfaces.optparse import (OptparseUsageExample,
 	                                           OptparseOption, OptparseResult)
@@ -271,6 +280,15 @@ Complete OptparseInterface configuration file
 At this stage we've fully configured our interface. The final interface configuration file should look like this::
 
 	#!/usr/bin/env python
+	from __future__ import division
+
+	__author__ = "Greg Caporaso"
+	__copyright__ = "Copyright 2013, Greg Caporaso"
+	__credits__ = ["Greg Caporaso"]
+	__license__ = "BSD"
+	__version__ = "0.0.1"
+	__maintainer__ = "Greg Caporaso"
+	__email__ = "gregcaporaso@gmail.com"
 
 	from pyqi.core.interfaces.optparse import (OptparseUsageExample,
 	                                           OptparseOption, OptparseResult)

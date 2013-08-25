@@ -18,22 +18,9 @@ __maintainer__ = "Daniel McDonald"
 __email__ = "mcdonadt@colorado.edu"
 
 from pyqi.core.command import Command, Parameter, ParameterCollection
+from pyqi.commands.code_header_generator import CodeHeaderGenerator
 
-header = """#!/usr/bin/env python
-from __future__ import division
-
-__author__ = "%(author)s"
-__copyright__ = "%(copyright)s"
-__credits__ = [%(credits)s]
-__license__ = "%(license)s"
-__version__ = "%(command_version)s"
-__maintainer__ = "%(author)s"
-__email__ = "%(email)s"
-
-"""
-
-command_imports = """from pyqi.core.command import Command, Parameter, ParameterCollection
-"""
+command_imports = """from pyqi.core.command import Command, Parameter, ParameterCollection"""
 
 command_format = """class %s(Command):
     BriefDescription = "FILL IN A 1 SENTENCE DESCRIPTION"
@@ -54,7 +41,7 @@ command_format = """class %s(Command):
 
 CommandConstructor = %s"""
 
-test_fmt = """from unittest import TestCase, main
+test_format = """from unittest import TestCase, main
 from FILL IN MODULE PATH import %(name)s
 
 class %(name)sTests(TestCase):
@@ -64,62 +51,40 @@ class %(name)sTests(TestCase):
     def test_run(self):
         self.fail()
 
+
 if __name__ == '__main__':
     main()"""
 
-class MakeCommand(Command):
+class MakeCommand(CodeHeaderGenerator):
     BriefDescription = "Construct a stubbed out Command object"
     LongDescription = """This command is intended to construct the basics of a Command object so that a developer can dive straight into the implementation of the command"""
-    Parameters = ParameterCollection([
+    Parameters = ParameterCollection(
+        CodeHeaderGenerator.Parameters.Parameters + [
         Parameter(Name='name', DataType=str,
                   Description='the name of the Command', Required=True),
-        Parameter(Name='email', DataType=str,
-                  Description='maintainer email address', Required=True),
-        Parameter(Name='author', DataType=str,
-                  Description='the Command author', Required=True),
-        Parameter(Name='license', DataType=str,
-                  Description='the license for the Command', Required=True),
-        Parameter(Name='copyright', DataType=str,
-                  Description='the Command copyright', Required=True),
-        Parameter(Name='command_version', DataType=str,
-                  Description='the Command version', Required=True),
-        Parameter(Name='credits', DataType=str,
-                  Description='comma-separated list of other authors',
-                  Required=False, Default=''),
         Parameter(Name='test_code', DataType=bool,
-                  Description='create stubbed out test code',
+                  Description='create stubbed out unit test code',
                   Required=False, Default=False)
-    ])
+        ]
+    )
 
     def run(self, **kwargs):
-        # build a string formatting dictionary for the file header
-        head = {}
-        head['email']        = kwargs['email']
-        head['author']       = kwargs['author']
-        head['license']      = kwargs['license']
-        head['copyright']    = kwargs['copyright']
-        head['command_version'] = kwargs['command_version']
+        code_header_lines = super(MakeCommand, self).run(
+                author=kwargs['author'], email=kwargs['email'],
+                license=kwargs['license'], copyright=kwargs['copyright'],
+                version=kwargs['version'], credits=kwargs['credits'])['result']
 
-        # Credits always includes author.
-        credits = [head['author']]
-        if len(kwargs['credits']) > 0:
-            credits.extend(kwargs['credits'].split(','))
+        result_lines = code_header_lines
 
-        f = lambda x: '"%s"' % x
-        head['credits'] = ', '.join(map(f, credits))
-
-        result_lines = [header % head]
-        
         if kwargs['test_code']:
-            result_lines.append(test_fmt % {'name':kwargs['name']})
+            result_lines.extend(
+                    (test_format % {'name': kwargs['name']}).split('\n'))
         else:
-            result_lines.append(command_imports)
-            result_lines.append('\n')
-            result_lines.append(command_format % (kwargs['name'], kwargs['name']))
+            result_lines.extend(command_imports.split('\n'))
+            result_lines.append('')
+            result_lines.extend((command_format % (
+                    kwargs['name'], kwargs['name'])).split('\n'))
 
-        output = {}
-        output['result'] = ''.join(result_lines)
-
-        return output
+        return {'result':  result_lines}
 
 CommandConstructor = MakeCommand
