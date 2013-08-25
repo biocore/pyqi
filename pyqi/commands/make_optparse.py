@@ -11,6 +11,7 @@
 from __future__ import division
 from operator import attrgetter
 from pyqi.core.command import Command, Parameter, ParameterCollection
+from pyqi.commands.code_header_generator import CodeHeaderGenerator
 
 __author__ = "Daniel McDonald"
 __copyright__ = "Copyright 2013, The pyqi project"
@@ -21,9 +22,7 @@ __version__ = "0.1.0-dev"
 __maintainer__ = "Daniel McDonald"
 __email__ = "mcdonadt@colorado.edu"
 
-header = """#!/usr/bin/env python
-
-from pyqi.core.interfaces.optparse import (OptparseUsageExample,
+header_format = """from pyqi.core.interfaces.optparse import (OptparseUsageExample,
                                            OptparseOption, OptparseResult)
 from pyqi.core.command import make_parameter_collection_lookup_f
 from %(command_module)s import CommandConstructor
@@ -92,11 +91,10 @@ outputs = [
     # An example option that does not map to a result key.
     # OptparseResult(ResultKey='some_other_result',
     #                OutputHandler=print_string)
-]
-"""
+]"""
 
 # Fill out by Parameter, and comment out some of the most common stuff.
-input_fmt = """    OptparseOption(Parameter=param_lookup('%(name)s'),
+input_format = """    OptparseOption(Parameter=param_lookup('%(name)s'),
                    InputType=%(datatype)s,
                    InputAction='%(action)s', # default is 'store', change if desired
                    InputHandler=None, # must be defined if desired
@@ -107,24 +105,32 @@ input_fmt = """    OptparseOption(Parameter=param_lookup('%(name)s'),
                    %(default_block)s
 """
 
-default_block_fmt = """# Default=%(default)s, # implied by Parameter
+default_block_format = """# Default=%(default)s, # implied by Parameter
                    # DefaultDescription=%(default_description)s, # implied by Parameter
 """
 
-class MakeOptparse(Command):
+class MakeOptparse(CodeHeaderGenerator):
     BriefDescription = "Consume a Command, stub out an optparse configuration"
     LongDescription = """Construct and stub out the basic optparse configuration for a given Command. This template provides comments and examples of what to fill in."""
-    Parameters = ParameterCollection([
+    Parameters = ParameterCollection(
+        CodeHeaderGenerator.Parameters.Parameters + [
         Parameter(Name='command', DataType=Command,
                   Description='an existing Command', Required=True),
         Parameter(Name='command_module', DataType=str,
                   Description='the Command source module', Required=True)
-    ])
+        ]
+    )
 
     def run(self, **kwargs):
-        param_formatted = []
+        code_header_lines = super(MakeOptparse, self).run(
+                author=kwargs['author'], email=kwargs['email'],
+                license=kwargs['license'], copyright=kwargs['copyright'],
+                version=kwargs['version'], credits=kwargs['credits'])['result']
+
+        result_lines = code_header_lines
 
         # construct inputs based off of parameters
+        param_formatted = []
         for param in sorted(kwargs['command'].Parameters.values(),
                             key=attrgetter('Name')):
             if param.Required:
@@ -134,7 +140,7 @@ class MakeOptparse(Command):
                         'default': repr(param.Default),
                         'default_description': repr(param.DefaultDescription)
                 }
-                default_block = default_block_fmt % default_fmt
+                default_block = default_block_format % default_fmt
 
             if param.DataType is bool:
                 action = 'store_true'
@@ -146,12 +152,13 @@ class MakeOptparse(Command):
             fmt = {'name':param.Name, 'datatype':data_type, 'action':action,
                    'required':str(param.Required),
                    'help':param.Description, 'default_block':default_block}
-            param_formatted.append(input_fmt % fmt)
+            param_formatted.append(input_format % fmt)
 
         param_formatted = ''.join(param_formatted)
-        header_format = {'command_module':kwargs['command_module'],
-                         'input_fmt': param_formatted}
+        header_fmt = {'command_module':kwargs['command_module'],
+                      'input_fmt': param_formatted}
 
-        return {'result': header % header_format}
+        result_lines.extend((header_format % header_fmt).split('\n'))
+        return {'result': result_lines}
 
 CommandConstructor = MakeOptparse
