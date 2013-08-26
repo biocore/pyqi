@@ -26,7 +26,7 @@ After installation, you can optionally enable bash completion for pyqi scripts, 
 To create the tab completion file for ``pyqi``, run the following commands::
 
 	mkdir ~/.bash_completion.d
-	pyqi make_bash_completion --command-config-module pyqi.interfaces.optparse.config --driver-name pyqi -o ~/.bash_completion.d/pyqi
+	pyqi make-bash-completion --command-config-module pyqi.interfaces.optparse.config --driver-name pyqi -o ~/.bash_completion.d/pyqi
 
 Then, add the following lines to your ``$HOME/.bash_profile`` file::
 
@@ -36,4 +36,4 @@ Then, add the following lines to your ``$HOME/.bash_profile`` file::
 	   source $f;
 	done
 
-When you open a new terminal, tab completion should work for the ``pyqi`` commands and their options. You can test this by typing ``pyqi make_c`` and then hitting the tab key (there should be no space after ``pyqi make_c``).
+When you open a new terminal, tab completion should work for the ``pyqi`` commands and their options. You can test this by typing ``pyqi make-c`` and then hitting the tab key (there should be no space after ``pyqi make-c``).
