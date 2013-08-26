@@ -76,7 +76,8 @@ def get_cmd_obj(cmd_cfg_mod, cmd):
     """Get a ``Command`` object"""
     cmd_cfg, _ = get_command_config(cmd_cfg_mod, cmd)
     return optparse_factory(cmd_cfg.CommandConstructor, cmd_cfg.usage_examples, 
-                            cmd_cfg.inputs, cmd_cfg.outputs)
+                            cmd_cfg.inputs, cmd_cfg.outputs,
+                            cmd_cfg.__version__)
 
 def help_(cmd_cfg_mod, cmd):
     """Dump the help for a ``Command``"""
