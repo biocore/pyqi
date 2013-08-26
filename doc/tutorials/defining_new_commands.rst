@@ -10,13 +10,13 @@ This document describes how to create your first ``pyqi`` ``Command``.
 Stubbing a new command
 ----------------------
 
-After installing pyqi, you can easily stub (i.e., create templates for) new commands using ``pyqi make_command``. You can get usage information by calling::
+After installing pyqi, you can easily stub (i.e., create templates for) new commands using ``pyqi make-command``. You can get usage information by calling::
 
-	pyqi make_command -h
+	pyqi make-command -h
 
 To create our sequence collection summarizer, we can start by stubbing a ``SequenceCollectionSummarizer`` class::
 
-	pyqi make_command -n SequenceCollectionSummarizer -a "Greg Caporaso" -c "Copyright 2013, Greg Caporaso" -e "gregcaporaso@gmail.com" -l BSD --command-version 0.0.1 -o sequence_collection_summarizer.py
+	pyqi make-command -n SequenceCollectionSummarizer -a "Greg Caporaso" -c "Copyright 2013, Greg Caporaso" -e "gregcaporaso@gmail.com" -l BSD --command-version 0.0.1 -o sequence_collection_summarizer.py
 
 If you run this command locally, substituting your own name and email address where applicable, you'll have a new file called ``sequence_collection_summarizer.py``, which will look roughly like the following::
 
@@ -55,7 +55,7 @@ If you run this command locally, substituting your own name and email address wh
 Defining a command
 ------------------
 
-There are several values that you'll need to fill in to define your command based on the stub that is created by ``make_command``. The first, which are the easiest, are ``BriefDescription`` and ``LongDescription``. ``BriefDescription`` should be a one sentence description of your command, and ``LongDescription`` should be a more detailed explanation (usually 2-3 sentences). These are used in auto-generated documentation.
+There are several values that you'll need to fill in to define your command based on the stub that is created by ``make-command``. The first, which are the easiest, are ``BriefDescription`` and ``LongDescription``. ``BriefDescription`` should be a one sentence description of your command, and ``LongDescription`` should be a more detailed explanation (usually 2-3 sentences). These are used in auto-generated documentation.
 
 Next, you'll need to define the parameters that your new command can take. Each of these parameters will be an instance of the ``pyqi.core.command.Parameter`` class.
 
@@ -176,8 +176,8 @@ At this stage you have defined a new command and its API. To access the API in t
 	6
 	>>> print r['max-length']
 	12
-	# You can now call this command again, either with different input.
-	# For example, we can call the command again passing the 
+	# You can call this command again with different input.
+	# For example, we can call the command again passing the
 	# suppress_length_summary parameter.
 	>>> r = s(seqs=[('sequence1','ACCGTGGACCAA'),('sequence2','TGTGGA')],suppress_length_summary=True)
 	>>> r
