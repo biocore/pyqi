@@ -5,8 +5,4 @@ pyqi (canonically pronounced *pie chee*) is designed to support wrapping general
 
 Development is primarily occurring in the [Caporaso](www.caporaso.us) and [Knight](https://knightlab.colorado.edu/) labs (at Northern Arizona University and University of Colorado, respectively), but the goal is for this to be a very open development effort. We accept code submissions as [pull requests](https://help.github.com/articles/using-pull-requests).
 
-pyqi derives from code that was originally to support [QIIME](www.qiime.org)'s command line interface, but our interface needs for QIIME and other bioinformatics packages have expanded, and it now makes more sense that this be stand-alone package. 
-
-
-
-
+pyqi derives from code that was originally developed to support [QIIME](www.qiime.org)'s command line interface, but our interface needs for QIIME and other bioinformatics packages have expanded, and it now makes more sense that this be a stand-alone package. 
