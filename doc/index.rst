@@ -1,40 +1,46 @@
+Introduction
+============
 
-Documentation
-=============
+What is pyqi?
+-------------
 
-About qcli
-----------
+pyqi (canonically pronounced *pie chee*) is a Python framework designed to support wrapping general *commands* in multiple types of *interfaces*, including at the command line, HTML, and API levels. 
 
-qcli (canonically pronounced *queue sea el eye*) contains tools for developing and testing command line interfaces in Python. Features include:
+pyqi's only requirement is a working Python 2.7 installation.
 
- * A consistent look-and-feel for all of your script interfaces and their associated help text. Building your first working qcli-based script is as easy as installing qcli and running ``qcli_make_script``. 
- * An automated test framework, which can supplement unit tests (which typically don't test command line interfaces) to alert you of changes that break your usage examples.
- * An automated documentation framework. Sphinx-compatible rst files can be auto-generated for your qcli scripts.
+Why should I care?
+------------------
 
-qcli is being designed to make `QIIME <http://www.qiime.org>`_'s Command Line Interface framework a standalone package so it can be used in tools other than QIIME without the very heavy-weight dependency of QIIME itself. The name of this package may change as it reaches maturity. qcli is very light-weight. Its only requirement is a working Python 2.6 installation. 
+pyqi allows you to write your command once, and easily make it accessible to different types of users through different types of interfaces. In the context of pyqi, **a command is a class that takes some inputs, performs some function, and produces some outputs**. An interface is a light wrapper around that command that makes it accessible to users.
 
-Documentation index
--------------------
+After defining and testing your command, you can **configure different types of interfaces**. This enables, for example, basic users to access your command through an **HTML interface** running on a local server, power or cluster users to access your command through a **command line interface**, and developers to access your command through an **application programmer interface (API)**. Because pyqi's interfaces are light wrappers around your underlying command, **users of each of these interfaces will be guaranteed to be accessing the same underlying functionality**.
 
-.. toctree::
-   :maxdepth: 2
+pyqi is currently in the early stages of development, and there is a lot to be done. We're very interested in having beta users, and we fully embrace collaborative development, so if you're interested in using or developing pyqi, you should get in touch.
 
-   install/index.rst
-   tutorials/index.rst
-   guidelines/index.rst
-   scripts/index.rst
 
-Getting involved in development
--------------------------------
+How do I start using pyqi?
+--------------------------
 
-qcli is open source software, available under GPL.
+First, install pyqi (it's easy) by following our :ref:`install instructions <install-index>`. Then, you can start working through our tutorials, which are designed to help you evaluate the utility of pyqi, and then integrate pyqi into your project.
 
-Development is currently occurring primarily in the `Caporaso <http://www.caporaso.us>`_ and `Knight <https://knightlab.colorado.edu/>`_ labs (at Northern Arizona University and University of Colorado, respectively), but the goal is for qcli to be a very open development effort. 
+The :ref:`Getting Started <getting-started>` series of tutorials progress linearly through :ref:`how to stub and build new commands <defining-new-commands>` and :ref:`how to stub and build new interfaces <defining-new-interfaces>`. These will give you an idea of what pyqi is capable of and how it works. 
 
-All source code is hosted in the `qcli GitHub repository <https://github.com/bipy/qcli/>`_. We accept code submissions as `pull requests <https://help.github.com/articles/using-pull-requests>`_.
+The :ref:`using-pyqi-in-your-project` series of tutorials will then give you an idea of how you could integrate pyqi into your project. This includes suggestions on :ref:`how to organize your project's repository to look like other repositories that make use of pyqi <organizing-your-repository>`, and :ref:`how to define a driver script <defining-your-command-driver>` (similar to the ``pyqi`` command which you'll become familiar with in the :ref:`Getting Started <getting-started>` tutorials) that will give your users access to the commands in your project. 
 
-Getting help with qcli
-----------------------
+As the pyqi project matures, we'll include additional :ref:`documentation for advanced developers <advanced-topics>`, who are interested in things like defining new interface types (though this is not something that is ever required for most developers).
 
-For now, please direct questions to gregcaporaso@gmail.com. Please report bugs and feature requests on the `qcli issue tracker <https://github.com/bipy/qcli/issues>`_.
+How do I get help with pyqi?
+----------------------------
+
+For now, please direct questions to gregcaporaso@gmail.com. Please report bugs and feature requests on the `pyqi issue tracker <https://github.com/bipy/pyqi/issues>`_.
+
+.. _contributing-to-pyqi:
+
+Can I help develop pyqi?
+------------------------
+
+Yes! pyqi is open source software, available under the BSD license. All source code is hosted in the `pyqi GitHub repository <https://github.com/bipy/pyqi/>`_.
+
+Development is primarily occurring in the `Caporaso Lab <http://www.caporaso.us>`_ (Northern Arizona University; Argonne National Laboratories) and `Knight Lab <https://knightlab.colorado.edu/>`_  (University of Colorado; Howard Hughes Medical Institute), but the goal is for pyqi to be a very open development effort. We accept code submissions as `pull requests <https://help.github.com/articles/using-pull-requests>`_.
+
 
