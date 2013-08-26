@@ -129,6 +129,8 @@ The resulting file will look something like this::
 
 There are three lists of values that we'll need to populate here to define the optparse interface for our ``SequenceCollectionSummarizer`` command. These are the ``inputs``, the ``outputs``, and the ``usage_examples``. We'll also need to define an input handler and an output handler to tell the ``OptparseInterface`` how to take input from the command line and turn it into something that ``SequenceCollectionSummarizer`` can use, and to take output from ``SequenceCollectionSummarizer`` and turn it into something a command line user will want. ``make-optparse`` will auto-populate the ``inputs`` based on the ``Parameters``, but some changes will usually be required (detailed below). The following sections describe each of these steps.
 
+.. note:: There is a fourth value that is required when defining an optparse interface, which is the version string of the command/interface (e.g., ``0.0.1``). This value has already been filled in for us in the configuration file template (see ``__version__`` at the top of the file). You can specify the version string when creating the configuration file template via ``--config-version``. In the example above, we specified a version string of ``0.0.1``.
+
 Defining usage examples
 -----------------------
 

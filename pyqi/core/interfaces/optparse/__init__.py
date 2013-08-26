@@ -139,7 +139,7 @@ class OptparseInterface(Interface):
 
         # Build the usage and version strings
         usage = self._build_usage_lines(required_opts)
-        version = 'Version: %prog ' + __version__
+        version = 'Version: %prog ' + self._get_version()
 
         # Instantiate the command line parser object
         parser = OptionParser(usage=usage, version=version)
@@ -270,17 +270,19 @@ class OptparseInterface(Interface):
         # optparse converts dashes to underscores in long option names.
         return name.replace('-', '_')
 
-def optparse_factory(command_constructor, usage_examples, inputs, outputs):
+def optparse_factory(command_constructor, usage_examples, inputs, outputs,
+                     version):
     """Optparse command line interface factory
     
     command_constructor - a subclass of ``Command``
-    usage_examples - usage examples for using ``command_constructor`` on via a
+    usage_examples - usage examples for using ``command_constructor`` via a
         command line interface.
     inputs  - config ``inputs`` or a list of ``OptparseOptions``
-    otuputs - config ``outputs`` or a list of ``OptparseResults`` 
+    outputs - config ``outputs`` or a list of ``OptparseResults`` 
+    version - config ``__version__`` (a version string)
     """
-    return general_factory(command_constructor, usage_examples, inputs, outputs,
-                           OptparseInterface)
+    return general_factory(command_constructor, usage_examples, inputs,
+                           outputs, version, OptparseInterface)
 
 def optparse_main(interface_object, local_argv):
     """Construct and execute an interface object"""
