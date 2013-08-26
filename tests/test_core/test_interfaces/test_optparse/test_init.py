@@ -109,7 +109,8 @@ class GeneralTests(TestCase):
                 [OptparseOption(InputType=str,
                                 Parameter=ghetto.Parameters['c'],
                                 ShortName='n')],
-                [OptparseResult(ResultKey='itsaresult', OutputHandler=oh)])
+                [OptparseResult(ResultKey='itsaresult', OutputHandler=oh)],
+                '2.0-dev')
 
     def test_optparse_factory(self):
         # exercise it
@@ -138,6 +139,9 @@ class fabulous(OptparseInterface):
 
     def _get_outputs(self):
         return [OptparseResult(ResultKey='itsaresult', OutputHandler=oh)]
+
+    def _get_version(self):
+        return '2.0-dev'
 
 # Doesn't have any usage examples...
 class NoUsageExamples(fabulous):

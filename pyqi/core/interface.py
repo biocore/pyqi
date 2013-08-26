@@ -122,6 +122,14 @@ class Interface(object):
         """
         raise NotImplementedError("Must define _get_outputs")
 
+    def _get_version(self):
+        """Return a version string, e.g., ``'0.1'``
+        
+        This is typically set in a command+interface specific configuration
+        file and passed to ``pyqi.core.general_factory``
+        """
+        raise NotImplementedError("Must define _get_version")
+
 class InterfaceOption(object):
     """Describes an option and what to do with it"""
     def __init__(self, Parameter=None, InputType=None, InputAction=None,

@@ -17,8 +17,8 @@ __version__ = "0.1.0-dev"
 __maintainer__ = "Daniel McDonald"
 __email__ = "mcdonadt@colorado.edu"
 
-def general_factory(command_constructor, usage_examples, inputs, outputs, 
-                    interface=None):
+def general_factory(command_constructor, usage_examples, inputs, outputs,
+                    version, interface=None):
     """Generalized interface factory"""
     class IObject(interface):
         """Dynamic interface object"""
@@ -29,5 +29,7 @@ def general_factory(command_constructor, usage_examples, inputs, outputs,
             return inputs
         def _get_outputs(self):
             return outputs
+        def _get_version(self):
+            return version
 
     return IObject
