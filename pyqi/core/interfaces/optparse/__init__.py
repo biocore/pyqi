@@ -17,17 +17,14 @@ __version__ = "0.1.0-dev"
 __maintainer__ = "Greg Caporaso"
 __email__ = "gregcaporaso@gmail.com"
 
-from pyqi.core.interface import Interface, InterfaceOption, \
-        InterfaceUsageExample, InterfaceResult
+import os
+from optparse import OptionParser, OptionGroup, OptionValueError, OptionError
+from pyqi.option_parsing import make_option
+from pyqi.core.interface import (Interface, InterfaceOption,
+                                 InterfaceUsageExample, InterfaceResult)
 from pyqi.core.factory import general_factory
 from pyqi.core.exception import IncompetentDeveloperError
 from pyqi.core.command import Parameter
-from pyqi.option_parsing import (OptionParser, OptionGroup, Option, 
-                                 OptionValueError, OptionError, make_option)
-from optparse import Option as OPTPARSE_OPTION 
-OPTPARSE_TYPES = OPTPARSE_OPTION.TYPES
-
-import os
 
 def new_filepath(data, path):
     if os.path.exists(path):

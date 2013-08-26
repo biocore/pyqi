@@ -35,7 +35,7 @@ def pyqi_system_call(cmd, shell=True):
     cmd can be either a string containing the command to be run, or a sequence
     of strings that are the tokens of the command.
 
-    Please see Python's subprocess. Popen for a description of the shell
+    Please see Python's subprocess.Popen for a description of the shell
     parameter and how cmd is interpreted differently based on its value.
     
     This function is ported from QIIME (previously qiime_system_call).
