@@ -158,7 +158,7 @@ Next we'll define the list of ``inputs`` that should be associated with our ``Op
 
 For the ``OptparseOptions`` that map onto ``Parameters`` directly, you can look up the corresponding ``Parameter`` in the ``param_lookup`` dictionary (which is created for you by ``make-optparse``), and most of the information in the ``OptparseOption`` will be auto-populated for you. ``make-optparse`` will actually fill in as much information as possible for each ``OptparseOption`` that corresponds to an existing ``Parameter``. 
 
-In our example, you'll notice that there are two ``OptparseOptions`` that are already defined. There are a few values that may need to be changed here. In almost all cases, you'll need to change the ``InputType``, which is set to the ``Parameter``' ``DataType`` value by default, but should be updated to the ``optparse`` type. You can find discussion of these types in the :ref:`optparse type definitions <optparse-types>` section (**NEED TO WRITE THIS SECTION!!**). Note that the ``InputType`` should be ``None`` for command line flags, as the type describes the value that is passed via that option, and command line flags don't take a value. The other value that often will need to be changed is ``InputHandler``, which tells ``OptparseInterface`` how to transform the ``OptparseOption`` into the corresponding ``Parameter``. In our case, for our ``seqs`` ``OptparseOption``, that involves converting a filepath into a list of tuples of (sequence id, sequence) pairs. First let's define the ``OptparseOptions``, and then we'll define a new ``InputHandler``.
+In our example, you'll notice that there are two ``OptparseOptions`` that are already defined. There are a few values that may need to be changed here. In almost all cases, you'll need to change the ``InputType``, which is set to the ``Parameter``' ``DataType`` value by default, but should be updated to the ``optparse`` type. You can find discussion of these types in the :ref:`optparse type definitions <optparse-types>` section. Note that the ``InputType`` should be ``None`` for command line flags, as the type describes the value that is passed via that option, and command line flags don't take a value. The other value that often will need to be changed is ``InputHandler``, which tells ``OptparseInterface`` how to transform the ``OptparseOption`` into the corresponding ``Parameter``. In our case, for our ``seqs`` ``OptparseOption``, that involves converting a filepath into a list of tuples of (sequence id, sequence) pairs. First let's define the ``OptparseOptions``, and then we'll define a new ``InputHandler``.
 
 The ``OptparseOptions`` corresponding to the existing ``Parameters`` should look like this::
 
@@ -435,6 +435,46 @@ The resulting ``seqs.summary.txt`` should contain the following lines::
 	max-length	27
 
 Calling your command via the pyqi driver itself, as we're doing here, is a little clunky. Creating a project-specific driver however is very simple (it's a two-line shell script) and is covered in :ref:`defining-your-command-driver`.
+
+.. _optparse-types:
+
+OptparseOption Types
+--------------------
+pyqi defines several new option types in addition to the optparse's built-in option types. All of the available option types are:
+
++------------------------------+------------------------------------------------------------+
+| option type                  | brief description                                          |
++==============================+============================================================+
+| string                       | a string                                                   |
++------------------------------+------------------------------------------------------------+
+| int                          | an int                                                     |
++------------------------------+------------------------------------------------------------+
+| long                         | a long                                                     |
++------------------------------+------------------------------------------------------------+
+| float                        | a float                                                    |
++------------------------------+------------------------------------------------------------+
+| complex                      | a complex number                                           |
++------------------------------+------------------------------------------------------------+
+| choice                       | one value from a list of choices                           |
++------------------------------+------------------------------------------------------------+
+| existing_path                | path to an existing file or directory                      |
++------------------------------+------------------------------------------------------------+
+| new_path                     | path to a new file or directory                            |
++------------------------------+------------------------------------------------------------+
+| existing_filepath            | path to an existing file                                   |
++------------------------------+------------------------------------------------------------+
+| existing_filepaths           | path to one or more existing files                         |
++------------------------------+------------------------------------------------------------+
+| new_filepath                 | path to a new file                                         |
++------------------------------+------------------------------------------------------------+
+| existing_dirpath             | path to an existing directory                              |
++------------------------------+------------------------------------------------------------+
+| new_dirpath                  | path to a new directory                                    |
++------------------------------+------------------------------------------------------------+
+| multiple_choice              | one or more values from a list of choices                  |
++------------------------------+------------------------------------------------------------+
+| blast_db                     | a blast database                                           |
++------------------------------+------------------------------------------------------------+
 
 Thoughts and guidelines on designing command line interfaces
 ------------------------------------------------------------
