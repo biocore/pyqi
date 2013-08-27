@@ -7,17 +7,12 @@
 #
 # The full license is in the file COPYING.txt, distributed with this software.
 #-----------------------------------------------------------------------------
-""" Utilities for parsing command line options and arguments
 
-This code was derived from QIIME (www.qiime.org), where it was initally
-developed. It has been ported to pyqi to support accessing this functionality 
-without those dependencies.
-
-"""
+"""Utility functionality for the pyqi project."""
 
 __author__ = "Greg Caporaso"
-__copyright__ = "Copyright 2013, The BiPy Project"
-__credits__ = ["Greg Caporaso"]
+__copyright__ = "Copyright 2013, The pyqi project"
+__credits__ = ["Greg Caporaso", "Jai Ram Rideout"]
 __license__ = "BSD"
 __version__ = "0.1.0-dev"
 __maintainer__ = "Greg Caporaso"
@@ -35,10 +30,13 @@ def pyqi_system_call(cmd, shell=True):
     cmd can be either a string containing the command to be run, or a sequence
     of strings that are the tokens of the command.
 
-    Please see Python's subprocess. Popen for a description of the shell
+    Please see Python's subprocess.Popen for a description of the shell
     parameter and how cmd is interpreted differently based on its value.
     
-    This function is ported from QIIME (previously qiime_system_call).
+    This function is ported from QIIME (http://www.qiime.org), previously
+    named qiime_system_call. QIIME is a GPL project, but we obtained permission
+    from the authors of this function to port it to pyqi (and keep it under
+    pyqi's BSD license).
     """
     proc = Popen(cmd,
                  shell=shell,
@@ -53,8 +51,10 @@ def pyqi_system_call(cmd, shell=True):
 
 def remove_files(list_of_filepaths, error_on_missing=True):
     """Remove list of filepaths, optionally raising an error if any are missing
-    
-       This function is ported from PyCogent.
+
+    This function is ported from PyCogent (http://www.pycogent.org). PyCogent
+    is a GPL project, but we obtained permission from the authors of this
+    function to port it to pyqi (and keep it under pyqi's BSD license).
     """
     missing = []
     for fp in list_of_filepaths:

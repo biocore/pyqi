@@ -8,9 +8,10 @@
 # The full license is in the file COPYING.txt, distributed with this software.
 #-----------------------------------------------------------------------------
 
-__author__ = "The BiPy Development Team"
-__copyright__ = "Copyright 2013, The BiPy Project"
-__credits__ = ["Rob Knight", "Greg Caporaso", ] 
+__author__ = "Greg Caporaso"
+__copyright__ = "Copyright 2013, The pyqi project"
+__credits__ = ["Rob Knight", "Greg Caporaso", "Jai Ram Rideout",
+               "Daniel McDonald", "Doug Wendel"]
 __license__ = "BSD"
 __version__ = "0.1.0-dev"
 __maintainer__ = "Greg Caporaso"
@@ -20,12 +21,18 @@ from distutils.core import setup
 from glob import glob
 
 setup(name='pyqi',
-      version='0.1.0-dev',
-      packages=['pyqi', 
+      version=__version__,
+      description='pyqi: expose your interface',
+      author=__maintainer__,
+      author_email=__email__,
+      maintainer=__maintainer__,
+      maintainer_email=__email__,
+      url='http://bipy.github.io/pyqi',
+      packages=['pyqi',
                 'pyqi/commands',
-                'pyqi/core', 
-                'pyqi/core/interfaces', 
-                'pyqi/core/interfaces/optparse', 
+                'pyqi/core',
+                'pyqi/core/interfaces',
+                'pyqi/core/interfaces/optparse',
                 'pyqi/interfaces',
                 'pyqi/interfaces/optparse',
                 'pyqi/interfaces/optparse/config',
