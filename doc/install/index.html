@@ -1,0 +1,100 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Installing pyqi &mdash; pyqi: expose your interface</title>
+    
+    <link rel="stylesheet" href="../_static/haiku.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/print.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1.0-dev',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/theme_extras.js"></script>
+    <link rel="top" title="pyqi: expose your interface" href="../index.html" /> 
+  </head>
+  <body>
+      <div class="header"><h1 class="heading"><a href="../index.html">
+          <span>pyqi: expose your interface</span></a></h1>
+        <h2 class="heading"><span>Installing pyqi</span></h2>
+      </div>
+      <div class="topnav">
+      
+        <p>
+        <a class="uplink" href="../index.html">Contents</a>
+        </p>
+
+      </div>
+      <div class="content">
+        
+        
+  <div class="section" id="installing-pyqi">
+<span id="install-index"></span><h1>Installing pyqi<a class="headerlink" href="#installing-pyqi" title="Permalink to this headline">¶</a></h1>
+<p>pyqi has no dependencies outside of Python, so installing is easy.</p>
+<div class="section" id="installation-of-pyqi">
+<h2>Installation of pyqi<a class="headerlink" href="#installation-of-pyqi" title="Permalink to this headline">¶</a></h2>
+<p>There are two steps to installing pyqi:</p>
+<ul class="simple">
+<li>First, decide if you want to work with the release or development version of pyqi. If you work with the release version, you&#8217;ll have the most recent stable version of pyqi, but may not have access to the latest and greatest features. If you&#8217;re most interested in having access to the latest features and can tolerate some instability, you should work with the development version of pyqi. If you&#8217;re unsure about what you want here, you should likely work with the release version.</li>
+</ul>
+<blockquote>
+<div><ul class="simple">
+<li>To use the release version of pyqi, you can download it from <a class="reference external" href="ftp://thebeast.colorado.edu/pub/pyqi-releases/pyqi-0.2.0.tar.gz">here</a>. The latest release is pyqi 0.2.0. After downloading, unzip the file with <tt class="docutils literal"><span class="pre">tar</span> <span class="pre">-xzf</span> <span class="pre">pyqi-0.2.0.tar.gz</span></tt> and change to the new <tt class="docutils literal"><span class="pre">pyqi-0.2.0</span></tt> directory.</li>
+<li>To use the latest development version of pyqi you can download it from our <a class="reference external" href="https://github.com/bipy/pyqi">GitHub repository</a> using <tt class="docutils literal"><span class="pre">git</span> <span class="pre">clone</span> <span class="pre">git&#64;github.com:bipy/pyqi.git</span></tt>. After downloading, change to the new <tt class="docutils literal"><span class="pre">pyqi</span></tt> directory.</li>
+</ul>
+</div></blockquote>
+<ul class="simple">
+<li>Next, run <tt class="docutils literal"><span class="pre">python</span> <span class="pre">setup.py</span> <span class="pre">install</span></tt>. That&#8217;s it!</li>
+</ul>
+</div>
+<div class="section" id="enabling-tab-completion-of-pyqi-commands-and-their-command-line-options">
+<h2>Enabling tab completion of pyqi commands and their command line options<a class="headerlink" href="#enabling-tab-completion-of-pyqi-commands-and-their-command-line-options" title="Permalink to this headline">¶</a></h2>
+<p>After installation, you can optionally enable bash completion for pyqi scripts, meaning that when you start typing the name of a command or an option, you can hit the tab key to complete it without typing the full name, if the name is unique. There are two steps in enabling tab completion. First, you&#8217;ll need to generate the tab completion file, and then you&#8217;ll need to edit your <tt class="docutils literal"><span class="pre">$HOME/.bash_profile</span></tt> file.</p>
+<p>To create the tab completion file for <tt class="docutils literal"><span class="pre">pyqi</span></tt>, run the following commands:</p>
+<div class="highlight-python"><pre>mkdir ~/.bash_completion.d
+pyqi make-bash-completion --command-config-module pyqi.interfaces.optparse.config --driver-name pyqi -o ~/.bash_completion.d/pyqi</pre>
+</div>
+<p>Then, add the following lines to your <tt class="docutils literal"><span class="pre">$HOME/.bash_profile</span></tt> file:</p>
+<div class="highlight-python"><pre># enable bash completion for pyqi-based scripts
+for f in ~/.bash_completion.d/*;
+do
+   source $f;
+done</pre>
+</div>
+<p>When you open a new terminal, tab completion should work for the <tt class="docutils literal"><span class="pre">pyqi</span></tt> commands and their options. You can test this by typing <tt class="docutils literal"><span class="pre">pyqi</span> <span class="pre">make-c</span></tt> and then hitting the tab key (there should be no space after <tt class="docutils literal"><span class="pre">pyqi</span> <span class="pre">make-c</span></tt>).</p>
+</div>
+</div>
+
+
+      </div>
+      <div class="bottomnav">
+      
+        <p>
+        <a class="uplink" href="../index.html">Contents</a>
+        </p>
+
+      </div>
+
+    <div class="footer">
+        &copy; Copyright 2013, The BiPy Development Team.
+      Last updated on Aug 26, 2013.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

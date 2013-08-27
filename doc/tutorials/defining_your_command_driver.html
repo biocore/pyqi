@@ -1,0 +1,106 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Defining your command driver &mdash; pyqi: expose your interface</title>
+    
+    <link rel="stylesheet" href="../_static/haiku.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/print.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1.0-dev',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/theme_extras.js"></script>
+    <link rel="top" title="pyqi: expose your interface" href="../index.html" /> 
+  </head>
+  <body>
+      <div class="header"><h1 class="heading"><a href="../index.html">
+          <span>pyqi: expose your interface</span></a></h1>
+        <h2 class="heading"><span>Defining your command driver</span></h2>
+      </div>
+      <div class="topnav">
+      
+        <p>
+        <a class="uplink" href="../index.html">Contents</a>
+        </p>
+
+      </div>
+      <div class="content">
+        
+        
+  <div class="section" id="defining-your-command-driver">
+<span id="id1"></span><h1>Defining your command driver<a class="headerlink" href="#defining-your-command-driver" title="Permalink to this headline">¶</a></h1>
+<p>It&#8217;s possible to run your <tt class="docutils literal"><span class="pre">OptparseInterfaces</span></tt> using the <tt class="docutils literal"><span class="pre">pyqi</span></tt> command, as illustrated in <a class="reference internal" href="defining_new_interfaces.html#running-our-command"><em>Running our Command via its OptparseInterface</em></a>, but that mechanism is clunky and not how you&#8217;d want your users to interact with your software. To handle this more gracefully, you can create a shell script that can be distributed with your package and used as the primary driver for all <tt class="docutils literal"><span class="pre">OptparseInterfaces</span></tt>.</p>
+<div class="section" id="creating-the-driver-shell-script">
+<h2>Creating the driver shell script<a class="headerlink" href="#creating-the-driver-shell-script" title="Permalink to this headline">¶</a></h2>
+<p>To define a driver command for your project, create a new file named as you&#8217;d like your users to access your code. For example, the driver for the <tt class="docutils literal"><span class="pre">biom-format</span></tt> package is called <tt class="docutils literal"><span class="pre">biom</span></tt>, and the driver for the <tt class="docutils literal"><span class="pre">pyqi</span></tt> package is called <tt class="docutils literal"><span class="pre">pyqi</span></tt>. In this example our driver name will be <tt class="docutils literal"><span class="pre">my-project</span></tt>. Add the following two lines to that file, replacing <tt class="docutils literal"><span class="pre">my-project</span></tt> with your driver name:</p>
+<div class="highlight-python"><pre>#!/bin/sh
+exec pyqi --driver-name my-project --command-config-module my_project.interfaces.optparse.config -- "$@"</pre>
+</div>
+<p>The value passed with <tt class="docutils literal"><span class="pre">--command-config-module</span></tt> must be the directory where the <tt class="docutils literal"><span class="pre">OptparseInterface</span></tt> configuration files can be found. If you followed the suggestions in <a class="reference internal" href="organizing_your_repository.html#organizing-your-repository"><em>Organizing your repository</em></a> the above should work.</p>
+<p>The driver script should then be made executable with:</p>
+<div class="highlight-python"><pre>chmod +x my-project</pre>
+</div>
+<p>You&#8217;ll next need to ensure that the directory containing this driver file is in your <tt class="docutils literal"><span class="pre">PATH</span></tt> environment variable. Again, if you followed the recommendations in <a class="reference internal" href="organizing_your_repository.html#organizing-your-repository"><em>Organizing your repository</em></a> and if your project directory is under <tt class="docutils literal"><span class="pre">$HOME/code</span></tt>, you can do this by running:</p>
+<div class="highlight-python"><pre>export PATH=$HOME/code/my-project/scripts/:$PATH</pre>
+</div>
+<p>You should now be able to run:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">my</span><span class="o">-</span><span class="n">project</span>
+</pre></div>
+</div>
+<p>This will print a list of the commands that are available via the driver script, which will be all of the <tt class="docutils literal"><span class="pre">Commands</span></tt> for which you&#8217;ve defined <tt class="docutils literal"><span class="pre">OptparseInterfaces</span></tt>. If one of these commands is called <tt class="docutils literal"><span class="pre">my-command</span></tt>, you can now run it as follows to get the help text associated with that command:</p>
+<div class="highlight-python"><pre>my-project my-command -h</pre>
+</div>
+<p>The command names that you pass to the driver (<tt class="docutils literal"><span class="pre">my-command</span></tt>, in this example) match the name of the <tt class="docutils literal"><span class="pre">OptparseInterface</span></tt> config file, minus the <tt class="docutils literal"><span class="pre">.py</span></tt>. The driver also matches the dashed version of a command name, so <tt class="docutils literal"><span class="pre">my-command</span></tt> and <tt class="docutils literal"><span class="pre">my_command</span></tt> both map to the same command.</p>
+</div>
+<div class="section" id="configuring-bash-completion">
+<h2>Configuring bash completion<a class="headerlink" href="#configuring-bash-completion" title="Permalink to this headline">¶</a></h2>
+<p>One very useful feature for your driver script is to enable tab-completion of commands and command line options (meaning that when a user starts typing the name of a command or an option, they can hit the tab key to complete it without typing the full name, if the name is unique). pyqi facilitates this with the <tt class="docutils literal"><span class="pre">pyqi</span> <span class="pre">make-bash-completion</span></tt> command. There are two steps in enabling tab completion. First, you&#8217;ll need to generate the tab completion file, and then you&#8217;ll need to edit your <tt class="docutils literal"><span class="pre">$HOME/.bash_profile</span></tt> file.</p>
+<p>To create the tab completion file for <tt class="docutils literal"><span class="pre">my-project</span></tt>, run the following commands (again, this is assuming that your <tt class="docutils literal"><span class="pre">OptparseInterface</span></tt> config files are located as described in <a class="reference internal" href="organizing_your_repository.html#organizing-your-repository"><em>Organizing your repository</em></a>):</p>
+<div class="highlight-python"><pre>mkdir ~/.bash_completion.d
+pyqi make-bash-completion --command-config-module my_project.interfaces.optparse.config --driver-name my-project -o ~/.bash_completion.d/my-project</pre>
+</div>
+<p>Then, add the following lines to your <tt class="docutils literal"><span class="pre">$HOME/.bash_profile</span></tt> file:</p>
+<div class="highlight-python"><pre># enable bash completion for pyqi-based scripts
+for f in ~/.bash_completion.d/*;
+do
+   source $f;
+done</pre>
+</div>
+<p>When you open a new terminal, tab completion should work for the <tt class="docutils literal"><span class="pre">my-project</span></tt> commands and their options.</p>
+</div>
+</div>
+
+
+      </div>
+      <div class="bottomnav">
+      
+        <p>
+        <a class="uplink" href="../index.html">Contents</a>
+        </p>
+
+      </div>
+
+    <div class="footer">
+        &copy; Copyright 2013, The BiPy Development Team.
+      Last updated on Aug 26, 2013.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

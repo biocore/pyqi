@@ -1,0 +1,94 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Introduction &mdash; pyqi: expose your interface</title>
+    
+    <link rel="stylesheet" href="_static/haiku.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/print.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.1.0-dev',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/theme_extras.js"></script>
+    <link rel="top" title="pyqi: expose your interface" href="#" /> 
+  </head>
+  <body>
+      <div class="header"><h1 class="heading"><a href="#">
+          <span>pyqi: expose your interface</span></a></h1>
+        <h2 class="heading"><span>Introduction</span></h2>
+      </div>
+      <div class="topnav">
+      
+        <p>
+        <a class="uplink" href="#">Contents</a>
+        </p>
+
+      </div>
+      <div class="content">
+        
+        
+  <div class="section" id="introduction">
+<h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="what-is-pyqi">
+<h2>What is pyqi?<a class="headerlink" href="#what-is-pyqi" title="Permalink to this headline">¶</a></h2>
+<p>pyqi (canonically pronounced <em>pie chee</em>) is a Python framework designed to support wrapping general <em>commands</em> in multiple types of <em>interfaces</em>, including at the command line, HTML, and API levels.</p>
+<p>pyqi&#8217;s only requirement is a working Python 2.7 installation.</p>
+</div>
+<div class="section" id="why-should-i-care">
+<h2>Why should I care?<a class="headerlink" href="#why-should-i-care" title="Permalink to this headline">¶</a></h2>
+<p>pyqi allows you to write your command once, and easily make it accessible to different types of users through different types of interfaces. In the context of pyqi, <strong>a command is a class that takes some inputs, performs some function, and produces some outputs</strong>. An interface is a light wrapper around that command that makes it accessible to users.</p>
+<p>After defining and testing your command, you can <strong>configure different types of interfaces</strong>. This enables, for example, basic users to access your command through an <strong>HTML interface</strong> running on a local server, power or cluster users to access your command through a <strong>command line interface</strong>, and developers to access your command through an <strong>application programmer interface (API)</strong>. Because pyqi&#8217;s interfaces are light wrappers around your underlying command, <strong>users of each of these interfaces will be guaranteed to be accessing the same underlying functionality</strong>.</p>
+<p>pyqi is currently in the early stages of development, and there is a lot to be done. We&#8217;re very interested in having beta users, and we fully embrace collaborative development, so if you&#8217;re interested in using or developing pyqi, you should get in touch.</p>
+</div>
+<div class="section" id="how-do-i-start-using-pyqi">
+<h2>How do I start using pyqi?<a class="headerlink" href="#how-do-i-start-using-pyqi" title="Permalink to this headline">¶</a></h2>
+<p>First, install pyqi (it&#8217;s easy) by following our <a class="reference internal" href="install/index.html#install-index"><em>install instructions</em></a>. Then, you can start working through our tutorials, which are designed to help you evaluate the utility of pyqi, and then integrate pyqi into your project.</p>
+<p>The <a class="reference internal" href="tutorials/index.html#getting-started"><em>Getting Started</em></a> series of tutorials progress linearly through <a class="reference internal" href="tutorials/defining_new_commands.html#defining-new-commands"><em>how to stub and build new commands</em></a> and <a class="reference internal" href="tutorials/defining_new_interfaces.html#defining-new-interfaces"><em>how to stub and build new interfaces</em></a>. These will give you an idea of what pyqi is capable of and how it works.</p>
+<p>The <a class="reference internal" href="tutorials/index.html#using-pyqi-in-your-project"><em>Using pyqi in your project</em></a> series of tutorials will then give you an idea of how you could integrate pyqi into your project. This includes suggestions on <a class="reference internal" href="tutorials/organizing_your_repository.html#organizing-your-repository"><em>how to organize your project&#8217;s repository to look like other repositories that make use of pyqi</em></a>, and <a class="reference internal" href="tutorials/defining_your_command_driver.html#defining-your-command-driver"><em>how to define a driver script</em></a> (similar to the <tt class="docutils literal"><span class="pre">pyqi</span></tt> command which you&#8217;ll become familiar with in the <a class="reference internal" href="tutorials/index.html#getting-started"><em>Getting Started</em></a> tutorials) that will give your users access to the commands in your project.</p>
+<p>As the pyqi project matures, we&#8217;ll include additional <a class="reference internal" href="tutorials/index.html#advanced-topics"><em>documentation for advanced developers</em></a>, who are interested in things like defining new interface types (though this is not something that is ever required for most developers).</p>
+</div>
+<div class="section" id="how-do-i-get-help-with-pyqi">
+<h2>How do I get help with pyqi?<a class="headerlink" href="#how-do-i-get-help-with-pyqi" title="Permalink to this headline">¶</a></h2>
+<p>For now, please direct questions to <a class="reference external" href="mailto:gregcaporaso&#37;&#52;&#48;gmail&#46;com">gregcaporaso<span>&#64;</span>gmail<span>&#46;</span>com</a>. Please report bugs and feature requests on the <a class="reference external" href="https://github.com/bipy/pyqi/issues">pyqi issue tracker</a>.</p>
+</div>
+<div class="section" id="can-i-help-develop-pyqi">
+<span id="contributing-to-pyqi"></span><h2>Can I help develop pyqi?<a class="headerlink" href="#can-i-help-develop-pyqi" title="Permalink to this headline">¶</a></h2>
+<p>Yes! pyqi is open source software, available under the BSD license. All source code is hosted in the <a class="reference external" href="https://github.com/bipy/pyqi/">pyqi GitHub repository</a>.</p>
+<p>Development is primarily occurring in the <a class="reference external" href="http://www.caporaso.us">Caporaso Lab</a> (Northern Arizona University; Argonne National Laboratories) and <a class="reference external" href="https://knightlab.colorado.edu/">Knight Lab</a>  (University of Colorado; Howard Hughes Medical Institute), but the goal is for pyqi to be a very open development effort. We accept code submissions as <a class="reference external" href="https://help.github.com/articles/using-pull-requests">pull requests</a>.</p>
+</div>
+</div>
+
+
+      </div>
+      <div class="bottomnav">
+      
+        <p>
+        <a class="uplink" href="#">Contents</a>
+        </p>
+
+      </div>
+
+    <div class="footer">
+        &copy; Copyright 2013, The BiPy Development Team.
+      Last updated on Aug 26, 2013.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

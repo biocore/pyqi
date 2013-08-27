@@ -1,0 +1,121 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pyqi tutorials &mdash; pyqi: expose your interface</title>
+    
+    <link rel="stylesheet" href="../_static/haiku.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/print.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1.0-dev',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/theme_extras.js"></script>
+    <link rel="top" title="pyqi: expose your interface" href="../index.html" /> 
+  </head>
+  <body>
+      <div class="header"><h1 class="heading"><a href="../index.html">
+          <span>pyqi: expose your interface</span></a></h1>
+        <h2 class="heading"><span>pyqi tutorials</span></h2>
+      </div>
+      <div class="topnav">
+      
+        <p>
+        <a class="uplink" href="../index.html">Contents</a>
+        </p>
+
+      </div>
+      <div class="content">
+        
+        
+  <span class="target" id="tutorial-index"></span><div class="section" id="pyqi-tutorials">
+<span id="index-0"></span><h1>pyqi tutorials<a class="headerlink" href="#pyqi-tutorials" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="installing-pyqi">
+<h2>Installing pyqi<a class="headerlink" href="#installing-pyqi" title="Permalink to this headline">¶</a></h2>
+<p>Before working through the tutorials below you&#8217;ll need to have a working installation of pyqi (it&#8217;s really easy to install). See our <a class="reference internal" href="../install/index.html#install-index"><em>install instructions</em></a> before you get started.</p>
+</div>
+<div class="section" id="getting-started-defining-new-commands-and-interfaces-using-pyqi">
+<span id="getting-started"></span><h2>Getting started: defining new commands and interfaces using pyqi<a class="headerlink" href="#getting-started-defining-new-commands-and-interfaces-using-pyqi" title="Permalink to this headline">¶</a></h2>
+<p>This section of the documentation covers how to define a new <tt class="docutils literal"><span class="pre">Command</span></tt>, its API, and its command line interface. You should work through these documents in order.</p>
+<p>As an example, we&#8217;ll define a new <tt class="docutils literal"><span class="pre">Command</span></tt> that provides a summary of a collection of biological sequences. (<em>Biological sequences</em>, in this context, are DNA sequences. These are <a class="reference external" href="http://www.bioinformatics.org/sms2/iupac.html">canonically represented</a> as strings of primarily <tt class="docutils literal"><span class="pre">A</span></tt>, <tt class="docutils literal"><span class="pre">C</span></tt>, <tt class="docutils literal"><span class="pre">G</span></tt>, and <tt class="docutils literal"><span class="pre">T</span></tt> characters, and <a class="reference external" href="http://en.wikipedia.org/wiki/FASTA_format">fasta format</a> is the most common file format for storing biological sequences on disk.) We&#8217;ll be able to pass the sequences to the <tt class="docutils literal"><span class="pre">Command</span></tt>, and the result from the <tt class="docutils literal"><span class="pre">Command</span></tt> will be the number of sequences in the collection, the minimum sequence length, and the maximum sequence length. We&#8217;ll then wrap that <tt class="docutils literal"><span class="pre">Command</span></tt> in an <tt class="docutils literal"><span class="pre">OptparseInterface</span></tt>, which will allow users to access it from the command line providing a fasta file as input and having a summary written to file as output.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="defining_new_commands.html">Defining new commands</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="defining_new_commands.html#stubbing-a-new-command">Stubbing a new command</a></li>
+<li class="toctree-l2"><a class="reference internal" href="defining_new_commands.html#defining-a-command">Defining a command</a></li>
+<li class="toctree-l2"><a class="reference internal" href="defining_new_commands.html#a-complete-example-command">A complete example Command</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="defining_new_interfaces.html">Defining new interfaces</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="defining_new_interfaces.html#stubbing-a-new-command-line-interface">Stubbing a new command line interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="defining_new_interfaces.html#defining-usage-examples">Defining usage examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="defining_new_interfaces.html#defining-inputs">Defining inputs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="defining_new_interfaces.html#defining-input-handlers">Defining input handlers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="defining_new_interfaces.html#defining-outputs">Defining outputs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="defining_new_interfaces.html#defining-output-handlers">Defining output handlers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="defining_new_interfaces.html#complete-optparseinterface-configuration-file">Complete OptparseInterface configuration file</a></li>
+<li class="toctree-l2"><a class="reference internal" href="defining_new_interfaces.html#running-our-command-via-its-optparseinterface">Running our Command via its OptparseInterface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="defining_new_interfaces.html#optparseoption-types">OptparseOption Types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="defining_new_interfaces.html#thoughts-and-guidelines-on-designing-command-line-interfaces">Thoughts and guidelines on designing command line interfaces</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="using-pyqi-in-your-project">
+<span id="id1"></span><h2>Using pyqi in your project<a class="headerlink" href="#using-pyqi-in-your-project" title="Permalink to this headline">¶</a></h2>
+<p>After you&#8217;ve experimented with defining a toy pyqi <tt class="docutils literal"><span class="pre">Command</span></tt>, its API, and an <tt class="docutils literal"><span class="pre">OptparseInterface</span></tt>, you are ready to start thinking about integrating pyqi into your project. This section of the documentation begins by providing suggestions for organizing your code to match best with the organization of pyqi and projects that use pyqi. We then cover how to define a command line driver (similar to the <tt class="docutils literal"><span class="pre">pyqi</span></tt> command) that can be used with your optparse interfaces, to customize how your users will interact with your project.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="organizing_your_repository.html">Organizing your repository</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="organizing_your_repository.html#structure-of-the-biom-format-project">Structure of the biom-format project</a></li>
+<li class="toctree-l2"><a class="reference internal" href="organizing_your_repository.html#discussion-of-the-biom-format-directory-structure">Discussion of the biom-format directory structure</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="defining_your_command_driver.html">Defining your command driver</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="defining_your_command_driver.html#creating-the-driver-shell-script">Creating the driver shell script</a></li>
+<li class="toctree-l2"><a class="reference internal" href="defining_your_command_driver.html#configuring-bash-completion">Configuring bash completion</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="advanced-topics">
+<span id="id2"></span><h2>Advanced topics<a class="headerlink" href="#advanced-topics" title="Permalink to this headline">¶</a></h2>
+<p>As pyqi matures we&#8217;ll include tutorials covering topics such as how to define new interface types. However, given the early state of development that we&#8217;re currently in, these will likely change a lot, so we recommend that if you are interested in developing new interface types now, that you get in touch (you can e-mail <a class="reference external" href="mailto:gregcaporaso&#37;&#52;&#48;gmail&#46;com">gregcaporaso<span>&#64;</span>gmail<span>&#46;</span>com</a> for now) to discuss what you&#8217;d like to do, and possibly get involved with development of pyqi.</p>
+</div>
+</div>
+
+
+      </div>
+      <div class="bottomnav">
+      
+        <p>
+        <a class="uplink" href="../index.html">Contents</a>
+        </p>
+
+      </div>
+
+    <div class="footer">
+        &copy; Copyright 2013, The BiPy Development Team.
+      Last updated on Aug 26, 2013.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

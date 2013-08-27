@@ -1,0 +1,242 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Defining new commands &mdash; pyqi: expose your interface</title>
+    
+    <link rel="stylesheet" href="../_static/haiku.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/print.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1.0-dev',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/theme_extras.js"></script>
+    <link rel="top" title="pyqi: expose your interface" href="../index.html" /> 
+  </head>
+  <body>
+      <div class="header"><h1 class="heading"><a href="../index.html">
+          <span>pyqi: expose your interface</span></a></h1>
+        <h2 class="heading"><span>Defining new commands</span></h2>
+      </div>
+      <div class="topnav">
+      
+        <p>
+        <a class="uplink" href="../index.html">Contents</a>
+        </p>
+
+      </div>
+      <div class="content">
+        
+        
+  <div class="section" id="defining-new-commands">
+<span id="id1"></span><h1>Defining new commands<a class="headerlink" href="#defining-new-commands" title="Permalink to this headline">¶</a></h1>
+<p>A pyqi <tt class="docutils literal"><span class="pre">Command</span></tt> is a class that accepts inputs, does some work, and produces outputs. A <tt class="docutils literal"><span class="pre">Command</span></tt> is designed to be interface agnostic, so ideally should not be tied to a filesystem (i.e., it shouldn&#8217;t do I/O or take filepaths) though there are some exceptions. Your <tt class="docutils literal"><span class="pre">Command</span></tt> class ultimately defines an API for your <tt class="docutils literal"><span class="pre">Command</span></tt> that can then easily be wrapped in other interface types (for example, a command line interface and/or a web interface) which handle input and output in an interface-specific way. This strategy also facilitates unit testing of your <tt class="docutils literal"><span class="pre">Command</span></tt> (by separating core functionality, which is essential to test, from interfaces, which can be very difficult to test in an automated fashion), parallel processing with your <tt class="docutils literal"><span class="pre">Command</span></tt>, and constructing workflows that chain multiple <tt class="docutils literal"><span class="pre">Commands</span></tt> together. In general, your <tt class="docutils literal"><span class="pre">Command</span></tt> should take structured input (for example, a list of tuples or a numpy array), not a file that needs to be parsed.</p>
+<p>This document describes how to create your first <tt class="docutils literal"><span class="pre">pyqi</span></tt> <tt class="docutils literal"><span class="pre">Command</span></tt>.</p>
+<div class="section" id="stubbing-a-new-command">
+<h2>Stubbing a new command<a class="headerlink" href="#stubbing-a-new-command" title="Permalink to this headline">¶</a></h2>
+<p>After installing pyqi, you can easily stub (i.e., create templates for) new commands using <tt class="docutils literal"><span class="pre">pyqi</span> <span class="pre">make-command</span></tt>. You can get usage information by calling:</p>
+<div class="highlight-python"><pre>pyqi make-command -h</pre>
+</div>
+<p>To create our sequence collection summarizer, we can start by stubbing a <tt class="docutils literal"><span class="pre">SequenceCollectionSummarizer</span></tt> class:</p>
+<div class="highlight-python"><pre>pyqi make-command -n SequenceCollectionSummarizer -a "Greg Caporaso" -c "Copyright 2013, Greg Caporaso" -e "gregcaporaso@gmail.com" -l BSD --command-version 0.0.1 -o sequence_collection_summarizer.py</pre>
+</div>
+<p>If you run this command locally, substituting your own name and email address where applicable, you&#8217;ll have a new file called <tt class="docutils literal"><span class="pre">sequence_collection_summarizer.py</span></tt>, which will look roughly like the following:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#!/usr/bin/env python</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span>
+
+<span class="n">__author__</span> <span class="o">=</span> <span class="s">&quot;Greg Caporaso&quot;</span>
+<span class="n">__copyright__</span> <span class="o">=</span> <span class="s">&quot;Copyright 2013, Greg Caporaso&quot;</span>
+<span class="n">__credits__</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;Greg Caporaso&quot;</span><span class="p">]</span>
+<span class="n">__license__</span> <span class="o">=</span> <span class="s">&quot;BSD&quot;</span>
+<span class="n">__version__</span> <span class="o">=</span> <span class="s">&quot;0.0.1&quot;</span>
+<span class="n">__maintainer__</span> <span class="o">=</span> <span class="s">&quot;Greg Caporaso&quot;</span>
+<span class="n">__email__</span> <span class="o">=</span> <span class="s">&quot;gregcaporaso@gmail.com&quot;</span>
+
+<span class="kn">from</span> <span class="nn">pyqi.core.command</span> <span class="kn">import</span> <span class="n">Command</span><span class="p">,</span> <span class="n">Parameter</span><span class="p">,</span> <span class="n">ParameterCollection</span>
+
+<span class="k">class</span> <span class="nc">SequenceCollectionSummarizer</span><span class="p">(</span><span class="n">Command</span><span class="p">):</span>
+    <span class="n">BriefDescription</span> <span class="o">=</span> <span class="s">&quot;FILL IN A 1 SENTENCE DESCRIPTION&quot;</span>
+    <span class="n">LongDescription</span> <span class="o">=</span> <span class="s">&quot;GO INTO MORE DETAIL&quot;</span>
+    <span class="n">Parameters</span> <span class="o">=</span> <span class="n">ParameterCollection</span><span class="p">([</span>
+        <span class="n">Parameter</span><span class="p">(</span><span class="n">Name</span><span class="o">=</span><span class="s">&#39;foo&#39;</span><span class="p">,</span> <span class="n">DataType</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+                  <span class="n">Description</span><span class="o">=</span><span class="s">&#39;some required parameter&#39;</span><span class="p">,</span> <span class="n">Required</span><span class="o">=</span><span class="bp">True</span><span class="p">),</span>
+        <span class="n">Parameter</span><span class="p">(</span><span class="n">Name</span><span class="o">=</span><span class="s">&#39;bar&#39;</span><span class="p">,</span> <span class="n">DataType</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span>
+                  <span class="n">Description</span><span class="o">=</span><span class="s">&#39;some optional parameter&#39;</span><span class="p">,</span> <span class="n">Required</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+                  <span class="n">Default</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="c"># EXAMPLE:</span>
+        <span class="c"># return {&#39;result_1&#39;: kwargs[&#39;foo&#39;] * kwargs[&#39;bar&#39;],</span>
+        <span class="c">#         &#39;result_2&#39;: &quot;Some output bits&quot;}</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;You must define this method&quot;</span><span class="p">)</span>
+
+<span class="n">CommandConstructor</span> <span class="o">=</span> <span class="n">SequenceCollectionSummarizer</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="defining-a-command">
+<h2>Defining a command<a class="headerlink" href="#defining-a-command" title="Permalink to this headline">¶</a></h2>
+<p>There are several values that you&#8217;ll need to fill in to define your command based on the stub that is created by <tt class="docutils literal"><span class="pre">make-command</span></tt>. The first, which are the easiest, are <tt class="docutils literal"><span class="pre">BriefDescription</span></tt> and <tt class="docutils literal"><span class="pre">LongDescription</span></tt>. <tt class="docutils literal"><span class="pre">BriefDescription</span></tt> should be a one sentence description of your command, and <tt class="docutils literal"><span class="pre">LongDescription</span></tt> should be a more detailed explanation (usually 2-3 sentences). These are used in auto-generated documentation.</p>
+<p>Next, you&#8217;ll need to define the parameters that your new command can take. Each of these parameters will be an instance of the <tt class="docutils literal"><span class="pre">pyqi.core.command.Parameter</span></tt> class.</p>
+<p>Our <tt class="docutils literal"><span class="pre">SequenceCollectionSummarizer</span></tt> command will take one required parameter and one optional parameter. The required parameter will be called <tt class="docutils literal"><span class="pre">seqs</span></tt>, and will be a list (or some other iterable type) of tuples of (sequence identifier, sequence) pairs. For example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">[(</span><span class="s">&#39;sequence1&#39;</span><span class="p">,</span><span class="s">&#39;ACCGTGGACCAA&#39;</span><span class="p">),(</span><span class="s">&#39;sequence2&#39;</span><span class="p">,</span><span class="s">&#39;TGTGGA&#39;</span><span class="p">),</span> <span class="o">...</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>We&#8217;ll also need to provide a description of this parameter (used in documentation), its type, and indicate that it is required. The final Parameter definition should look like this:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">Parameter</span><span class="p">(</span><span class="n">Name</span><span class="o">=</span><span class="s">&#39;seqs&#39;</span><span class="p">,</span> <span class="n">DataType</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span>
+         <span class="n">Description</span><span class="o">=</span><span class="s">&#39;sequences to be summarized&#39;</span><span class="p">,</span> <span class="n">Required</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The optional parameter will be called <tt class="docutils literal"><span class="pre">suppress_length_summary</span></tt>, and if passed will indicate that we don&#8217;t want information on sequence lengths included in our output summary. The <tt class="docutils literal"><span class="pre">Parameter</span></tt> definition in this case should look like this:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">Parameter</span><span class="p">(</span><span class="n">Name</span><span class="o">=</span><span class="s">&#39;suppress_length_summary&#39;</span><span class="p">,</span> <span class="n">DataType</span><span class="o">=</span><span class="nb">bool</span><span class="p">,</span>
+         <span class="n">Description</span><span class="o">=</span><span class="s">&#39;do not generate summary information on the sequence lengths&#39;</span><span class="p">,</span>
+         <span class="n">Required</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">Default</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The only additional <tt class="docutils literal"><span class="pre">Parameter</span></tt> that is passed here, relative to our <tt class="docutils literal"><span class="pre">seqs</span></tt> parameter, is <tt class="docutils literal"><span class="pre">Default</span></tt>. Because this parameter isn&#8217;t required, it&#8217;s necessary to give it a default value here. All of the <tt class="docutils literal"><span class="pre">Parameters</span></tt> should be included in a <tt class="docutils literal"><span class="pre">pyqi.core.command.ParameterCollection</span></tt> object (as in the stubbed file).</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">There are a few restrictions on what <tt class="docutils literal"><span class="pre">Name</span></tt> can be set to for a <tt class="docutils literal"><span class="pre">Parameter</span></tt>. It must be a <a class="reference external" href="http://docs.python.org/2/reference/lexical_analysis.html#identifiers">valid python identifier</a> (e.g., it cannot contain <tt class="docutils literal"><span class="pre">-</span></tt> characters or begin with a number) so the <tt class="docutils literal"><span class="pre">Command</span></tt> can be called with named options instead of passing a dict. <tt class="docutils literal"><span class="pre">Parameter</span></tt> names also must be unique for a <tt class="docutils literal"><span class="pre">Command</span></tt>.</p>
+</div>
+<p>Next, we&#8217;ll need to define what our <tt class="docutils literal"><span class="pre">Command</span></tt> will actually do. This is done in the <tt class="docutils literal"><span class="pre">run</span></tt> method, and all results are returned in a dictionary. The run method for our <tt class="docutils literal"><span class="pre">SequenceCollectionSummarizer</span></tt> object would look like the following:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">num_seqs</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">sequence_lengths</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">seq_id</span><span class="p">,</span> <span class="n">seq</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;seqs&#39;</span><span class="p">]:</span>
+        <span class="n">num_seqs</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">sequence_lengths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">seq</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;suppress_length_summary&#39;</span><span class="p">]:</span>
+        <span class="n">min_length</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="n">max_length</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">min_length</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">sequence_lengths</span><span class="p">)</span>
+        <span class="n">max_length</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">sequence_lengths</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">{</span><span class="s">&#39;num-seqs&#39;</span><span class="p">:</span><span class="n">num_seqs</span><span class="p">,</span>
+            <span class="s">&#39;min-length&#39;</span><span class="p">:</span><span class="n">min_length</span><span class="p">,</span>
+            <span class="s">&#39;max-length&#39;</span><span class="p">:</span><span class="n">max_length</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>In practice, if your <tt class="docutils literal"><span class="pre">Command</span></tt> is more complex than our <tt class="docutils literal"><span class="pre">SequenceCollectionSummarizer</span></tt> (which it probably is), you can define other methods that are called by <tt class="docutils literal"><span class="pre">run</span></tt>. These should likely be private methods.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last"><tt class="docutils literal"><span class="pre">kwargs</span></tt> is validated prior to <tt class="docutils literal"><span class="pre">run</span></tt> being called, so that any required <tt class="docutils literal"><span class="pre">kwargs</span></tt> that are missing will raise an error, and any optional <tt class="docutils literal"><span class="pre">kwargs</span></tt> that are missing will have their default values filled in. To customize the validation that is performed on <tt class="docutils literal"><span class="pre">kwargs</span></tt> for your <tt class="docutils literal"><span class="pre">Command</span></tt> you should override <tt class="docutils literal"><span class="pre">_validate_kwargs</span></tt> in your <tt class="docutils literal"><span class="pre">Command</span></tt>.</p>
+</div>
+</div>
+<div class="section" id="a-complete-example-command">
+<h2>A complete example Command<a class="headerlink" href="#a-complete-example-command" title="Permalink to this headline">¶</a></h2>
+<p>The following illustrates a complete python file defining a new pyqi <tt class="docutils literal"><span class="pre">Command</span></tt>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#!/usr/bin/env python</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span>
+
+<span class="n">__author__</span> <span class="o">=</span> <span class="s">&quot;Greg Caporaso&quot;</span>
+<span class="n">__copyright__</span> <span class="o">=</span> <span class="s">&quot;Copyright 2013, Greg Caporaso&quot;</span>
+<span class="n">__credits__</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;Greg Caporaso&quot;</span><span class="p">]</span>
+<span class="n">__license__</span> <span class="o">=</span> <span class="s">&quot;BSD&quot;</span>
+<span class="n">__version__</span> <span class="o">=</span> <span class="s">&quot;0.0.1&quot;</span>
+<span class="n">__maintainer__</span> <span class="o">=</span> <span class="s">&quot;Greg Caporaso&quot;</span>
+<span class="n">__email__</span> <span class="o">=</span> <span class="s">&quot;gregcaporaso@gmail.com&quot;</span>
+
+<span class="kn">from</span> <span class="nn">pyqi.core.command</span> <span class="kn">import</span> <span class="n">Command</span><span class="p">,</span> <span class="n">Parameter</span><span class="p">,</span> <span class="n">ParameterCollection</span>
+
+<span class="k">class</span> <span class="nc">SequenceCollectionSummarizer</span><span class="p">(</span><span class="n">Command</span><span class="p">):</span>
+    <span class="n">BriefDescription</span> <span class="o">=</span> <span class="s">&quot;Generate summary statistics on a collection of sequences.&quot;</span>
+    <span class="n">LongDescription</span> <span class="o">=</span> <span class="s">&quot;Provide the number of sequences, the minimum sequence length, and the maximum sequence length given a collection of sequences. Sequences should be provided as a list (or other iterable object) of tuples of (sequence id, sequence) pairs.&quot;</span>
+    <span class="n">Parameters</span> <span class="o">=</span> <span class="n">ParameterCollection</span><span class="p">([</span>
+        <span class="n">Parameter</span><span class="p">(</span><span class="n">Name</span><span class="o">=</span><span class="s">&#39;seqs&#39;</span><span class="p">,</span> <span class="n">DataType</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span>
+                  <span class="n">Description</span><span class="o">=</span><span class="s">&#39;sequences to be summarized&#39;</span><span class="p">,</span> <span class="n">Required</span><span class="o">=</span><span class="bp">True</span><span class="p">),</span>
+        <span class="n">Parameter</span><span class="p">(</span><span class="n">Name</span><span class="o">=</span><span class="s">&#39;suppress_length_summary&#39;</span><span class="p">,</span> <span class="n">DataType</span><span class="o">=</span><span class="nb">bool</span><span class="p">,</span>
+                  <span class="n">Description</span><span class="o">=</span><span class="s">&#39;do not generate summary information on the sequence lengths&#39;</span><span class="p">,</span>
+                  <span class="n">Required</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span><span class="n">Default</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+    <span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">num_seqs</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">sequence_lengths</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">seq_id</span><span class="p">,</span> <span class="n">seq</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;seqs&#39;</span><span class="p">]:</span>
+            <span class="n">num_seqs</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">sequence_lengths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">seq</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;suppress_length_summary&#39;</span><span class="p">]:</span>
+            <span class="n">min_length</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="n">max_length</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">min_length</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">sequence_lengths</span><span class="p">)</span>
+            <span class="n">max_length</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">sequence_lengths</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">{</span><span class="s">&#39;num-seqs&#39;</span><span class="p">:</span><span class="n">num_seqs</span><span class="p">,</span>
+                <span class="s">&#39;min-length&#39;</span><span class="p">:</span><span class="n">min_length</span><span class="p">,</span>
+                <span class="s">&#39;max-length&#39;</span><span class="p">:</span><span class="n">max_length</span><span class="p">}</span>
+
+<span class="n">CommandConstructor</span> <span class="o">=</span> <span class="n">SequenceCollectionSummarizer</span>
+</pre></div>
+</div>
+<p>At this stage you have defined a new command and its API. To access the API in the python terminal, you could do the following:</p>
+<div class="highlight-python"><pre># Import your new class
+&gt;&gt;&gt; from sequence_collection_summarizer import SequenceCollectionSummarizer
+# Instantiate it
+&gt;&gt;&gt; s = SequenceCollectionSummarizer()
+# Call the command, passing a list of (seq id, sequence) tuples as input.
+# Note that because the parameters are provided as kwargs, you need to
+# pass the parameter with a keyword.
+&gt;&gt;&gt; r = s(seqs=[('sequence1','ACCGTGGACCAA'),('sequence2','TGTGGA')])
+# You can now see the full output of the command by inspecting the
+# result dictionary.
+&gt;&gt;&gt; r
+{'max-length': 12, 'min-length': 6, 'num-seqs': 2}
+# Alternatively, you can access each value independently, as with any dictionary.
+&gt;&gt;&gt; print r['num-seqs']
+2
+&gt;&gt;&gt; print r['min-length']
+6
+&gt;&gt;&gt; print r['max-length']
+12
+# You can call this command again with different input.
+# For example, we can call the command again passing the
+# suppress_length_summary parameter.
+&gt;&gt;&gt; r = s(seqs=[('sequence1','ACCGTGGACCAA'),('sequence2','TGTGGA')],suppress_length_summary=True)
+&gt;&gt;&gt; r
+{'max-length': None, 'min-length': None, 'num-seqs': 2}</pre>
+</div>
+</div>
+</div>
+
+
+      </div>
+      <div class="bottomnav">
+      
+        <p>
+        <a class="uplink" href="../index.html">Contents</a>
+        </p>
+
+      </div>
+
+    <div class="footer">
+        &copy; Copyright 2013, The BiPy Development Team.
+      Last updated on Aug 26, 2013.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>
