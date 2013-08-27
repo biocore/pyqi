@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2013, The pyqi project"
 __credits__ = ["Daniel McDonald", "Jai Ram Rideout", "Doug Wendel",
                "Greg Caporaso"]
 __license__ = "BSD"
-__version__ = "0.2.0"
+__version__ = "0.2.0-dev"
 __maintainer__ = "Daniel McDonald"
 __email__ = "mcdonadt@colorado.edu"
 

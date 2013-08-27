@@ -13,7 +13,7 @@ __author__ = "Jai Ram Rideout"
 __copyright__ = "Copyright 2013, The pyqi project"
 __credits__ = ["Jai Ram Rideout", "Daniel McDonald"]
 __license__ = "BSD"
-__version__ = "0.2.0"
+__version__ = "0.2.0-dev"
 __maintainer__ = "Jai Ram Rideout"
 __email__ = "jai.rideout@gmail.com"
 
