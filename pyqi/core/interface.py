@@ -132,8 +132,8 @@ class Interface(object):
 
 class InterfaceOption(object):
     """Describes an option and what to do with it"""
-    def __init__(self, Parameter=None, InputType=None, InputAction=None,
-                 InputHandler=None, ShortName=None, Name=None, Required=False,
+    def __init__(self, Parameter=None, Type=None, Action=None,
+                 Handler=None, ShortName=None, Name=None, Required=False,
                  Help=None, Default=None, DefaultDescription=None,
                  convert_to_dashed_name=True):
         self.Parameter = Parameter
@@ -169,9 +169,9 @@ class InterfaceOption(object):
                 self.Required = Parameter.Required
 
         # This information is never contained in a Parameter.
-        self.InputType = InputType
-        self.InputAction = InputAction
-        self.InputHandler = InputHandler
+        self.Type = Type
+        self.Action = Action
+        self.Handler = Handler
         self.ShortName = ShortName
 
         if convert_to_dashed_name:
@@ -193,20 +193,6 @@ class InterfaceOption(object):
             return None
         else:
             return self.Parameter.Name
-
-class InterfaceResult(object):
-    """Describes a result and what to do with it"""
-
-    def __init__(self, ResultKey, OutputHandler, OptionName=None):
-        self.ResultKey = ResultKey
-        self.OutputHandler = OutputHandler
-        self.OptionName = OptionName
-
-        self._validate_result()
-
-    def _validate_result(self):
-        """Validate a result object"""
-        raise NotImplementedError("Must implement in a subclass")
 
 class InterfaceUsageExample(object): 
     """Provide structure to a usage example"""

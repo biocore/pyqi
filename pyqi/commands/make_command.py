@@ -58,14 +58,19 @@ if __name__ == '__main__':
 class MakeCommand(CodeHeaderGenerator):
     BriefDescription = "Construct a stubbed out Command object"
     LongDescription = """This command is intended to construct the basics of a Command object so that a developer can dive straight into the implementation of the command"""
-    Parameters = ParameterCollection(
-        CodeHeaderGenerator.Parameters.Parameters + [
-        Parameter(Name='name', DataType=str,
-                  Description='the name of the Command', Required=True),
-        Parameter(Name='test_code', DataType=bool,
-                  Description='create stubbed out unit test code',
-                  Required=False, Default=False)
-        ]
+    InParameters = ParameterCollection(
+          CodeHeaderGenerator.Parameters.Parameters + [
+          Parameter(Name='name', DataType=str,
+                    Description='the name of the Command', Required=True),
+          Parameter(Name='test_code', DataType=bool,
+                    Description='create stubbed out unit test code',
+                    Required=False, Default=False)
+          ]
+    )
+    OutParameters = ParameterCollection([
+          Parameter(Name='result',DataType=str, 
+                    Description='The resulting template', Required=True)
+          ]
     )
 
     def run(self, **kwargs):

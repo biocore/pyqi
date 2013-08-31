@@ -22,10 +22,12 @@ from pyqi.core.interfaces.optparse import (OptparseOption,
                                            OptparseUsageExample)
 from pyqi.core.interfaces.optparse.input_handler import string_list_handler
 from pyqi.core.interfaces.optparse.output_handler import write_list_of_strings
-from pyqi.core.command import make_parameter_collection_lookup_f
+from pyqi.core.command import (make_in_parameter_collection_lookup_f,
+                               make_out_parameter_collection_lookup_f)
 from pyqi.commands.make_command import CommandConstructor
 
-param_lookup = make_parameter_collection_lookup_f(CommandConstructor)
+in_param_lookup = make_in_parameter_collection_lookup_f(CommandConstructor)
+out_param_lookup = make_out_parameter_collection_lookup_f(CommandConstructor)
 
 usage_examples = [
     OptparseUsageExample(ShortDesc="Basic Command",
@@ -34,21 +36,21 @@ usage_examples = [
 ]
 
 inputs = [
-    OptparseOption(Parameter=param_lookup('name'),
+    OptparseOption(Parameter=in_param_lookup('name'),
                    ShortName='n'),
-    OptparseOption(Parameter=param_lookup('author'),
+    OptparseOption(Parameter=in_param_lookup('author'),
                    ShortName='a'),
-    OptparseOption(Parameter=param_lookup('email'),
+    OptparseOption(Parameter=in_param_lookup('email'),
                    ShortName='e'),
-    OptparseOption(Parameter=param_lookup('license'),
+    OptparseOption(Parameter=in_param_lookup('license'),
                    ShortName='l'),
-    OptparseOption(Parameter=param_lookup('copyright'),
+    OptparseOption(Parameter=in_param_lookup('copyright'),
                    ShortName='c'),
-    OptparseOption(Parameter=param_lookup('version'), Name='command-version'),
-    OptparseOption(Parameter=param_lookup('credits'),
+    OptparseOption(Parameter=in_param_lookup('version'), Name='command-version'),
+    OptparseOption(Parameter=in_param_lookup('credits'),
                    InputHandler=string_list_handler,
                    Help='comma-separated list of other authors'),
-    OptparseOption(Parameter=param_lookup('test_code'),
+    OptparseOption(Parameter=in_param_lookup('test_code'),
                    InputType=None, InputAction='store_true'),
     OptparseOption(Parameter=None,
                    InputType='new_filepath',
@@ -59,7 +61,8 @@ inputs = [
 ]
 
 outputs = [
-    OptparseResult(ResultKey='result',
+    ### InputName is used to tie this output to output-fp, which is an input...
+    OptparseResult(Parameter=out_param_lookup('result'),
                    OutputHandler=write_list_of_strings,
-                   OptionName='output-fp')
+                   InputName='output-fp')
 ]

@@ -26,13 +26,25 @@ from os.path import abspath, exists, isdir, isfile, split
 from optparse import (Option, OptionParser, OptionGroup, OptionValueError,
                       OptionError)
 from pyqi.core.interface import (Interface, InterfaceOption,
-                                 InterfaceUsageExample, InterfaceResult)
+                                 InterfaceUsageExample)
 from pyqi.core.factory import general_factory
 from pyqi.core.exception import IncompetentDeveloperError
 from pyqi.core.command import Parameter
 
-class OptparseResult(InterfaceResult):
-    def _validate_result(self):
+class OptparseResult(InterfaceOption):
+    def __init__(self, Parameter=None, OutputType=str, OutputAction='store',
+                 OutputHandler=None, ShortName=None, Name=None, Required=False,
+                 Help=None, Default=None, DefaultDescription=None,
+                 convert_to_dashed_name=True, InputName=None):
+        super(OptparseResult, self).__init__(Parameter=Parameter,
+                Type=OutputType, Action=OutputAction,
+                Handler=OutputHandler, ShortName=ShortName, Name=Name,
+                Required=Required, Help=Help, Default=Default,
+                DefaultDescription=DefaultDescription,
+                convert_to_dashed_name=convert_to_dashed_name)
+        self.InputName = InputName
+
+    def _validate_option(self):
         pass
 
 class OptparseOption(InterfaceOption):
@@ -43,8 +55,8 @@ class OptparseOption(InterfaceOption):
                  Help=None, Default=None, DefaultDescription=None,
                  convert_to_dashed_name=True):
         super(OptparseOption, self).__init__(Parameter=Parameter,
-                InputType=InputType, InputAction=InputAction,
-                InputHandler=InputHandler, ShortName=ShortName, Name=Name,
+                Type=InputType, Action=InputAction,
+                Handler=InputHandler, ShortName=ShortName, Name=Name,
                 Required=Required, Help=Help, Default=Default,
                 DefaultDescription=DefaultDescription,
                 convert_to_dashed_name=convert_to_dashed_name)
@@ -69,12 +81,12 @@ class OptparseOption(InterfaceOption):
                 help_text += ' [REQUIRED]'
 
             if self.ShortName is None:
-                option = PyqiOption('--' + self.Name, type=self.InputType,
-                                    action=self.InputAction, help=help_text)
+                option = PyqiOption('--' + self.Name, type=self.Type,
+                                    action=self.Action, help=help_text)
             else:
                 option = PyqiOption('-' + self.ShortName,
-                                    '--' + self.Name, type=self.InputType,
-                                    action=self.InputAction, help=help_text)
+                                    '--' + self.Name, type=self.Type,
+                                    action=self.Action, help=help_text)
         else:
             if self.DefaultDescription is None:
                 help_text = '%s [default: %%default]' % self.Help
@@ -83,13 +95,13 @@ class OptparseOption(InterfaceOption):
                                                   self.DefaultDescription)
 
             if self.ShortName is None:
-                option = PyqiOption('--' + self.Name, type=self.InputType,
-                                    action=self.InputAction, help=help_text,
+                option = PyqiOption('--' + self.Name, type=self.Type,
+                                    action=self.Action, help=help_text,
                                     default=self.Default)
             else:
                 option = PyqiOption('-' + self.ShortName,
-                                    '--' + self.Name, type=self.InputType,
-                                    action=self.InputAction, help=help_text,
+                                    '--' + self.Name, type=self.Type,
+                                    action=self.Action, help=help_text,
                                     default=self.Default)
         return option
 
@@ -193,10 +205,10 @@ class OptparseInterface(Interface):
                 optparse_clean_name = \
                         self._get_optparse_clean_name(option.Name)
 
-                if option.InputHandler is None:
+                if option.Handler is None:
                     value = self._optparse_input[optparse_clean_name]
                 else:
-                    value = option.InputHandler(
+                    value = option.Handler(
                             self._optparse_input[optparse_clean_name])
 
                 cmd_input_kwargs[param_name] = value
@@ -244,18 +256,18 @@ class OptparseInterface(Interface):
         handled_results = {}
 
         for output in self._get_outputs():
-            rk = output.ResultKey
+            rk = output.Name
             if rk not in results:
                 raise IncompetentDeveloperError("Did not find the expected "
                                                 "output '%s' in results." % rk)
 
-            if output.OptionName is None:
-                handled_results[rk] = output.OutputHandler(rk, results[rk])
+            if output.InputName is None:
+                handled_results[rk] = output.Handler(rk, results[rk])
             else:
                 optparse_clean_name = \
-                        self._get_optparse_clean_name(output.OptionName)
+                        self._get_optparse_clean_name(output.InputName)
                 opt_value = self._optparse_input[optparse_clean_name]
-                handled_results[rk] = output.OutputHandler(rk, results[rk],
+                handled_results[rk] = output.Handler(rk, results[rk],
                                                            opt_value)
 
         return handled_results
