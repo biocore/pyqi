@@ -20,7 +20,16 @@ __email__ = "gregcaporaso@gmail.com"
 from distutils.core import setup
 from glob import glob
 
+# from https://wiki.python.org/moin/PortingPythonToPy3k
+try:
+    # python 3.x
+    from distutils.command.build_py import build_py_2to3 as build_py
+except ImportError:
+    # python 2.x
+    from distutils.command.build_py import build_py
+
 setup(name='pyqi',
+      cmdclass={'build_py':build_py},
       version=__version__,
       description='pyqi: expose your interface',
       author=__maintainer__,
