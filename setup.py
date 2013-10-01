@@ -24,7 +24,7 @@ from glob import glob
 try:
     # python 3.x
     from distutils.command.build_py import build_py_2to3 as build_py
-except:
+except ImportError:
     # python 2.x
     from distutils.command.build_py import build_py
 
