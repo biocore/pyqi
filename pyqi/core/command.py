@@ -110,8 +110,8 @@ class Command(object):
     """
     BriefDescription = "" # 1 sentence description
     LongDescription = """""" # longer, more detailed description
-    InParameters = ParameterCollection([])
-    OutParameters = ParameterCollection([])
+    CommandIn = ParameterCollection([])
+    CommandOut = ParameterCollection([])
 
     def __init__(self, **kwargs):
         """ """
@@ -151,7 +151,7 @@ class Command(object):
         self_str = str(self.__class__)
 
         # check required parameters
-        for p in self.InParameters.values():
+        for p in self.CommandIn.values():
             if p.Required and p.Name not in kwargs:
                 self._logger.fatal('Missing required parameter %s in %s' % (p.Name, self_str))
                 raise MissingParameterError("Missing required parameter %s in %s" % (p.Name, self_str))
@@ -163,13 +163,13 @@ class Command(object):
 
         # make sure we only have things we expect
         for opt in kwargs:
-            if opt not in self.InParameters:
+            if opt not in self.CommandIn:
                 self._logger.fatal('Unknown parameter %s in %s' % (opt, self_str))
                 raise UnknownParameterError("Unknown parameter %s in %s" % (opt, self_str))
         
     def _set_defaults(self, kwargs):
         """Set defaults for optional parameters"""
-        for p in self.InParameters.values():
+        for p in self.CommandIn.values():
             if not p.Required and p.Name not in kwargs:
                 kwargs[p.Name] = p.Default
 
@@ -181,20 +181,21 @@ class Command(object):
         """
         raise NotImplementedError("All subclasses must implement run.")
 
-def make_in_parameter_collection_lookup_f(obj):
-    """Return a function for convenient InParameter lookup.
+# I do not like this
+def make_CommandIn_collection_lookup_f(obj):
+    """Return a function for convenient ``CommandIn`` lookup.
 
     ``obj`` should be a Command (sub)class or instance.
     """
     def lookup_f(name):
-        return obj.InParameters[name]
+        return obj.CommandIn[name]
     return lookup_f
 
-def make_out_parameter_collection_lookup_f(obj):
-    """Return a function for convenient OutParameter lookup.
+def make_CommandOut_collection_lookup_f(obj):
+    """Return a function for convenient ``CommandOut`` lookup.
 
     ``obj`` should be a Command (sub)class or instance.
     """
     def lookup_f(name):
-        return obj.OutParameters[name]
+        return obj.CommandOut[name]
     return lookup_f
