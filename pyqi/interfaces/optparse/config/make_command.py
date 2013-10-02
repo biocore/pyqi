@@ -22,12 +22,12 @@ from pyqi.core.interfaces.optparse import (OptparseOption,
                                            OptparseUsageExample)
 from pyqi.core.interfaces.optparse.input_handler import string_list_handler
 from pyqi.core.interfaces.optparse.output_handler import write_list_of_strings
-from pyqi.core.command import (make_in_parameter_collection_lookup_f,
-                               make_out_parameter_collection_lookup_f)
+from pyqi.core.command import (make_command_in_collection_lookup_f,
+                               make_command_out_collection_lookup_f)
 from pyqi.commands.make_command import CommandConstructor
 
-in_param_lookup = make_in_parameter_collection_lookup_f(CommandConstructor)
-out_param_lookup = make_out_parameter_collection_lookup_f(CommandConstructor)
+in_param_lookup = make_command_in_collection_lookup_f(CommandConstructor)
+out_param_lookup = make_command_out_collection_lookup_f(CommandConstructor)
 
 usage_examples = [
     OptparseUsageExample(ShortDesc="Basic Command",

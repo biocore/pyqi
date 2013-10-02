@@ -182,7 +182,7 @@ class Command(object):
         raise NotImplementedError("All subclasses must implement run.")
 
 # I do not like this
-def make_CommandIn_collection_lookup_f(obj):
+def make_command_in_collection_lookup_f(obj):
     """Return a function for convenient ``CommandIn`` lookup.
 
     ``obj`` should be a Command (sub)class or instance.
@@ -191,7 +191,7 @@ def make_CommandIn_collection_lookup_f(obj):
         return obj.CommandIn[name]
     return lookup_f
 
-def make_CommandOut_collection_lookup_f(obj):
+def make_command_out_collection_lookup_f(obj):
     """Return a function for convenient ``CommandOut`` lookup.
 
     ``obj`` should be a Command (sub)class or instance.
