@@ -19,7 +19,8 @@ __maintainer__ = "Daniel McDonald"
 __email__ = "mcdonadt@colorado.edu"
 
 import importlib
-from pyqi.core.command import Command, Parameter, ParameterCollection
+from pyqi.core.command import (Command, CommandIn, CommandOut, 
+    ParameterCollection)
 from pyqi.core.interface import get_command_names, get_command_config
 
 def _get_cfg_module(desc):
@@ -63,12 +64,18 @@ command_fmt = """       "%(command)s")
 class BashCompletion(Command):
     BriefDescription = "Construct a bash completion script"
     LongDescription = """Construct a bash tab completion script that will search through available commands and options"""
-    Parameters = ParameterCollection([
-        Parameter(Name='command_config_module', DataType=str,
+    
+    CommandIns= ParameterCollection([
+        CommandIn(Name='command_config_module', DataType=str,
                   Description="CLI command configuration module",
                   Required=True),
-        Parameter(Name='driver_name', DataType=str,
+        CommandIn(Name='driver_name', DataType=str,
                   Description="name of the driver script", Required=True)
+    ])
+
+    CommandOuts = ParameterCollection([
+        CommandOut(Name='result', DataType=str,
+                   Description="result bash completion script")
     ])
 
     def run(self, **kwargs):
