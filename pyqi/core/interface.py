@@ -43,8 +43,10 @@ class Interface(object):
 
     def __call__(self, in_, *args, **kwargs):
         self._the_in_validator(in_)
-        cmd_input = self._input_handler(in_, *args, **kwargs)
-        return self._output_handler(self.CmdInstance(**cmd_input))
+        cmd_input = self._input_handler(in_, *args, **kwargs)a
+        cmd_result = self.CmdInstance(**cmd_input)
+        self._the_out_validator(cmd_result)
+        return self._output_handler(cmd_result)
 
     def _validate_usage_examples(self, usage_examples):
         """Perform validation on a list of ``InterfaceUsageExample`` objects.
@@ -89,6 +91,11 @@ class Interface(object):
         """The job securator"""
         raise NotImplementedError("All subclasses must implement "
                                   "_the_in_validator.")
+
+    def _the_out_validator(self, out_):
+        """The result securator"""
+        raise NotImplementedError("All subclasses must implement "
+                                  "_the_out_validator.")
 
     def _input_handler(self, in_, *args, **kwargs):
         raise NotImplementedError("All subclasses must implement "
