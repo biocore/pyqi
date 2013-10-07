@@ -110,8 +110,8 @@ class Command(object):
     """
     BriefDescription = "" # 1 sentence description
     LongDescription = """""" # longer, more detailed description
-    CommandIn = ParameterCollection([])
-    CommandOut = ParameterCollection([])
+    CommandIns = ParameterCollection([])
+    CommandOuts = ParameterCollection([])
 
     def __init__(self, **kwargs):
         """ """
@@ -140,6 +140,9 @@ class Command(object):
             raise InvalidReturnTypeError("Unsupported result return type. "
                                          "Results must be stored in a "
                                          "dictionary.")
+
+        self._validate_result(result)
+
         return result
 
     def _validate_kwargs(self, kwargs):
@@ -151,7 +154,7 @@ class Command(object):
         self_str = str(self.__class__)
 
         # check required parameters
-        for p in self.CommandIn.values():
+        for p in self.CommandIns.values():
             if p.Required and p.Name not in kwargs:
                 self._logger.fatal('Missing required parameter %s in %s' % (p.Name, self_str))
                 raise MissingParameterError("Missing required parameter %s in %s" % (p.Name, self_str))
@@ -163,13 +166,26 @@ class Command(object):
 
         # make sure we only have things we expect
         for opt in kwargs:
-            if opt not in self.CommandIn:
+            if opt not in self.CommandIns:
                 self._logger.fatal('Unknown parameter %s in %s' % (opt, self_str))
                 raise UnknownParameterError("Unknown parameter %s in %s" % (opt, self_str))
-        
+    
+    def _validate_result(self, result):
+        """Validate the result from a ``Command.run``"""
+        self_str = str(self.__class__)
+
+        for p in self.CommandOuts.values():
+            if p.Name not in kwargs:
+                self._logger.fatal("CommandOut %s not in %s" % (p, self_str))
+                raise UnknownParameterError("CommandOut %s not in %s" % (p, self_str))
+        for k in result:
+            if k not in self.CommandOuts:
+                self._logger.fatal("Unknown CommandOut %s in %s" % (k, self_str))
+                raise UnknownParameterError("Unknown CommandOut %s in %s" % (p, self_str))
+
     def _set_defaults(self, kwargs):
         """Set defaults for optional parameters"""
-        for p in self.CommandIn.values():
+        for p in self.CommandIns.values():
             if not p.Required and p.Name not in kwargs:
                 kwargs[p.Name] = p.Default
 
@@ -183,19 +199,19 @@ class Command(object):
 
 # I do not like this
 def make_command_in_collection_lookup_f(obj):
-    """Return a function for convenient ``CommandIn`` lookup.
+    """Return a function for convenient ``CommandIns`` lookup.
 
     ``obj`` should be a Command (sub)class or instance.
     """
     def lookup_f(name):
-        return obj.CommandIn[name]
+        return obj.CommandIns[name]
     return lookup_f
 
 def make_command_out_collection_lookup_f(obj):
-    """Return a function for convenient ``CommandOut`` lookup.
+    """Return a function for convenient ``CommandOuts`` lookup.
 
     ``obj`` should be a Command (sub)class or instance.
     """
     def lookup_f(name):
-        return obj.CommandOut[name]
+        return obj.CommandOuts[name]
     return lookup_f
