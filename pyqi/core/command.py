@@ -26,14 +26,14 @@ from pyqi.core.exception import (IncompetentDeveloperError,
                                  MissingParameterError)
 
 class Parameter(object):
-    """A ``Command`` variable
+    """The ``Command`` variable type baseclass
 
     A ``Command`` variable is interface agnostic and is analogous to a function
     argument.
     """
 
-    def __init__(self, Name, DataType, Description, Required=False,
-                 Default=None, DefaultDescription=None, ValidateValue=None):
+    def __init__(self, Name, DataType, Description, Default=None, 
+                 ValidateValue=None):
         """
         
         ``Name`` should be a valid Python name so that users can supply either
@@ -52,17 +52,10 @@ class Parameter(object):
                                             "start with a letter or "
                                             "underscore." % Name)
 
-        if Required and Default is not None:
-            raise IncompetentDeveloperError("Found required parameter '%s' "
-                    "with default value '%s'. Required parameters cannot have "
-                    "default values." % (Name, Default))
 
         self.Name = Name
         self.DataType = DataType
         self.Description = Description
-        self.Required = Required
-        self.Default = Default
-        self.DefaultDescription = DefaultDescription
         self.ValidateValue = ValidateValue
 
     def _is_valid_name(self, name):
@@ -77,6 +70,26 @@ class Parameter(object):
         name = re.sub('^[^a-zA-Z_]+', '', name)
 
         return name
+
+class CommandIn(Parameter):
+    """A ``Command`` input variable type"""
+    def __init__(self, *args, **kwargs):
+        self.Required = kwargs.get('Required', False)
+        self.Default = kwargs.get('Default', None)
+        self.DefaultDescription = kwargs.get('DefaultDescription', None)
+        
+        if self.Required and self.Default is not None:
+            raise IncompetentDeveloperError("Found required parameter '%s' "
+                    "with default value '%r'. Required parameters cannot have "
+                    "default values." % (kwargs.get('Name', 'UNNAMED'), 
+                                         self.Default))
+        
+        super(self, CommandIn).__init__(*args, **kwargs)
+
+class CommandOut(Parameter):
+    """A ``Command`` output variable type"""
+    def __init__(self, *args, **kwargs):
+        super(self, CommandOut).__init__(*args, **kwargs)
 
 class ParameterCollection(dict):
     """A collection of parameters with dict like lookup"""
