@@ -17,7 +17,8 @@ __version__ = "0.2.0-dev"
 __maintainer__ = "Daniel McDonald"
 __email__ = "mcdonadt@colorado.edu"
 
-from pyqi.core.command import Command, Parameter, ParameterCollection
+from pyqi.core.command import (Command, CommandIn, CommandOut, 
+    ParameterCollection)
 from pyqi.commands.code_header_generator import CodeHeaderGenerator
 
 command_imports = """from pyqi.core.command import Command, Parameter, ParameterCollection"""
@@ -58,17 +59,18 @@ if __name__ == '__main__':
 class MakeCommand(CodeHeaderGenerator):
     BriefDescription = "Construct a stubbed out Command object"
     LongDescription = """This command is intended to construct the basics of a Command object so that a developer can dive straight into the implementation of the command"""
-    CommandIn = ParameterCollection(
+
+    CommandIns = ParameterCollection(
           CodeHeaderGenerator.Parameters.Parameters + [
-          Parameter(Name='name', DataType=str,
+          CommandIn(Name='name', DataType=str,
                     Description='the name of the Command', Required=True),
-          Parameter(Name='test_code', DataType=bool,
+          CommandIn(Name='test_code', DataType=bool,
                     Description='create stubbed out unit test code',
                     Required=False, Default=False)
           ]
     )
-    CommandOut = ParameterCollection([
-          Parameter(Name='result',DataType=str, 
+    CommandOuts = ParameterCollection([
+          CommandOut(Name='result',DataType=str, 
                     Description='The resulting template', Required=True)
           ]
     )
