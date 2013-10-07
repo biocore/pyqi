@@ -138,6 +138,12 @@ class OptparseInterface(Interface):
             raise IncompetentDeveloperError("Unsupported input '%r'. Input "
                                             "must be a list." % in_)
 
+    def _the_out_validator(self, out_):
+        """Validate output coming from the command call"""
+        if not isinstance(out_, dict):
+            raise IncompetentDeveloperError("Unsupported result '%r'. Result "
+                                            "must be a dict." % out_)
+
     def _input_handler(self, in_, *args, **kwargs):
         """Parses command-line input."""
         required_opts = [opt for opt in self._get_inputs() if opt.Required]
