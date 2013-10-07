@@ -73,23 +73,29 @@ class Parameter(object):
 
 class CommandIn(Parameter):
     """A ``Command`` input variable type"""
-    def __init__(self, *args, **kwargs):
-        self.Required = kwargs.get('Required', False)
-        self.Default = kwargs.get('Default', None)
-        self.DefaultDescription = kwargs.get('DefaultDescription', None)
+    def __init__(self, Name, DataType, Description, Required=False, 
+                 Default=None, DefaultDescription=None, **kwargs):
+        self.Required = Required
+        self.Default = Default
+        self.DefaultDescription = DefaultDescription
         
-        if self.Required and self.Default is not None:
+        if Required and Default is not None:
             raise IncompetentDeveloperError("Found required parameter '%s' "
                     "with default value '%r'. Required parameters cannot have "
-                    "default values." % (kwargs.get('Name', 'UNNAMED'), 
-                                         self.Default))
+                    "default values." % (Name, Default))
         
-        super(self, CommandIn).__init__(*args, **kwargs)
+        super(CommandIn, self).__init__(Name, DataType, Description, **kwargs)
 
 class CommandOut(Parameter):
-    """A ``Command`` output variable type"""
-    def __init__(self, *args, **kwargs):
-        super(self, CommandOut).__init__(*args, **kwargs)
+    """A ``Command`` output variable type
+    
+    ### SHOULD THIS JUST BE A REFERENCE TO THE ACTUAL COMMANDIN OBJECT?
+    ``InputName`` can be specified to link against a ``CommandIn``
+    """
+    def __init__(self, Name, DataType, Description, InputName=None, **kwargs):
+        self.InputName = InputName
+
+        super(CommandOut, self).__init__(Name, DataType, Description, **kwargs)
 
 class ParameterCollection(dict):
     """A collection of parameters with dict like lookup"""

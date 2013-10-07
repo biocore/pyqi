@@ -67,7 +67,7 @@ class MakeCommand(CodeHeaderGenerator):
     LongDescription = """This command is intended to construct the basics of a Command object so that a developer can dive straight into the implementation of the command"""
 
     CommandIns = ParameterCollection(
-          CodeHeaderGenerator.Parameters.Parameters + [
+          CodeHeaderGenerator.CommandIns.Parameters + [
           CommandIn(Name='name', DataType=str,
                     Description='the name of the Command', Required=True),
           CommandIn(Name='test_code', DataType=bool,
@@ -77,7 +77,7 @@ class MakeCommand(CodeHeaderGenerator):
     )
     CommandOuts = ParameterCollection([
           CommandOut(Name='result',DataType=str, 
-                    Description='The resulting template', Required=True)
+                    Description='The resulting template')
           ]
     )
 

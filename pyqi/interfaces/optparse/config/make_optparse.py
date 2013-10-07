@@ -67,5 +67,5 @@ inputs = [
 outputs = [
     OptparseResult(Parameter=cmdout_lookup('result'),
                    OutputHandler=write_list_of_strings,
-                   OptionName='output-fp')
+                   InputName='output-fp')
 ]

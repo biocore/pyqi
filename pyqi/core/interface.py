@@ -24,6 +24,9 @@ from glob import glob
 from os.path import basename, dirname, expanduser, join
 from pyqi.core.exception import IncompetentDeveloperError
 
+### for an isintance check. not very excited about this
+from pyqi.core.command import CommandIn
+
 class Interface(object):
     CommandConstructor = None
 
@@ -43,7 +46,7 @@ class Interface(object):
 
     def __call__(self, in_, *args, **kwargs):
         self._the_in_validator(in_)
-        cmd_input = self._input_handler(in_, *args, **kwargs)a
+        cmd_input = self._input_handler(in_, *args, **kwargs)
         cmd_result = self.CmdInstance(**cmd_input)
         self._the_out_validator(cmd_result)
         return self._output_handler(cmd_result)
@@ -163,17 +166,19 @@ class InterfaceOption(object):
             # Transfer information from Parameter unless overridden here.
             self.Name = Parameter.Name if Name is None else Name
             self.Help = Parameter.Description if Help is None else Help
-            self.Default = Parameter.Default if Default is None else Default
-            self.DefaultDescription = Parameter.DefaultDescription if \
+            
+            if isinstance(Parameter, CommandIn):
+                self.Default = Parameter.Default if Default is None else Default
+                self.DefaultDescription = Parameter.DefaultDescription if \
                     DefaultDescription is None else DefaultDescription
 
-            # If a parameter is required, the option is always required, but
-            # if a parameter is not required, but the option does require it,
-            # then we make the option required.
-            if not Parameter.Required and Required:
-                self.Required = True
-            else:
-                self.Required = Parameter.Required
+                # If a parameter is required, the option is always required, but
+                # if a parameter is not required, but the option does require it,
+                # then we make the option required.
+                if not Parameter.Required and Required:
+                    self.Required = True
+                else:
+                    self.Required = Parameter.Required
 
         # This information is never contained in a Parameter.
         self.Type = Type
@@ -184,10 +189,11 @@ class InterfaceOption(object):
         if convert_to_dashed_name:
             self.Name = self.Name.replace('_', '-')
 
-        if self.Required and self.Default is not None:
-            raise IncompetentDeveloperError("Found required option '%s' "
-                    "with default value '%s'. Required options cannot have "
-                    "default values." % (self.Name, self.Default))
+        if isinstance(Parameter, CommandIn):
+            if self.Required and self.Default is not None:
+                raise IncompetentDeveloperError("Found required option '%s' "
+                        "with default value '%s'. Required options cannot have "
+                        "default values." % (self.Name, self.Default))
 
         self._validate_option()
 

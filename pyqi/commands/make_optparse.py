@@ -10,7 +10,8 @@
 
 from __future__ import division
 from operator import attrgetter
-from pyqi.core.command import Command, Parameter, ParameterCollection
+from pyqi.core.command import (Command, CommandIn, CommandOut, 
+    ParameterCollection)
 from pyqi.commands.code_header_generator import CodeHeaderGenerator
 
 __author__ = "Daniel McDonald"
@@ -123,7 +124,7 @@ class MakeOptparse(CodeHeaderGenerator):
     LongDescription = """Construct and stub out the basic optparse configuration for a given Command. This template provides comments and examples of what to fill in."""
     
     CommandIns = ParameterCollection(
-        CodeHeaderGenerator.Parameters.Parameters + [
+        CodeHeaderGenerator.CommandIns.Parameters + [
         CommandIn(Name='command', DataType=Command,
                   Description='an existing Command', Required=True),
         CommandIn(Name='command_module', DataType=str,
@@ -131,7 +132,7 @@ class MakeOptparse(CodeHeaderGenerator):
         ]
     )
 
-    CommandOuts = ParameterCollection(
+    CommandOuts = ParameterCollection([
         CommandOut(Name='result', DataType=str,
                    Description='The resulting template configuration')
     ])
