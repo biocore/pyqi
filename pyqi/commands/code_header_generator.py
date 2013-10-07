@@ -17,7 +17,8 @@ __version__ = "0.2.0-dev"
 __maintainer__ = "Jai Ram Rideout"
 __email__ = "jai.rideout@gmail.com"
 
-from pyqi.core.command import Command, CommandIn, ParameterCollection
+from pyqi.core.command import (Command, CommandIn, CommandOut, 
+    ParameterCollection)
 
 header_format = """#!/usr/bin/env python
 from __future__ import division
