@@ -24,7 +24,8 @@ __email__ = "mcdonadt@colorado.edu"
 
 header_format = """from pyqi.core.interfaces.optparse import (OptparseUsageExample,
                                            OptparseOption, OptparseResult)
-from pyqi.core.command import make_parameter_collection_lookup_f
+from pyqi.core.command import (make_command_in_collection_lookup_f,
+                               make_command_out_collection_lookup_f)
 from %(command_module)s import CommandConstructor
 
 # If you need access to input or output handlers provided by pyqi, consider
@@ -35,7 +36,8 @@ from %(command_module)s import CommandConstructor
 # pyqi.interfaces.optparse.output_handler
 
 # Convenience function for looking up parameters by name.
-param_lookup = make_parameter_collection_lookup_f(CommandConstructor)
+cmd_in_lookup = make_command_in_collection_lookup_f(CommandConstructor)
+cmd_out_lookup = make_command_out_collection_lookup_f(CommandConstructor)
 
 # Examples of how the command can be used from the command line using an
 # optparse interface.
@@ -49,7 +51,7 @@ usage_examples = [
 # to define options here that do not exist as parameters, e.g., an output file.
 inputs = [
     # An example option that has a direct relationship with a Parameter.
-    # OptparseOption(Parameter=param_lookup('name_of_a_parameter'),
+    # OptparseOption(Parameter=cmd_in_lookup('name_of_a_command_in'),
     #                InputType='existing_filepath', # the optparse type of input
     #                InputAction='store', # the optparse action
     #                InputHandler=None, # Apply a function to the input value to convert it into the type expected by Parameter.DataType
@@ -79,30 +81,37 @@ inputs = [
 # inputs list (above).
 outputs = [
     # An example option that maps to a result key.
-    # OptparseResult(ResultKey='some_result',
+    # OptparseResult(Parameter=cmd_out_lookup('name_of_a_command_out'),
     #                OutputHandler=write_string, # a function applied to the value at ResultKey
     #
     #                # the name of the option (defined in inputs, above), whose
     #                # value will be made available to OutputHandler. This name
     #                # can be either an underscored or dashed version of the
     #                # option name (e.g., 'output_fp' or 'output-fp')
-    #                OptionName='output-fp'), 
+    #                InputName='output-fp'), 
     #
     # An example option that does not map to a result key.
-    # OptparseResult(ResultKey='some_other_result',
+    # OptparseResult(Parameter=cmd_out_lookup('some_other_result'),
     #                OutputHandler=print_string)
+
+%(output_fmt)s
 ]"""
 
 # Fill out by Parameter, and comment out some of the most common stuff.
-input_format = """    OptparseOption(Parameter=param_lookup('%(name)s'),
+input_format = """    OptparseOption(Parameter=cmd_in_lookup('%(name)s'),
                    InputType=%(datatype)s,
                    InputAction='%(action)s', # default is 'store', change if desired
                    InputHandler=None, # must be defined if desired
-                   ShortName=None), # must be defined if desired
+                   ShortName=None, # must be defined if desired
                    # Name='%(name)s', # implied by Parameter
                    # Required=%(required)s, # implied by Parameter
                    # Help='%(help)s', # implied by Parameter
-                   %(default_block)s
+                   %(default_block)s),
+"""
+
+output_format = """    OptparseResult(Parameter=cmd_out_lookup('%(name)s'),
+                    OutputHandler=None, # must be defined
+                    Inputname=None), # define if tying to an OptparseOption
 """
 
 default_block_format = """# Default=%(default)s, # implied by Parameter
@@ -112,14 +121,20 @@ default_block_format = """# Default=%(default)s, # implied by Parameter
 class MakeOptparse(CodeHeaderGenerator):
     BriefDescription = "Consume a Command, stub out an optparse configuration"
     LongDescription = """Construct and stub out the basic optparse configuration for a given Command. This template provides comments and examples of what to fill in."""
-    Parameters = ParameterCollection(
+    
+    CommandIns = ParameterCollection(
         CodeHeaderGenerator.Parameters.Parameters + [
-        Parameter(Name='command', DataType=Command,
+        CommandIn(Name='command', DataType=Command,
                   Description='an existing Command', Required=True),
-        Parameter(Name='command_module', DataType=str,
+        CommandIn(Name='command_module', DataType=str,
                   Description='the Command source module', Required=True)
         ]
     )
+
+    CommandOuts = ParameterCollection(
+        CommandOut(Name='result', DataType=str,
+                   Description='The resulting template configuration')
+    ])
 
     def run(self, **kwargs):
         code_header_lines = super(MakeOptparse, self).run(
@@ -130,8 +145,8 @@ class MakeOptparse(CodeHeaderGenerator):
         result_lines = code_header_lines
 
         # construct inputs based off of parameters
-        param_formatted = []
-        for param in sorted(kwargs['command'].Parameters.values(),
+        cmdin_formatted = []
+        for param in sorted(kwargs['command'].CommandIns.values(),
                             key=attrgetter('Name')):
             if param.Required:
                 default_block = ''
@@ -152,11 +167,20 @@ class MakeOptparse(CodeHeaderGenerator):
             fmt = {'name':param.Name, 'datatype':data_type, 'action':action,
                    'required':str(param.Required),
                    'help':param.Description, 'default_block':default_block}
-            param_formatted.append(input_format % fmt)
+            cmdin_formatted.append(input_format % fmt)
 
-        param_formatted = ''.join(param_formatted)
+        cmdout_formatted = []
+        for param in sorted(kwargs['command'].CommandOuts.values(),
+                            key=attrgetter('Name')):
+            fmt = {'name':param.Name}
+            cmdout_formatted.append(output_format % fmt)
+
+
+        cmdin_formatted = ''.join(cmdin_formatted)
+        cmdout_formatted = ''.join(cmdout_formatted)
         header_fmt = {'command_module':kwargs['command_module'],
-                      'input_fmt': param_formatted}
+                      'input_fmt': cmdin_formatted,
+                      'output_fmt':cmdout_formatted}
 
         result_lines.extend((header_format % header_fmt).split('\n'))
         return {'result': result_lines}
