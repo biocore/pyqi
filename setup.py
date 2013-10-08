@@ -19,6 +19,7 @@ __email__ = "gregcaporaso@gmail.com"
 
 from distutils.core import setup
 from glob import glob
+import sys
 
 # from https://wiki.python.org/moin/PortingPythonToPy3k
 try:
@@ -28,10 +29,38 @@ except ImportError:
     # python 2.x
     from distutils.command.build_py import build_py
 
+# classes/classifiers code adapted from Celery:
+# https://github.com/celery/celery/blob/master/setup.py
+#
+# PyPI's list of classifiers can be found here:
+# https://pypi.python.org/pypi?%3Aaction=list_classifiers
+classes = """
+    Development Status :: 4 - Beta
+    License :: OSI Approved :: BSD License
+    Topic :: Software Development :: Libraries :: Application Frameworks
+    Topic :: Software Development :: User Interfaces 
+    Programming Language :: Python
+    Programming Language :: Python :: 2.7
+    Programming Language :: Python :: Implementation :: CPython
+    Operating System :: OS Independent
+    Operating System :: POSIX
+    Operating System :: MacOS :: MacOS X
+"""
+classifiers = [s.strip() for s in classes.split('\n') if s]
+
+# Verify Python version
+ver = '.'.join(map(str, [sys.version_info.major, sys.version_info.minor]))
+if ver not in ['2.7']:
+    raise ValueError, "Python %s is not supported" % ver    
+
+long_description = """pyqi (canonically pronounced pie chee) is a Python framework designed to support wrapping general commands in multiple types of interfaces, including at the command line, HTML, and API levels."""
+
 setup(name='pyqi',
       cmdclass={'build_py':build_py},
       version=__version__,
+      license=__license__,
       description='pyqi: expose your interface',
+      long_description=long_description,
       author=__maintainer__,
       author_email=__email__,
       maintainer=__maintainer__,
@@ -50,5 +79,6 @@ setup(name='pyqi',
       install_requires=[
           "Sphinx >= 0.3",
           "nose >= 0.10.1"
-          ]
+          ],
+      classifiers=classifiers
       )
