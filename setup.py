@@ -48,6 +48,7 @@ setup(name='pyqi',
                 ],
       scripts=glob('scripts/pyqi*'),
       install_requires=[
-          "Sphinx >= 0.3"
+          "Sphinx >= 0.3",
+          "nose >= 0.10.1"
           ]
       )
