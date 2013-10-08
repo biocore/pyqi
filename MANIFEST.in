@@ -1,6 +1,6 @@
 include README.md
 include COPYING.txt
-include ChangeLod.md
+include ChangeLog.md
 
 graft pyqi
 graft scripts
