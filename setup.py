@@ -19,7 +19,7 @@ __email__ = "gregcaporaso@gmail.com"
 
 from distutils.core import setup
 from glob import glob
-import sys
+import sys, stderr, exit
 
 # from https://wiki.python.org/moin/PortingPythonToPy3k
 try:
@@ -51,7 +51,8 @@ classifiers = [s.strip() for s in classes.split('\n') if s]
 # Verify Python version
 ver = '.'.join(map(str, [sys.version_info.major, sys.version_info.minor]))
 if ver not in ['2.7']:
-    raise ValueError, "Python %s is not supported" % ver    
+    stderr.write("Python %s is not supported\n" % ver)
+    exit(1)
 
 long_description = """pyqi (canonically pronounced pie chee) is a Python framework designed to support wrapping general commands in multiple types of interfaces, including at the command line, HTML, and API levels."""
 
