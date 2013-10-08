@@ -46,4 +46,8 @@ setup(name='pyqi',
                 'pyqi/interfaces/optparse',
                 'pyqi/interfaces/optparse/config',
                 ],
-      scripts=glob('scripts/pyqi*'))
+      scripts=glob('scripts/pyqi*'),
+      install_requires=[
+          "Sphinx >= 0.3"
+          ]
+      )
