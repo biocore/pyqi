@@ -1,0 +1,13 @@
+include README.md
+include COPYING.txt
+include ChangeLod.md
+
+graft pyqi
+graft scripts
+graft docs
+
+prune docs/_build
+
+global-exclude *.pyc
+global-exclude *.pyo
+global-exclude .git
