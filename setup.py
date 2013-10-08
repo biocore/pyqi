@@ -76,9 +76,10 @@ setup(name='pyqi',
                 'pyqi/interfaces/optparse/config',
                 ],
       scripts=glob('scripts/pyqi*'),
-      install_requires=[
-          "Sphinx >= 0.3",
-          "nose >= 0.10.1"
-          ],
+      install_requires=[],
+      extras_require={'test':["nose >= 0.10.1",
+                              "tox >= 1.6.1"],
+                      'doc':"Sphinx >= 0.3"
+                     },
       classifiers=classifiers
       )
