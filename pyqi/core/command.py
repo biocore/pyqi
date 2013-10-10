@@ -193,7 +193,7 @@ class Command(object):
         self_str = str(self.__class__)
 
         for p in self.CommandOuts.values():
-            if p.Name not in kwargs:
+            if p.Name not in result:
                 self._logger.fatal("CommandOut %s not in %s" % (p, self_str))
                 raise UnknownParameterError("CommandOut %s not in %s" % (p, self_str))
         for k in result:
