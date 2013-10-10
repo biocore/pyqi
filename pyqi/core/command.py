@@ -32,8 +32,7 @@ class Parameter(object):
     or outputs of a ``Command``.
     """
 
-    def __init__(self, Name, DataType, Description, Default=None, 
-                 ValidateValue=None):
+    def __init__(self, Name, DataType, Description, ValidateValue=None):
         """
         
         ``Name`` should be a valid Python name so that users can supply either
