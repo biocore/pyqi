@@ -174,19 +174,24 @@ class Command(object):
         # check required parameters
         for p in self.CommandIns.values():
             if p.Required and p.Name not in kwargs:
-                self._logger.fatal('Missing required parameter %s in %s' % (p.Name, self_str))
-                raise MissingParameterError("Missing required parameter %s in %s" % (p.Name, self_str))
+                err_msg = 'Missing required parameter %s in %s' % (p.Name, 
+                                                                   self_str)
+                self._logger.fatal(err_msg)
+                raise MissingParameterError(err_msg)
 
             if p.Name in kwargs and p.ValidateValue:
                 if not p.ValidateValue(kwargs[p.Name]):
-                    self._logger.fatal("Parameter %s cannot take value %s in %s" % (p.Name, kwargs[p.Name], self_str))
-                    raise ValueError("Parameter %s cannot take value %s in %s" % (p.Name, kwargs[p.Name], self_str))
+                    err_msg = "Parameter %s cannot take value %s in %s" % \
+                                (p.Name, kwargs[p.Name], self_str)
+                    self._logger.fatal(err_msg)
+                    raise ValueError(err_msg)
 
         # make sure we only have things we expect
         for opt in kwargs:
             if opt not in self.CommandIns:
-                self._logger.fatal('Unknown parameter %s in %s' % (opt, self_str))
-                raise UnknownParameterError("Unknown parameter %s in %s" % (opt, self_str))
+                err_msg = 'Unknown parameter %s in %s' % (opt, self_str)
+                self._logger.fatal(err_msg)
+                raise UnknownParameterError(err_msg)
     
     def _validate_result(self, result):
         """Validate the result from a ``Command.run``"""
@@ -194,12 +199,14 @@ class Command(object):
 
         for p in self.CommandOuts.values():
             if p.Name not in result:
-                self._logger.fatal("CommandOut %s not in %s" % (p, self_str))
-                raise UnknownParameterError("CommandOut %s not in %s" % (p, self_str))
+                err_msg = "CommandOut %s not in %s" % (p, self_str)
+                self._logger.fatal(err_msg)
+                raise UnknownParameterError(err_msg)
         for k in result:
             if k not in self.CommandOuts:
-                self._logger.fatal("Unknown CommandOut %s in %s" % (k, self_str))
-                raise UnknownParameterError("Unknown CommandOut %s in %s" % (p, self_str))
+                err_msg = "Unknown CommandOut %s in %s" % (k, self_str)
+                self._logger.fatal(err_msg)
+                raise UnknownParameterError(err_msg)
 
     def _set_defaults(self, kwargs):
         """Set defaults for optional parameters"""
