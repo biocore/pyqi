@@ -28,8 +28,8 @@ from pyqi.core.exception import (IncompetentDeveloperError,
 class Parameter(object):
     """The ``Command`` variable type baseclass
 
-    A ``Command`` variable is interface agnostic and is analogous to a function
-    argument.
+    A ``Parameter`` is interface agnostic, and is used to describe an input
+    or outputs of a ``Command``.
     """
 
     def __init__(self, Name, DataType, Description, Default=None, 
