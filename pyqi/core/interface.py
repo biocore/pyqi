@@ -140,12 +140,67 @@ class Interface(object):
         """
         raise NotImplementedError("Must define _get_version")
 
+class InterfaceInputOption(InterfaceOption):
+    def __init__(self, Action=None, Required=False, Default=None, 
+                 ShortName=None, DefaultDescription=None, 
+                 convert_to_dashed_name=True, **kwargs):
+        super(InterfaceInputOption, self).__init__(**kwargs)
+
+        self.Required = Required
+        self.Default = Default
+        self.DefaultDescription = DefaultDescription
+        self.ShortName = ShortName
+        self.Action = Action
+        
+        if convert_to_dashed_name:
+            self.Name = self.Name.replace('_', '-')
+
+        ### Jai, what if Parameter could never be None? See comment in 
+        ### InterfaceOption
+        if self.Parameter is not None:
+            if self.Required and self.Default is not None:
+                raise IncompetentDeveloperError("Found required option '%s' "
+                        "with default value '%s'. Required options cannot have "
+                        "default values." % (self.Name, self.Default))
+
+        if self.Parameter is not None:
+            self.Default = Parameter.Default if Default is None else Default
+            self.DefaultDescription = Parameter.DefaultDescription if \
+                DefaultDescription is None else DefaultDescription
+
+            # If a parameter is required, the option is always required, but
+            # if a parameter is not required, but the option does require it,
+            # then we make the option required.
+            if not Parameter.Required and Required:
+                self.Required = True
+            else:
+                self.Required = Parameter.Required
+
+        ### cannot call from base class as we need to initialize base prior
+        ### to subclass, but object likely isn't valid until the end of
+        ### subclass initialization
+        self._validate_option()
+
+class InterfaceOutputOption(InterfaceOption):
+    pass
+
 class InterfaceOption(object):
-    """Describes an option and what to do with it"""
-    def __init__(self, Parameter=None, Type=None, Action=None,
-                 Handler=None, ShortName=None, Name=None, Required=False,
-                 Help=None, Default=None, DefaultDescription=None,
-                 convert_to_dashed_name=True):
+    """Describes an option and what to do with it
+    
+    ``Parameter`` is a pyqi.core.command.Parameter instance
+    ``Type`` refers to the interface type, not the actually datatype of the
+        ``Parameter``. For instance, a file path may be specified on a command
+        line interface for a BIOM table. The ``Parameter.Datatype`` is a BIOM 
+        type, while the ``InterfaceOption.Type`` is a string or possibly a 
+        ``FilePath`` object.
+    ``Handler`` is a function that can take the value associated with the
+        option and transform it into the ``Parameter.DataType``.
+    ``Name`` is the name of the ``InterfaceOption``, e.g,, 'input-fp'
+    ``Help`` is a description of the ``InterfaceOption``
+    """
+    def __init__(self, Parameter=None, Type=None, Handler=None, Name=None,
+                 Help=None):
+        ### should Type ever be None?
         self.Parameter = Parameter
 
         if self.Parameter is None:
@@ -159,43 +214,17 @@ class InterfaceOption(object):
                                                 "doesn't have a Parameter.")
             self.Name = Name
             self.Help = Help
-            self.Required = Required
-            self.Default = Default
-            self.DefaultDescription = DefaultDescription
+
+            ### Jai, what about setting a placeholder Parameter here, eg:
+            ### self.Parameter = Parameter(Name=Name, Description=Help, DataType=None) 
         else:
             # Transfer information from Parameter unless overridden here.
             self.Name = Parameter.Name if Name is None else Name
             self.Help = Parameter.Description if Help is None else Help
             
-            if isinstance(Parameter, CommandIn):
-                self.Default = Parameter.Default if Default is None else Default
-                self.DefaultDescription = Parameter.DefaultDescription if \
-                    DefaultDescription is None else DefaultDescription
-
-                # If a parameter is required, the option is always required, but
-                # if a parameter is not required, but the option does require it,
-                # then we make the option required.
-                if not Parameter.Required and Required:
-                    self.Required = True
-                else:
-                    self.Required = Parameter.Required
-
-        # This information is never contained in a Parameter.
+        # This information is never contained in a Parameter. 
         self.Type = Type
-        self.Action = Action
         self.Handler = Handler
-        self.ShortName = ShortName
-
-        if convert_to_dashed_name:
-            self.Name = self.Name.replace('_', '-')
-
-        if isinstance(Parameter, CommandIn):
-            if self.Required and self.Default is not None:
-                raise IncompetentDeveloperError("Found required option '%s' "
-                        "with default value '%s'. Required options cannot have "
-                        "default values." % (self.Name, self.Default))
-
-        self._validate_option()
 
     def _validate_option(self):
         """Interface specific validation requirements"""
