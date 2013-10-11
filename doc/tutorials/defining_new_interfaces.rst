@@ -469,6 +469,8 @@ pyqi defines several new option types in addition to the optparse's built-in opt
 +------------------------------+------------------------------------------------------------+
 | existing_dirpath             | path to an existing directory                              |
 +------------------------------+------------------------------------------------------------+
+| existing_dirpaths            | path to one or more existing directories                   |
++------------------------------+------------------------------------------------------------+
 | new_dirpath                  | path to a new directory                                    |
 +------------------------------+------------------------------------------------------------+
 | multiple_choice              | one or more values from a list of choices                  |
