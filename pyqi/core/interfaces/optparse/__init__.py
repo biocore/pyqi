@@ -333,6 +333,22 @@ def check_existing_dirpath(option, opt, value):
     else:
         return value
 
+def check_existing_dirpaths(option, opt, value):
+    paths = []
+    for v in value.split(','):
+        dps = glob(v)
+        if len(dps) == 0:
+            raise OptionValueError(
+                "No dirpaths match pattern/name '%s'."
+                "All patters must be matched at least once." % v)
+        else:
+            paths.extend(fps)
+    values = []
+    for v in paths:
+        check_existing_dirpath(option, opt, v)
+        values.append(v)
+    return values
+
 def check_new_filepath(option, opt, value):
     return value
         
@@ -377,6 +393,7 @@ class PyqiOption(Option):
                             "existing_filepaths",
                             "new_filepath",
                             "existing_dirpath",
+                            "existing_dirpaths",
                             "new_dirpath",
                             "multiple_choice",
                             "blast_db")
@@ -398,6 +415,9 @@ class PyqiOption(Option):
     # for cases where the user is passing an existing directory
     # (e.g., containing a set of input files)
     TYPE_CHECKER["existing_dirpath"] = check_existing_dirpath
+    # for cases where the user passes one or more existing directories
+    # as a comma-separated list - paths are returned as a list
+    TYPE_CHECKER["existing_dirpaths"] = check_existing_dirpaths
     # for cases where the user is passing a new directory to be 
     # create (e.g., an output dir which will contain many result files)
     TYPE_CHECKER["new_dirpath"] = check_new_dirpath
