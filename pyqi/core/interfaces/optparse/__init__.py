@@ -311,7 +311,7 @@ def check_existing_filepaths(option, opt, value):
     paths = []
     for v in value.split(','):
         fps = glob(v)
-        if len(fps) == 0:            
+        if len(fps) == 0:
             raise OptionValueError(
              "No filepaths match pattern/name '%s'. "
              "All patterns must be matched at least once." % v)
@@ -342,7 +342,7 @@ def check_existing_dirpaths(option, opt, value):
                 "No dirpaths match pattern/name '%s'."
                 "All patters must be matched at least once." % v)
         else:
-            paths.extend(fps)
+            paths.extend(dps)
     values = []
     for v in paths:
         check_existing_dirpath(option, opt, v)
@@ -350,9 +350,19 @@ def check_existing_dirpaths(option, opt, value):
     return values
 
 def check_new_filepath(option, opt, value):
+    if exists(value):
+        if isdir(value):
+            raise OptionValueError(
+                "option %s: output file exists and it is a directory: %r" %(opt,
+                    value))
     return value
         
 def check_new_dirpath(option, opt, value):
+    if exists(value):
+        if isfile(value):
+            raise OptionValueError(
+                "option %s: output directory exists and it is a file: %r" %(opt,
+                    value))
     return value
     
 def check_existing_path(option, opt, value):
