@@ -340,7 +340,7 @@ def check_existing_dirpaths(option, opt, value):
         if len(dps) == 0:
             raise OptionValueError(
                 "No dirpaths match pattern/name '%s'."
-                "All patters must be matched at least once." % v)
+                "All patterns must be matched at least once." % v)
         else:
             paths.extend(dps)
     values = []
