@@ -80,13 +80,13 @@ class Interface(object):
                                             "same Parameter.")
 
     def _validate_outputs(self, outputs):
-        """Perform validation on a list of ``InterfaceResult`` objects.
+        """Perform validation on a list of ``InterfaceOutput`` objects.
 
         ``outputs`` will be the output of ``self._get_outputs()``. Subclasses
         can override to perform validation that requires a list of all
         interface results. Validation that should be performed on a
         per-interface result basis should instead go into
-        ``InterfaceResult._validate_result``.
+        ``InterfaceOutput._validate_result``.
         """
         pass
 
@@ -125,7 +125,7 @@ class Interface(object):
         raise NotImplementedError("Must define _get_inputs")
 
     def _get_outputs(self):
-        """Return a list of ``InterfaceResult`` objects
+        """Return a list of ``InterfaceOutput`` objects
         
         These are typically set in a command+interface specific configuration
         file and passed to ``pyqi.core.general_factory``
@@ -139,50 +139,6 @@ class Interface(object):
         file and passed to ``pyqi.core.general_factory``
         """
         raise NotImplementedError("Must define _get_version")
-
-class InterfaceInputOption(InterfaceOption):
-    def __init__(self, Action=None, Required=False, Default=None, 
-                 ShortName=None, DefaultDescription=None, 
-                 convert_to_dashed_name=True, **kwargs):
-        super(InterfaceInputOption, self).__init__(**kwargs)
-
-        self.Required = Required
-        self.Default = Default
-        self.DefaultDescription = DefaultDescription
-        self.ShortName = ShortName
-        self.Action = Action
-        
-        if convert_to_dashed_name:
-            self.Name = self.Name.replace('_', '-')
-
-        ### Jai, what if Parameter could never be None? See comment in 
-        ### InterfaceOption
-        if self.Parameter is not None:
-            if self.Required and self.Default is not None:
-                raise IncompetentDeveloperError("Found required option '%s' "
-                        "with default value '%s'. Required options cannot have "
-                        "default values." % (self.Name, self.Default))
-
-        if self.Parameter is not None:
-            self.Default = Parameter.Default if Default is None else Default
-            self.DefaultDescription = Parameter.DefaultDescription if \
-                DefaultDescription is None else DefaultDescription
-
-            # If a parameter is required, the option is always required, but
-            # if a parameter is not required, but the option does require it,
-            # then we make the option required.
-            if not Parameter.Required and Required:
-                self.Required = True
-            else:
-                self.Required = Parameter.Required
-
-        ### cannot call from base class as we need to initialize base prior
-        ### to subclass, but object likely isn't valid until the end of
-        ### subclass initialization
-        self._validate_option()
-
-class InterfaceOutputOption(InterfaceOption):
-    pass
 
 class InterfaceOption(object):
     """Describes an option and what to do with it
@@ -200,7 +156,6 @@ class InterfaceOption(object):
     """
     def __init__(self, Parameter=None, Type=None, Handler=None, Name=None,
                  Help=None):
-        ### should Type ever be None?
         self.Parameter = Parameter
 
         if self.Parameter is None:
@@ -235,6 +190,53 @@ class InterfaceOption(object):
             return None
         else:
             return self.Parameter.Name
+
+class InterfaceInputOption(InterfaceOption):
+    def __init__(self, Action=None, Required=False, Default=None, 
+                 ShortName=None, DefaultDescription=None, 
+                 convert_to_dashed_name=True, **kwargs):
+        super(InterfaceInputOption, self).__init__(**kwargs)
+
+        self.Required = Required
+        self.Default = Default
+        self.DefaultDescription = DefaultDescription
+        self.ShortName = ShortName
+        self.Action = Action
+        
+        if convert_to_dashed_name:
+            self.Name = self.Name.replace('_', '-')
+
+        ### Jai, what if Parameter could never be None? See comment in 
+        ### InterfaceOption
+        if self.Parameter is not None:
+            if self.Required and self.Default is not None:
+                raise IncompetentDeveloperError("Found required option '%s' "
+                        "with default value '%s'. Required options cannot have "
+                        "default values." % (self.Name, self.Default))
+
+        if self.Parameter is not None:
+            self.Default = self.Parameter.Default if Default is None else Default
+            self.DefaultDescription = self.Parameter.DefaultDescription if \
+                DefaultDescription is None else DefaultDescription
+
+            # If a parameter is required, the option is always required, but
+            # if a parameter is not required, but the option does require it,
+            # then we make the option required.
+            if not self.Parameter.Required and Required:
+                self.Required = True
+            else:
+                self.Required = self.Parameter.Required
+
+        ### cannot call from base class as we need to initialize base prior
+        ### to subclass, but object likely isn't valid until the end of
+        ### subclass initialization
+        self._validate_option()
+
+class InterfaceOutputOption(InterfaceOption):
+    def __init__(self, InputName=None, **kwargs):
+        super(InterfaceOutputOption, self).__init__(**kwargs)
+
+        self.InputName = InputName
 
 class InterfaceUsageExample(object): 
     """Provide structure to a usage example"""

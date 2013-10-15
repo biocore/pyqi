@@ -48,12 +48,12 @@ inputs = [
                    ShortName='c'),
     OptparseOption(Parameter=cmd_in_lookup('version'), Name='command-version'),
     OptparseOption(Parameter=cmd_in_lookup('credits'),
-                   InputHandler=string_list_handler,
+                   Handler=string_list_handler,
                    Help='comma-separated list of other authors'),
     OptparseOption(Parameter=cmd_in_lookup('test_code'),
-                   InputType=None, InputAction='store_true'),
+                   Type=None, Action='store_true'),
     OptparseOption(Parameter=None,
-                   InputType='new_filepath',
+                   Type='new_filepath',
                    ShortName='o',
                    Name='output-fp',
                    Required=True,
@@ -63,6 +63,6 @@ inputs = [
 outputs = [
     ### InputName is used to tie this output to output-fp, which is an input...
     OptparseResult(Parameter=cmd_out_lookup('result'),
-                   OutputHandler=write_list_of_strings,
+                   Handler=write_list_of_strings,
                    InputName='output-fp')
 ]

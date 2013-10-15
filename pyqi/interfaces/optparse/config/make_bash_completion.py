@@ -37,7 +37,7 @@ inputs = [
     OptparseOption(Parameter=cmd_in_lookup('command_config_module')),
     OptparseOption(Parameter=cmd_in_lookup('driver_name')),
     OptparseOption(Parameter=None,
-                   InputType='new_filepath',
+                   Type='new_filepath',
                    ShortName='o',
                    Name='output-fp',
                    Required=True,
@@ -46,6 +46,6 @@ inputs = [
 
 outputs = [
     OptparseResult(Parameter=cmd_out_lookup('result'),
-                   OutputHandler=write_string,
+                   Handler=write_string,
                    InputName='output-fp')
 ]

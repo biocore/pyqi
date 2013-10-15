@@ -25,41 +25,24 @@ from glob import glob
 from os.path import abspath, exists, isdir, isfile, split
 from optparse import (Option, OptionParser, OptionGroup, OptionValueError,
                       OptionError)
-from pyqi.core.interface import (Interface, InterfaceOption,
-                                 InterfaceUsageExample)
+from pyqi.core.interface import (Interface, InterfaceInputOption, 
+                                 InterfaceOutputOption, InterfaceUsageExample)
 from pyqi.core.factory import general_factory
 from pyqi.core.exception import IncompetentDeveloperError
 from pyqi.core.command import Parameter
 
-class OptparseResult(InterfaceOption):
-    def __init__(self, Parameter=None, OutputType=str, OutputAction='store',
-                 OutputHandler=None, ShortName=None, Name=None, Required=False,
-                 Help=None, Default=None, DefaultDescription=None,
-                 convert_to_dashed_name=True, InputName=None):
-        super(OptparseResult, self).__init__(Parameter=Parameter,
-                Type=OutputType, Action=OutputAction,
-                Handler=OutputHandler, ShortName=ShortName, Name=Name,
-                Required=Required, Help=Help, Default=Default,
-                DefaultDescription=DefaultDescription,
-                convert_to_dashed_name=convert_to_dashed_name)
-        self.InputName = InputName
+class OptparseResult(InterfaceOutputOption):
+    def __init__(self, **kwargs):
+        super(OptparseResult, self).__init__(**kwargs)
 
     def _validate_option(self):
         pass
 
-class OptparseOption(InterfaceOption):
+class OptparseOption(InterfaceInputOption):
     """An augmented option that expands a Parameter into an Option"""
 
-    def __init__(self, Parameter=None, InputType=str, InputAction='store',
-                 InputHandler=None, ShortName=None, Name=None, Required=False,
-                 Help=None, Default=None, DefaultDescription=None,
-                 convert_to_dashed_name=True):
-        super(OptparseOption, self).__init__(Parameter=Parameter,
-                Type=InputType, Action=InputAction,
-                Handler=InputHandler, ShortName=ShortName, Name=Name,
-                Required=Required, Help=Help, Default=Default,
-                DefaultDescription=DefaultDescription,
-                convert_to_dashed_name=convert_to_dashed_name)
+    def __init__(self, **kwargs):
+        super(OptparseOption, self).__init__(**kwargs)
 
     def _validate_option(self):
         # optparse takes care of validating InputType, InputAction, and
@@ -263,6 +246,7 @@ class OptparseInterface(Interface):
 
         for output in self._get_outputs():
             rk = output.Name
+            
             if rk not in results:
                 raise IncompetentDeveloperError("Did not find the expected "
                                                 "output '%s' in results." % rk)

@@ -42,7 +42,7 @@ usage_examples = [
 inputs = [
     OptparseOption(Parameter=cmdin_lookup('command'),
                    ShortName='c',
-                   InputHandler=command_handler),
+                   Handler=command_handler),
     OptparseOption(Parameter=cmdin_lookup('command_module'),
                    ShortName='m'),
     OptparseOption(Parameter=cmdin_lookup('author'),
@@ -54,10 +54,10 @@ inputs = [
     OptparseOption(Parameter=cmdin_lookup('copyright')),
     OptparseOption(Parameter=cmdin_lookup('version'), Name='config-version'),
     OptparseOption(Parameter=cmdin_lookup('credits'),
-                   InputHandler=string_list_handler,
+                   Handler=string_list_handler,
                    Help='comma-separated list of other authors'),
     OptparseOption(Parameter=None,
-                   InputType='new_filepath',
+                   Type='new_filepath',
                    ShortName='o',
                    Name='output-fp',
                    Required=True,
@@ -66,6 +66,6 @@ inputs = [
 
 outputs = [
     OptparseResult(Parameter=cmdout_lookup('result'),
-                   OutputHandler=write_list_of_strings,
+                   Handler=write_list_of_strings,
                    InputName='output-fp')
 ]
