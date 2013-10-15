@@ -86,15 +86,10 @@ class CommandIn(Parameter):
         super(CommandIn, self).__init__(Name, DataType, Description, **kwargs)
 
 class CommandOut(Parameter):
-    """A ``Command`` output variable type
-    
-    ### SHOULD THIS JUST BE A REFERENCE TO THE ACTUAL COMMANDIN OBJECT?
-    ``InputName`` can be specified to link against a ``CommandIn``
-    """
-    def __init__(self, Name, DataType, Description, InputName=None, **kwargs):
-        self.InputName = InputName
-
-        super(CommandOut, self).__init__(Name, DataType, Description, **kwargs)
+    """A ``Command`` output variable type"""
+    def __init__(self, Name, DataType, Description, **kwargs):
+        super(CommandOut, self).__init__(Name, DataType, Description, 
+                                         **kwargs)
 
 class ParameterCollection(dict):
     """A collection of parameters with dict like lookup"""

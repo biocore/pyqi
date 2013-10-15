@@ -53,9 +53,9 @@ usage_examples = [
 inputs = [
     # An example option that has a direct relationship with a Parameter.
     # OptparseOption(Parameter=cmd_in_lookup('name_of_a_command_in'),
-    #                InputType='existing_filepath', # the optparse type of input
-    #                InputAction='store', # the optparse action
-    #                InputHandler=None, # Apply a function to the input value to convert it into the type expected by Parameter.DataType
+    #                Type='existing_filepath', # the optparse type of input
+    #                Action='store', # the optparse action
+    #                Handler=None, # Apply a function to the input value to convert it into the type expected by Parameter.DataType
     #                ShortName='n', # a parameter short name, can be None
     #                # Name='foo', # implied by Parameter.Name. Can be overwritten here if desired
     #                # Required=False, # implied by Parameter.Required. Can be promoted by setting True
@@ -66,9 +66,9 @@ inputs = [
     #
     # An example option that does not have an associated Parameter.
     # OptparseOption(Parameter=None,
-    #                InputType='new_filepath',
-    #                InputAction='store',
-    #                InputHandler=None, # we don't need an InputHandler because this option isn't being converted into a format that a Parameter expects
+    #                Type='new_filepath',
+    #                Action='store',
+    #                Handler=None, # we don't need an InputHandler because this option isn't being converted into a format that a Parameter expects
     #                ShortName='o',
     #                Name='output-fp',
     #                Required=True,
@@ -93,16 +93,16 @@ outputs = [
     #
     # An example option that does not map to a result key.
     # OptparseResult(Parameter=cmd_out_lookup('some_other_result'),
-    #                OutputHandler=print_string)
+    #                Handler=print_string)
 
 %(output_fmt)s
 ]"""
 
 # Fill out by Parameter, and comment out some of the most common stuff.
 input_format = """    OptparseOption(Parameter=cmd_in_lookup('%(name)s'),
-                   InputType=%(datatype)s,
-                   InputAction='%(action)s', # default is 'store', change if desired
-                   InputHandler=None, # must be defined if desired
+                   Type=%(datatype)s,
+                   Action='%(action)s', # default is 'store', change if desired
+                   Handler=None, # must be defined if desired
                    ShortName=None, # must be defined if desired
                    # Name='%(name)s', # implied by Parameter
                    # Required=%(required)s, # implied by Parameter
@@ -111,8 +111,8 @@ input_format = """    OptparseOption(Parameter=cmd_in_lookup('%(name)s'),
 """
 
 output_format = """    OptparseResult(Parameter=cmd_out_lookup('%(name)s'),
-                    OutputHandler=None, # must be defined
-                    Inputname=None), # define if tying to an OptparseOption
+                    Handler=None, # must be defined
+                    Name=None), # define if tying to an OptparseOption
 """
 
 default_block_format = """# Default=%(default)s, # implied by Parameter

@@ -25,7 +25,7 @@ from os.path import basename, dirname, expanduser, join
 from pyqi.core.exception import IncompetentDeveloperError
 
 ### for an isintance check. not very excited about this
-from pyqi.core.command import CommandIn
+from pyqi.core.command import CommandIn, Parameter as CommandParameter
 
 class Interface(object):
     CommandConstructor = None
@@ -170,8 +170,6 @@ class InterfaceOption(object):
             self.Name = Name
             self.Help = Help
 
-            ### Jai, what about setting a placeholder Parameter here, eg:
-            ### self.Parameter = Parameter(Name=Name, Description=Help, DataType=None) 
         else:
             # Transfer information from Parameter unless overridden here.
             self.Name = Parameter.Name if Name is None else Name
@@ -206,30 +204,23 @@ class InterfaceInputOption(InterfaceOption):
         if convert_to_dashed_name:
             self.Name = self.Name.replace('_', '-')
 
-        ### Jai, what if Parameter could never be None? See comment in 
-        ### InterfaceOption
-        if self.Parameter is not None:
-            if self.Required and self.Default is not None:
-                raise IncompetentDeveloperError("Found required option '%s' "
-                        "with default value '%s'. Required options cannot have "
-                        "default values." % (self.Name, self.Default))
+        if self.Required and self.Default is not None:
+            raise IncompetentDeveloperError("Found required option '%s' "
+                    "with default value '%s'. Required options cannot have "
+                    "default values." % (self.Name, self.Default))
+    
+        if self.Default is None:
+            if hasattr(self.Parameter, "Default"):
+                self.Default = self.Parameter.Default
+                self.DefaultDescription = self.Parameter.DefaultDescription 
 
-        if self.Parameter is not None:
-            self.Default = self.Parameter.Default if Default is None else Default
-            self.DefaultDescription = self.Parameter.DefaultDescription if \
-                DefaultDescription is None else DefaultDescription
-
-            # If a parameter is required, the option is always required, but
-            # if a parameter is not required, but the option does require it,
-            # then we make the option required.
+        # If a parameter is required, the option is always required, but
+        # if a parameter is not required, but the option does require it,
+        # then we make the option required.
+        if hasattr(self.Parameter, "Required"):
             if not self.Parameter.Required and Required:
                 self.Required = True
-            else:
-                self.Required = self.Parameter.Required
 
-        ### cannot call from base class as we need to initialize base prior
-        ### to subclass, but object likely isn't valid until the end of
-        ### subclass initialization
         self._validate_option()
 
 class InterfaceOutputOption(InterfaceOption):
