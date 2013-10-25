@@ -19,7 +19,7 @@ __maintainer__ = "Daniel McDonald"
 __email__ = "mcdonadt@colorado.edu"
 
 from unittest import TestCase, main
-from pyqi.core.command import Parameter, ParameterCollection, Command
+from pyqi.core.command import CommandIn, CommandOut, ParameterCollection, Command
 from pyqi.core.exception import (IncompetentDeveloperError, 
                                  UnknownParameterError, 
                                  MissingParameterError)
@@ -27,10 +27,10 @@ from pyqi.core.exception import (IncompetentDeveloperError,
 class CommandTests(TestCase):
     def setUp(self):
         class stubby(Command):
-            Parameters = ParameterCollection([
-                            Parameter('a',int,'', Required=True),
-                            Parameter('b',int,'', Required=False, Default=5),
-                            Parameter('c',int,'', Required=False, Default=10,
+            CommandIns = ParameterCollection([
+                            CommandIn('a',int,'', Required=True),
+                            CommandIn('b',int,'', Required=False, Default=5),
+                            CommandIn('c',int,'', Required=False, Default=10,
                                       ValidateValue=lambda x: x == 10)])
             def run(self, **kwargs):
                 return {}
@@ -39,16 +39,17 @@ class CommandTests(TestCase):
     def test_init(self):
         """Jog the init"""
         c = Command()
-        self.assertEqual(len(c.Parameters), 0)
+        self.assertEqual(len(c.CommandIns), 0)
+        self.assertEqual(len(c.CommandOuts), 0)
         with self.assertRaises(NotImplementedError):
             _ = c()
 
     def test_subclass_init(self):
         """Exercise the subclassing"""
         class foo(Command):
-            Parameters = ParameterCollection([Parameter('a', str, 'help1',
+            Parameters = ParameterCollection([CommandIn('a', str, 'help1',
                                                         Required=True),
-                                              Parameter('b', str, 'help2',
+                                              CommandIn('b', str, 'help2',
                                                         Required=False)])
             def run(self, **kwargs):
                 return {}
@@ -85,24 +86,24 @@ class CommandTests(TestCase):
 class ParameterTests(TestCase):
     def test_init(self):
         """Jog the init"""
-        obj = Parameter('a', str, 'help', Required=False)
+        obj = CommandIn('a', str, 'help', Required=False)
         self.assertEqual(obj.Name, 'a')
         self.assertEqual(obj.DataType, str)
         self.assertEqual(obj.Description, 'help')
         self.assertEqual(obj.Required, False)
         self.assertEqual(obj.Default, None)
         self.assertEqual(obj.DefaultDescription, None)
-        self.assertRaises(IncompetentDeveloperError, Parameter, 'a', str,
+        self.assertRaises(IncompetentDeveloperError, CommandIn, 'a', str,
                           'help', True, 'x')
 
 class ParameterCollectionTests(TestCase):
     def setUp(self):
-        self.pc = ParameterCollection([Parameter('foo',str, 'help')])
+        self.pc = ParameterCollection([CommandIn('foo',str, 'help')])
     
     def test_init(self):
         """Jog the init"""
-        params = [Parameter('a', str, 'help', Required=False),
-                  Parameter('b', float, 'help2', Required=True)]
+        params = [CommandIn('a', str, 'help', Required=False),
+                  CommandIn('b', float, 'help2', Required=True)]
         obj = ParameterCollection(params)
 
         self.assertEqual(obj.Parameters, params)
@@ -110,7 +111,7 @@ class ParameterCollectionTests(TestCase):
         self.assertEqual(obj['b'], params[1])
 
         # Duplicate Parameter names.
-        params.append(Parameter('a', int, 'help3'))
+        params.append(CommandIn('a', int, 'help3'))
         with self.assertRaises(IncompetentDeveloperError):
             _ = ParameterCollection(params)
 
