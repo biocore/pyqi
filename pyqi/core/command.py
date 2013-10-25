@@ -194,7 +194,7 @@ class Command(object):
 
         for p in self.CommandOuts.values():
             if p.Name not in result:
-                err_msg = "CommandOut %s not in %s" % (p, self_str)
+                err_msg = "CommandOut %s not in %s" % (p.Name, self_str)
                 self._logger.fatal(err_msg)
                 raise UnknownParameterError(err_msg)
         for k in result:
