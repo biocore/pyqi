@@ -210,16 +210,14 @@ class InterfaceInputOption(InterfaceOption):
                     "default values." % (self.Name, self.Default))
     
         if self.Default is None:
-            if hasattr(self.Parameter, "Default"):
-                self.Default = self.Parameter.Default
-                self.DefaultDescription = self.Parameter.DefaultDescription 
+            self.Default = self.Parameter.Default
+            self.DefaultDescription = self.Parameter.DefaultDescription 
 
         # If a parameter is required, the option is always required, but
         # if a parameter is not required, but the option does require it,
         # then we make the option required.
-        if hasattr(self.Parameter, "Required"):
-            if not self.Parameter.Required and Required:
-                self.Required = True
+        if not self.Parameter.Required and Required:
+            self.Required = True
 
         self._validate_option()
 
