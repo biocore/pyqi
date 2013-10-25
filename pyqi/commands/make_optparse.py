@@ -111,7 +111,7 @@ input_format = """    OptparseOption(Parameter=cmd_in_lookup('%(name)s'),
 
 output_format = """    OptparseResult(Parameter=cmd_out_lookup('%(name)s'),
                     Handler=None, # must be defined
-                    Name=None), # define if tying to an OptparseOption
+                    InputName=None), # define if tying to an OptparseOption
 """
 
 default_block_format = """# Default=%(default)s, # implied by Parameter
