@@ -83,14 +83,14 @@ inputs = [
 outputs = [
     # An example option that maps to a CommandIn.
     # OptparseResult(Parameter=cmd_out_lookup('name_of_a_command_out'),
-    #                Handler=write_string, # a function applied to the value
+    #                Handler=write_string, # a function applied to the output of the Command
     #                # the name of the option (defined in inputs, above), whose
-    #                # value will be made available to OutputHandler. This name
+    #                # value will be made available to Handler. This name
     #                # can be either an underscored or dashed version of the
     #                # option name (e.g., 'output_fp' or 'output-fp')
     #                InputName='output-fp'), 
     #
-    # An example option that does not map to a result key.
+    # An example option that does not map to a CommandIn.
     # OptparseResult(Parameter=cmd_out_lookup('some_other_result'),
     #                Handler=print_string)
 
