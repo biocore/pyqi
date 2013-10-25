@@ -24,9 +24,6 @@ from glob import glob
 from os.path import basename, dirname, expanduser, join
 from pyqi.core.exception import IncompetentDeveloperError
 
-### for an isintance check. not very excited about this
-from pyqi.core.command import CommandIn, Parameter as CommandParameter
-
 class Interface(object):
     CommandConstructor = None
 
