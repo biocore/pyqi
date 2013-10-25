@@ -74,8 +74,7 @@ inputs = [
     #                Required=True,
     #                Help='output filepath')
 
-%(input_fmt)s
-]
+%(input_fmt)s]
 
 # outputs map result keys to output options and handlers. It is not necessary
 # to supply an associated option, but if you do, it must be an option from the
@@ -94,8 +93,7 @@ outputs = [
     # OptparseResult(Parameter=cmd_out_lookup('some_other_result'),
     #                Handler=print_string)
 
-%(output_fmt)s
-]"""
+%(output_fmt)s]"""
 
 # Fill out by Parameter, and comment out some of the most common stuff.
 input_format = """    OptparseOption(Parameter=cmd_in_lookup('%(name)s'),
@@ -115,8 +113,7 @@ output_format = """    OptparseResult(Parameter=cmd_out_lookup('%(name)s'),
 """
 
 default_block_format = """# Default=%(default)s, # implied by Parameter
-                   # DefaultDescription=%(default_description)s, # implied by Parameter
-"""
+                   # DefaultDescription=%(default_description)s, # implied by Parameter"""
 
 class MakeOptparse(CodeHeaderGenerator):
     BriefDescription = "Consume a Command, stub out an optparse configuration"

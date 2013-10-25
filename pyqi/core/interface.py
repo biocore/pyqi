@@ -209,14 +209,14 @@ class InterfaceInputOption(InterfaceOption):
                     "with default value '%s'. Required options cannot have "
                     "default values." % (self.Name, self.Default))
     
-        if self.Default is None:
+        if self.Default is None and self.Parameter is not None:
             self.Default = self.Parameter.Default
             self.DefaultDescription = self.Parameter.DefaultDescription 
 
         # If a parameter is required, the option is always required, but
         # if a parameter is not required, but the option does require it,
         # then we make the option required.
-        if not self.Parameter.Required and Required:
+        if self.Parameter is not None and not self.Parameter.Required and Required:
             self.Required = True
 
         self._validate_option()
