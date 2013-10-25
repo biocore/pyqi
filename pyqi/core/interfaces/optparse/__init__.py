@@ -39,7 +39,7 @@ class OptparseResult(InterfaceOutputOption):
         pass
 
 class OptparseOption(InterfaceInputOption):
-    """An augmented option that expands a Parameter into an Option"""
+    """An augmented option that expands a ``CommandIn`` into an Option"""
 
     def __init__(self, **kwargs):
         super(OptparseOption, self).__init__(**kwargs)
