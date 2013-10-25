@@ -169,14 +169,14 @@ class Command(object):
         # check required parameters
         for p in self.CommandIns.values():
             if p.Required and p.Name not in kwargs:
-                err_msg = 'Missing required parameter %s in %s' % (p.Name, 
+                err_msg = 'Missing required CommandIn %s in %s' % (p.Name, 
                                                                    self_str)
                 self._logger.fatal(err_msg)
                 raise MissingParameterError(err_msg)
 
             if p.Name in kwargs and p.ValidateValue:
                 if not p.ValidateValue(kwargs[p.Name]):
-                    err_msg = "Parameter %s cannot take value %s in %s" % \
+                    err_msg = "CommandIn %s cannot take value %s in %s" % \
                                 (p.Name, kwargs[p.Name], self_str)
                     self._logger.fatal(err_msg)
                     raise ValueError(err_msg)
@@ -184,7 +184,7 @@ class Command(object):
         # make sure we only have things we expect
         for opt in kwargs:
             if opt not in self.CommandIns:
-                err_msg = 'Unknown parameter %s in %s' % (opt, self_str)
+                err_msg = 'Unknown CommandIn %s in %s' % (opt, self_str)
                 self._logger.fatal(err_msg)
                 raise UnknownParameterError(err_msg)
     
