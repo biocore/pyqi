@@ -143,7 +143,8 @@ class Interface(object):
 class InterfaceOption(object):
     """Describes an option and what to do with it
     
-    ``Parameter`` is a pyqi.core.command.Parameter instance
+    ``Parameter`` is a pyqi.core.command.Parameter instance, typically an 
+        instance of a ``CommandIn`` or a ``CommandOut``.
     ``Type`` refers to the interface type, not the actually datatype of the
         ``Parameter``. For instance, a file path may be specified on a command
         line interface for a BIOM table. The ``Parameter.Datatype`` is a BIOM 
