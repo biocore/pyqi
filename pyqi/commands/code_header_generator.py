@@ -58,7 +58,7 @@ class CodeHeaderGenerator(Command):
 
     CommandOuts = ParameterCollection([
         CommandOut(Name='result', DataType=str,
-                   Description='the command header')])
+                   Description='the resulting header')])
 
     def run(self, **kwargs):
         # Build a string formatting dictionary for the file header.
