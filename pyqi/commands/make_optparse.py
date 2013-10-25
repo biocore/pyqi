@@ -144,35 +144,35 @@ class MakeOptparse(CodeHeaderGenerator):
 
         result_lines = code_header_lines
 
-        # construct inputs based off of parameters
+        # construct inputs based off of CommandIns
         cmdin_formatted = []
-        for param in sorted(kwargs['command'].CommandIns.values(),
+        for cmdin in sorted(kwargs['command'].CommandIns.values(),
                             key=attrgetter('Name')):
-            if param.Required:
+            if cmdin.Required:
                 default_block = ''
             else:
                 default_fmt = {
-                        'default': repr(param.Default),
-                        'default_description': repr(param.DefaultDescription)
+                        'default': repr(cmdin.Default),
+                        'default_description': repr(cmdin.DefaultDescription)
                 }
                 default_block = default_block_format % default_fmt
 
-            if param.DataType is bool:
+            if cmdin.DataType is bool:
                 action = 'store_true'
                 data_type = None
             else:
                 action = 'store'
-                data_type = param.DataType
+                data_type = cmdin.DataType
 
-            fmt = {'name':param.Name, 'datatype':data_type, 'action':action,
-                   'required':str(param.Required),
-                   'help':param.Description, 'default_block':default_block}
+            fmt = {'name':cmdin.Name, 'datatype':data_type, 'action':action,
+                   'required':str(cmdin.Required),
+                   'help':cmdin.Description, 'default_block':default_block}
             cmdin_formatted.append(input_format % fmt)
 
         cmdout_formatted = []
-        for param in sorted(kwargs['command'].CommandOuts.values(),
+        for cmdin in sorted(kwargs['command'].CommandOuts.values(),
                             key=attrgetter('Name')):
-            fmt = {'name':param.Name}
+            fmt = {'name':cmdin.Name}
             cmdout_formatted.append(output_format % fmt)
 
 
