@@ -81,7 +81,7 @@ class BashCompletionTests(TestCase):
         params = {'command_config_module':self.temp_module_name,
                   'driver_name':'pyqi'}
         obs = self.cmd(**params)
-        self.assertEqual(obs.keys(), ['result'])
+        self.assertEqual(list(obs.keys()), ['result'])
         self.assertEqual(obs['result'], outputandstuff)
 
 

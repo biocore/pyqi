@@ -19,7 +19,11 @@ __email__ = "mcdonadt@colorado.edu"
 
 import os
 import sys
-from StringIO import StringIO
+
+if sys.version_info.major == 2:
+    from StringIO import StringIO
+else:
+    from io import StringIO
 from shutil import rmtree
 from tempfile import mkdtemp
 from unittest import TestCase, main

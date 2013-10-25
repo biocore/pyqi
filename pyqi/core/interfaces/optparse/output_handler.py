@@ -71,4 +71,4 @@ def print_list_of_strings(result_key, data, option_value=None):
     ``result_key`` and ``option_value`` are ignored.
     """
     for line in data:
-        print line
+        print(line)

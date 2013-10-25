@@ -19,7 +19,6 @@ __email__ = "gregcaporaso@gmail.com"
 
 import importlib
 from sys import exit, stderr
-from ConfigParser import SafeConfigParser
 from glob import glob
 from os.path import basename, dirname, expanduser, join
 from pyqi.core.exception import IncompetentDeveloperError
@@ -278,9 +277,9 @@ def get_command_config(command_config_module, cmd, exit_on_failure=True):
     try:
         cmd_cfg = importlib.import_module('.'.join([command_config_module,
                                                     python_cmd_name]))
-    except ImportError, e:
+    except ImportError as e:
         error_msg = str(e)
-
+        
         if exit_on_failure:
             stderr.write("Unable to import the command configuration for "
                          "%s:\n" % cmd)

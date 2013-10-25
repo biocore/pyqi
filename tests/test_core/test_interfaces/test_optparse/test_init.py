@@ -92,7 +92,7 @@ class OptparseInterfaceTests(TestCase):
 
     def test_input_handler(self):
         obs = self.interface._input_handler(['--c','foo'])
-        self.assertEqual(obs.items(), [('c', 'foo')])
+        self.assertEqual(list(obs.items()), [('c', 'foo')])
 
     def test_build_usage_lines(self):
         obs = self.interface._build_usage_lines([])
