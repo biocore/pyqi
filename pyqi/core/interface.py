@@ -147,8 +147,10 @@ class InterfaceOption(object):
         line interface for a BIOM table. The ``Parameter.Datatype`` is a BIOM 
         type, while the ``InterfaceOption.Type`` is a string or possibly a 
         ``FilePath`` object.
-    ``Handler`` is a function that can take the value associated with the
-        option and transform it into the ``Parameter.DataType``.
+    ``Handler`` is a function that either transforms the value associated with 
+        the option into the ``Parameter.DataType`` (e.g., if ``Parameter`` is a
+        ``CommandIn``), or the result of a ``Command`` into something consumable
+        by the interface (e.g., if ``Parameter`` is a ``CommandOut``).
     ``Name`` is the name of the ``InterfaceOption``, e.g,, 'input-fp'
     ``Help`` is a description of the ``InterfaceOption``
     """
