@@ -28,7 +28,7 @@ command_format = """class %s(Command):
     BriefDescription = "FILL IN A 1 SENTENCE DESCRIPTION"
     LongDescription = "GO INTO MORE DETAIL"
     CommandIns = ParameterCollection([
-        CommandIn((Name='foo', DataType=str,
+        CommandIn(Name='foo', DataType=str,
                   Description='some required parameter', Required=True),
         CommandIn(Name='bar', DataType=int,
                   Description='some optional parameter', Required=False,
