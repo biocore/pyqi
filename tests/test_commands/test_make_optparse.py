@@ -10,7 +10,7 @@
 
 from __future__ import division
 from pyqi.commands.make_optparse import MakeOptparse
-from pyqi.core.command import Parameter, ParameterCollection
+from pyqi.core.command import CommandIn, ParameterCollection
 from unittest import TestCase, main
 
 __author__ = "Daniel McDonald"
@@ -28,12 +28,13 @@ class MakeOptparseTests(TestCase):
     def test_run(self):
         exp = win_text
         
-        pc = Parameter(Name='DUN', Required=True, DataType=str, Description="")
-        bool_param = Parameter(Name='imabool', DataType=bool,
+        pc = CommandIn(Name='DUN', Required=True, DataType=str, Description="")
+        bool_param = CommandIn(Name='imabool', DataType=bool,
                                Description='zero or one', Required=False)
 
         class stubby:
-            Parameters = ParameterCollection([pc, bool_param])
+            CommandIns = ParameterCollection([pc, bool_param])
+            CommandOuts = ParameterCollection([])
 
         obs = self.cmd(**{'command_module':'foobar',
                           'command':stubby(),
@@ -43,9 +44,9 @@ class MakeOptparseTests(TestCase):
                           'copyright': 'what\'s that?',
                           'version': '1.0'
         })
-
-        self.assertEqual('\n'.join(obs['result']), exp)
-
+        
+        self.assertEqual(obs['result'], exp.splitlines())
+        
 win_text = """#!/usr/bin/env python
 from __future__ import division
 
@@ -59,7 +60,8 @@ __email__ = "bob@bob.bob"
 
 from pyqi.core.interfaces.optparse import (OptparseUsageExample,
                                            OptparseOption, OptparseResult)
-from pyqi.core.command import make_parameter_collection_lookup_f
+from pyqi.core.command import (make_command_in_collection_lookup_f,
+                               make_command_out_collection_lookup_f)
 from foobar import CommandConstructor
 
 # If you need access to input or output handlers provided by pyqi, consider
@@ -70,7 +72,8 @@ from foobar import CommandConstructor
 # pyqi.interfaces.optparse.output_handler
 
 # Convenience function for looking up parameters by name.
-param_lookup = make_parameter_collection_lookup_f(CommandConstructor)
+cmd_in_lookup = make_command_in_collection_lookup_f(CommandConstructor)
+cmd_out_lookup = make_command_out_collection_lookup_f(CommandConstructor)
 
 # Examples of how the command can be used from the command line using an
 # optparse interface.
@@ -84,10 +87,10 @@ usage_examples = [
 # to define options here that do not exist as parameters, e.g., an output file.
 inputs = [
     # An example option that has a direct relationship with a Parameter.
-    # OptparseOption(Parameter=param_lookup('name_of_a_parameter'),
-    #                InputType='existing_filepath', # the optparse type of input
-    #                InputAction='store', # the optparse action
-    #                InputHandler=None, # Apply a function to the input value to convert it into the type expected by Parameter.DataType
+    # OptparseOption(Parameter=cmd_in_lookup('name_of_a_command_in'),
+    #                Type='existing_filepath', # the optparse type of input
+    #                Action='store', # the optparse action
+    #                Handler=None, # Apply a function to the input value to convert it into the type expected by Parameter.DataType
     #                ShortName='n', # a parameter short name, can be None
     #                # Name='foo', # implied by Parameter.Name. Can be overwritten here if desired
     #                # Required=False, # implied by Parameter.Required. Can be promoted by setting True
@@ -98,34 +101,34 @@ inputs = [
     #
     # An example option that does not have an associated Parameter.
     # OptparseOption(Parameter=None,
-    #                InputType='new_filepath',
-    #                InputAction='store',
-    #                InputHandler=None, # we don't need an InputHandler because this option isn't being converted into a format that a Parameter expects
+    #                Type='new_filepath',
+    #                Action='store',
+    #                Handler=None, # we don't need a Handler because this option isn't being converted into a format that a Parameter expects
     #                ShortName='o',
     #                Name='output-fp',
     #                Required=True,
     #                Help='output filepath')
 
-    OptparseOption(Parameter=param_lookup('DUN'),
-                   InputType=<type 'str'>,
-                   InputAction='store', # default is 'store', change if desired
-                   InputHandler=None, # must be defined if desired
-                   ShortName=None), # must be defined if desired
+    OptparseOption(Parameter=cmd_in_lookup('DUN'),
+                   Type=<type 'str'>,
+                   Action='store', # default is 'store', change if desired
+                   Handler=None, # must be defined if desired
+                   ShortName=None, # must be defined if desired
                    # Name='DUN', # implied by Parameter
                    # Required=True, # implied by Parameter
                    # Help='', # implied by Parameter
-                   
-    OptparseOption(Parameter=param_lookup('imabool'),
-                   InputType=None,
-                   InputAction='store_true', # default is 'store', change if desired
-                   InputHandler=None, # must be defined if desired
-                   ShortName=None), # must be defined if desired
+                   ),
+    OptparseOption(Parameter=cmd_in_lookup('imabool'),
+                   Type=None,
+                   Action='store_true', # default is 'store', change if desired
+                   Handler=None, # must be defined if desired
+                   ShortName=None, # must be defined if desired
                    # Name='imabool', # implied by Parameter
                    # Required=False, # implied by Parameter
                    # Help='zero or one', # implied by Parameter
                    # Default=None, # implied by Parameter
                    # DefaultDescription=None, # implied by Parameter
-
+),
 
 ]
 
@@ -134,19 +137,21 @@ inputs = [
 # inputs list (above).
 outputs = [
     # An example option that maps to a result key.
-    # OptparseResult(ResultKey='some_result',
-    #                OutputHandler=write_string, # a function applied to the value at ResultKey
-    #
+    # OptparseResult(Parameter=cmd_out_lookup('name_of_a_command_out'),
+    #                Handler=write_string, # a function applied to the value
     #                # the name of the option (defined in inputs, above), whose
     #                # value will be made available to OutputHandler. This name
     #                # can be either an underscored or dashed version of the
     #                # option name (e.g., 'output_fp' or 'output-fp')
-    #                OptionName='output-fp'), 
+    #                InputName='output-fp'), 
     #
     # An example option that does not map to a result key.
-    # OptparseResult(ResultKey='some_other_result',
-    #                OutputHandler=print_string)
-]"""
+    # OptparseResult(Parameter=cmd_out_lookup('some_other_result'),
+    #                Handler=print_string)
+
+
+]
+"""
 
 if __name__ == '__main__':
     main()

@@ -68,7 +68,7 @@ inputs = [
     # OptparseOption(Parameter=None,
     #                Type='new_filepath',
     #                Action='store',
-    #                Handler=None, # we don't need an InputHandler because this option isn't being converted into a format that a Parameter expects
+    #                Handler=None, # we don't need a Handler because this option isn't being converted into a format that a Parameter expects
     #                ShortName='o',
     #                Name='output-fp',
     #                Required=True,
@@ -83,8 +83,7 @@ inputs = [
 outputs = [
     # An example option that maps to a result key.
     # OptparseResult(Parameter=cmd_out_lookup('name_of_a_command_out'),
-    #                OutputHandler=write_string, # a function applied to the value at ResultKey
-    #
+    #                Handler=write_string, # a function applied to the value
     #                # the name of the option (defined in inputs, above), whose
     #                # value will be made available to OutputHandler. This name
     #                # can be either an underscored or dashed version of the
