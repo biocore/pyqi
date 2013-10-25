@@ -81,7 +81,7 @@ inputs = [
 # to supply an associated option, but if you do, it must be an option from the
 # inputs list (above).
 outputs = [
-    # An example option that maps to a result key.
+    # An example option that maps to a CommandIn.
     # OptparseResult(Parameter=cmd_out_lookup('name_of_a_command_out'),
     #                Handler=write_string, # a function applied to the value
     #                # the name of the option (defined in inputs, above), whose
