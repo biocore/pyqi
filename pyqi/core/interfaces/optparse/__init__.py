@@ -247,12 +247,6 @@ class OptparseInterface(Interface):
         for output in self._get_outputs():
             rk = output.Name
         
-            ### possibly redundant check given that Command now verifies
-            ### all CommandOuts are present
-            if rk not in results:
-                raise IncompetentDeveloperError("Did not find the expected "
-                                                "output '%s' in results." % rk)
-
             if output.InputName is None:
                 handled_results[rk] = output.Handler(rk, results[rk])
             else:
