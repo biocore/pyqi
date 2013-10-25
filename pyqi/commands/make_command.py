@@ -76,7 +76,7 @@ class MakeCommand(CodeHeaderGenerator):
           ]
     )
     CommandOuts = ParameterCollection([
-          CommandOut(Name='result',DataType=str, 
+          CommandOut(Name='result',DataType=list, 
                     Description='The resulting template')
           ]
     )
