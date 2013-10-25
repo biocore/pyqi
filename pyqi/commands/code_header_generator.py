@@ -57,7 +57,7 @@ class CodeHeaderGenerator(Command):
     ])
 
     CommandOuts = ParameterCollection([
-        CommandOut(Name='result', DataType=str,
+        CommandOut(Name='result', DataType=list,
                    Description='the resulting header')])
 
     def run(self, **kwargs):
