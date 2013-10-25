@@ -33,7 +33,7 @@ class MakeCommandTests(TestCase):
         self.assertEqual(obs.keys(), ['result'])
 
         obs = obs['result']
-        self.assertEqual('\n'.join(obs), exp_command_code1)
+        self.assertEqual(obs, exp_command_code1.splitlines())
 
     def test_run_test_code_generation(self):
         """Correctly generates stubbed out unit test code."""
@@ -58,17 +58,23 @@ __version__ = "1.0"
 __maintainer__ = "bob"
 __email__ = "bob@bob.bob"
 
-from pyqi.core.command import Command, Parameter, ParameterCollection
+from pyqi.core.command import (Command, CommandIn, CommandOut, 
+    ParameterCollection)
 
 class Test(Command):
     BriefDescription = "FILL IN A 1 SENTENCE DESCRIPTION"
     LongDescription = "GO INTO MORE DETAIL"
-    Parameters = ParameterCollection([
-        Parameter(Name='foo', DataType=str,
+    CommandIns = ParameterCollection([
+        CommandIn(Name='foo', DataType=str,
                   Description='some required parameter', Required=True),
-        Parameter(Name='bar', DataType=int,
+        CommandIn(Name='bar', DataType=int,
                   Description='some optional parameter', Required=False,
                   Default=1)
+    ])
+
+    CommandOuts = ParameterCollection([
+        CommandOut(Name="result_1", DataType=str, Description="xyz"),
+        CommandOut(Name="result_2", DataType=str, Description="123"),
     ])
 
     def run(self, **kwargs):
