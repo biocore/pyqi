@@ -29,7 +29,7 @@ class Parameter(object):
     """The ``Command`` variable type baseclass
 
     A ``Parameter`` is interface agnostic, and is used to describe an input
-    or outputs of a ``Command``.
+    or output of a ``Command``.
     """
 
     def __init__(self, Name, DataType, Description, ValidateValue=None):
@@ -79,8 +79,8 @@ class CommandIn(Parameter):
         self.DefaultDescription = DefaultDescription
         
         if Required and Default is not None:
-            raise IncompetentDeveloperError("Found required parameter '%s' "
-                    "with default value '%r'. Required parameters cannot have "
+            raise IncompetentDeveloperError("Found required CommandIn '%s' "
+                    "with default value '%r'. Required CommandIns cannot have "
                     "default values." % (Name, Default))
         
         super(CommandIn, self).__init__(Name, DataType, Description, **kwargs)
