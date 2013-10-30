@@ -37,12 +37,19 @@ usage_examples = [
 ]
 
 inputs = [
-    OptparseOption(Parameter=None,
+    OptparseOption(Parameter=param_lookup('port'),
                    InputType='int',
                    ShortName='p',
                    Name='port',
                    Required=False,
-                   Help='Port to run the server on.')
+                   Help='Port to run the server on.'),
+
+    OptparseOption(Parameter=param_lookup('interface_module'),
+                   InputType='str',
+                   ShortName='m',
+                   Name='interface_module',
+                   Required=True,
+                   Help='The python interface module to run the server on.')
 ]
 
 outputs = [

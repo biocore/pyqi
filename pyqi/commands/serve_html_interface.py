@@ -18,14 +18,17 @@ class ServeHTMLInterface(Command):
     Parameters = ParameterCollection([
         Parameter(Name='port', DataType=int,
                   Description='The port to run the server on', Required=False,
-                  Default=8080)
+                  Default=8080),
+
+        Parameter(Name='interface_module', DataType=str,
+                  Description='The module to serve the interface for', Required=True)
     ])
 
     def run(self, **kwargs):
         # EXAMPLE:
         # return {'result_1': kwargs['foo'] * kwargs['bar'],
         #         'result_2': "Some output bits"}
-        result = start_server(kwargs['port'])
+        result = start_server(kwargs['port'], kwargs['interface_module'])
         return {'result': result}
 
 CommandConstructor = ServeHTMLInterface
