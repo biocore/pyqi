@@ -38,9 +38,8 @@ class Interface(object):
         self.CmdInstance = self.CommandConstructor(**kwargs)
 
         self._validate_usage_examples(self._get_usage_examples())
-        self._validate_inputs(self._get_inputs())
-        self._validate_outputs(self._get_outputs())
-
+        self._validate_inputs_outputs(self._get_inputs(), self._get_outputs())
+    
     def __call__(self, in_, *args, **kwargs):
         self._the_in_validator(in_)
         cmd_input = self._input_handler(in_, *args, **kwargs)
@@ -59,13 +58,19 @@ class Interface(object):
         """
         pass
 
-    def _validate_inputs(self, inputs):
-        """Perform validation on a list of ``InterfaceOption`` objects.
+    def _validate_inputs_outputs(self, inputs, outputs):
+        """Perform validation on interface IO objects.
 
         ``inputs`` will be the output of ``self._get_inputs()``. Subclasses can
         override to perform validation that requires a list of all input
         options. Validation that should be performed on a per-option basis
         should instead go into ``InterfaceOption._validate_option``.
+
+        ``outputs`` will be the output of ``self._get_outputs()``. Subclasses
+        can override to perform validation that requires a list of all
+        interface results. Validation that should be performed on a
+        per-interface result basis should instead go into
+        ``InterfaceOutput._validate_result``.
         """
         param_names = [input_.getParameterName()
                        for input_ in inputs
@@ -76,16 +81,14 @@ class Interface(object):
                                             "InterfaceOption mapping to the "
                                             "same Parameter.")
 
-    def _validate_outputs(self, outputs):
-        """Perform validation on a list of ``InterfaceOutput`` objects.
-
-        ``outputs`` will be the output of ``self._get_outputs()``. Subclasses
-        can override to perform validation that requires a list of all
-        interface results. Validation that should be performed on a
-        per-interface result basis should instead go into
-        ``InterfaceOutput._validate_result``.
-        """
-        pass
+        input_names = set([i.Name for i in inputs])
+        for ifout in outputs:
+            if ifout.InputName is None:
+                continue
+            
+            if ifout.InputName not in input_names:
+                raise IncompetentDeveloperError(\
+                        "Could not link %s to an input!" % ifout.InputName)
 
     def _the_in_validator(self, in_):
         """The job securator"""
