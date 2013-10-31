@@ -10,7 +10,8 @@
 
 from __future__ import division
 from operator import attrgetter
-from pyqi.core.command import Command, Parameter, ParameterCollection
+from pyqi.core.command import (Command, CommandIn, CommandOut, 
+    ParameterCollection)
 from pyqi.commands.code_header_generator import CodeHeaderGenerator
 
 __author__ = "Daniel McDonald"
@@ -24,7 +25,8 @@ __email__ = "mcdonadt@colorado.edu"
 
 header_format = """from pyqi.core.interfaces.optparse import (OptparseUsageExample,
                                            OptparseOption, OptparseResult)
-from pyqi.core.command import make_parameter_collection_lookup_f
+from pyqi.core.command import (make_command_in_collection_lookup_f,
+                               make_command_out_collection_lookup_f)
 from %(command_module)s import CommandConstructor
 
 # If you need access to input or output handlers provided by pyqi, consider
@@ -35,7 +37,8 @@ from %(command_module)s import CommandConstructor
 # pyqi.interfaces.optparse.output_handler
 
 # Convenience function for looking up parameters by name.
-param_lookup = make_parameter_collection_lookup_f(CommandConstructor)
+cmd_in_lookup = make_command_in_collection_lookup_f(CommandConstructor)
+cmd_out_lookup = make_command_out_collection_lookup_f(CommandConstructor)
 
 # Examples of how the command can be used from the command line using an
 # optparse interface.
@@ -49,10 +52,10 @@ usage_examples = [
 # to define options here that do not exist as parameters, e.g., an output file.
 inputs = [
     # An example option that has a direct relationship with a Parameter.
-    # OptparseOption(Parameter=param_lookup('name_of_a_parameter'),
-    #                InputType='existing_filepath', # the optparse type of input
-    #                InputAction='store', # the optparse action
-    #                InputHandler=None, # Apply a function to the input value to convert it into the type expected by Parameter.DataType
+    # OptparseOption(Parameter=cmd_in_lookup('name_of_a_command_in'),
+    #                Type='existing_filepath', # the optparse type of input
+    #                Action='store', # the optparse action
+    #                Handler=None, # Apply a function to the input value to convert it into the type expected by Parameter.DataType
     #                ShortName='n', # a parameter short name, can be None
     #                # Name='foo', # implied by Parameter.Name. Can be overwritten here if desired
     #                # Required=False, # implied by Parameter.Required. Can be promoted by setting True
@@ -63,63 +66,72 @@ inputs = [
     #
     # An example option that does not have an associated Parameter.
     # OptparseOption(Parameter=None,
-    #                InputType='new_filepath',
-    #                InputAction='store',
-    #                InputHandler=None, # we don't need an InputHandler because this option isn't being converted into a format that a Parameter expects
+    #                Type='new_filepath',
+    #                Action='store',
+    #                Handler=None, # we don't need a Handler because this option isn't being converted into a format that a Parameter expects
     #                ShortName='o',
     #                Name='output-fp',
     #                Required=True,
     #                Help='output filepath')
 
-%(input_fmt)s
-]
+%(input_fmt)s]
 
 # outputs map result keys to output options and handlers. It is not necessary
 # to supply an associated option, but if you do, it must be an option from the
 # inputs list (above).
 outputs = [
-    # An example option that maps to a result key.
-    # OptparseResult(ResultKey='some_result',
-    #                OutputHandler=write_string, # a function applied to the value at ResultKey
-    #
+    # An example option that maps to a CommandIn.
+    # OptparseResult(Parameter=cmd_out_lookup('name_of_a_command_out'),
+    #                Handler=write_string, # a function applied to the output of the Command
     #                # the name of the option (defined in inputs, above), whose
-    #                # value will be made available to OutputHandler. This name
+    #                # value will be made available to Handler. This name
     #                # can be either an underscored or dashed version of the
     #                # option name (e.g., 'output_fp' or 'output-fp')
-    #                OptionName='output-fp'), 
+    #                InputName='output-fp'), 
     #
-    # An example option that does not map to a result key.
-    # OptparseResult(ResultKey='some_other_result',
-    #                OutputHandler=print_string)
-]"""
+    # An example option that does not map to a CommandIn.
+    # OptparseResult(Parameter=cmd_out_lookup('some_other_result'),
+    #                Handler=print_string)
+
+%(output_fmt)s]"""
 
 # Fill out by Parameter, and comment out some of the most common stuff.
-input_format = """    OptparseOption(Parameter=param_lookup('%(name)s'),
-                   InputType=%(datatype)s,
-                   InputAction='%(action)s', # default is 'store', change if desired
-                   InputHandler=None, # must be defined if desired
-                   ShortName=None), # must be defined if desired
+input_format = """    OptparseOption(Parameter=cmd_in_lookup('%(name)s'),
+                   Type=%(datatype)s,
+                   Action='%(action)s', # default is 'store', change if desired
+                   Handler=None, # must be defined if desired
+                   ShortName=None, # must be defined if desired
                    # Name='%(name)s', # implied by Parameter
                    # Required=%(required)s, # implied by Parameter
                    # Help='%(help)s', # implied by Parameter
-                   %(default_block)s
+                   %(default_block)s),
+"""
+
+output_format = """    OptparseResult(Parameter=cmd_out_lookup('%(name)s'),
+                    Handler=None, # must be defined
+                    InputName=None), # define if tying to an OptparseOption
 """
 
 default_block_format = """# Default=%(default)s, # implied by Parameter
-                   # DefaultDescription=%(default_description)s, # implied by Parameter
-"""
+                   # DefaultDescription=%(default_description)s, # implied by Parameter"""
 
 class MakeOptparse(CodeHeaderGenerator):
     BriefDescription = "Consume a Command, stub out an optparse configuration"
     LongDescription = """Construct and stub out the basic optparse configuration for a given Command. This template provides comments and examples of what to fill in."""
-    Parameters = ParameterCollection(
-        CodeHeaderGenerator.Parameters.Parameters + [
-        Parameter(Name='command', DataType=Command,
+    
+    CommandIns = ParameterCollection(
+        CodeHeaderGenerator.CommandIns.Parameters + [
+        CommandIn(Name='command', DataType=Command,
                   Description='an existing Command', Required=True),
-        Parameter(Name='command_module', DataType=str,
+        CommandIn(Name='command_module', DataType=str,
                   Description='the Command source module', Required=True)
         ]
     )
+
+    CommandOuts = ParameterCollection([
+        CommandOut(Name='result', DataType=list,
+                   Description='The resulting template configuration')
+    ])
 
     def run(self, **kwargs):
         code_header_lines = super(MakeOptparse, self).run(
@@ -129,34 +141,43 @@ class MakeOptparse(CodeHeaderGenerator):
 
         result_lines = code_header_lines
 
-        # construct inputs based off of parameters
-        param_formatted = []
-        for param in sorted(kwargs['command'].Parameters.values(),
+        # construct inputs based off of CommandIns
+        cmdin_formatted = []
+        for cmdin in sorted(kwargs['command'].CommandIns.values(),
                             key=attrgetter('Name')):
-            if param.Required:
+            if cmdin.Required:
                 default_block = ''
             else:
                 default_fmt = {
-                        'default': repr(param.Default),
-                        'default_description': repr(param.DefaultDescription)
+                        'default': repr(cmdin.Default),
+                        'default_description': repr(cmdin.DefaultDescription)
                 }
                 default_block = default_block_format % default_fmt
 
-            if param.DataType is bool:
+            if cmdin.DataType is bool:
                 action = 'store_true'
                 data_type = None
             else:
                 action = 'store'
-                data_type = param.DataType
+                data_type = cmdin.DataType
 
-            fmt = {'name':param.Name, 'datatype':data_type, 'action':action,
-                   'required':str(param.Required),
-                   'help':param.Description, 'default_block':default_block}
-            param_formatted.append(input_format % fmt)
+            fmt = {'name':cmdin.Name, 'datatype':data_type, 'action':action,
+                   'required':str(cmdin.Required),
+                   'help':cmdin.Description, 'default_block':default_block}
+            cmdin_formatted.append(input_format % fmt)
 
-        param_formatted = ''.join(param_formatted)
+        cmdout_formatted = []
+        for cmdin in sorted(kwargs['command'].CommandOuts.values(),
+                            key=attrgetter('Name')):
+            fmt = {'name':cmdin.Name}
+            cmdout_formatted.append(output_format % fmt)
+
+
+        cmdin_formatted = ''.join(cmdin_formatted)
+        cmdout_formatted = ''.join(cmdout_formatted)
         header_fmt = {'command_module':kwargs['command_module'],
-                      'input_fmt': param_formatted}
+                      'input_fmt': cmdin_formatted,
+                      'output_fmt':cmdout_formatted}
 
         result_lines.extend((header_format % header_fmt).split('\n'))
         return {'result': result_lines}

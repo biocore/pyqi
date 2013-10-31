@@ -20,10 +20,12 @@ from pyqi.core.interfaces.optparse import (OptparseOption,
                                            OptparseUsageExample,
                                            OptparseResult)
 from pyqi.core.interfaces.optparse.output_handler import write_string
-from pyqi.core.command import make_parameter_collection_lookup_f
+from pyqi.core.command import (make_command_in_collection_lookup_f,
+        make_command_out_collection_lookup_f)
 from pyqi.commands.make_bash_completion import CommandConstructor
 
-param_lookup = make_parameter_collection_lookup_f(CommandConstructor)
+cmd_in_lookup = make_command_in_collection_lookup_f(CommandConstructor)
+cmd_out_lookup = make_command_out_collection_lookup_f(CommandConstructor)
 
 usage_examples = [
     OptparseUsageExample(ShortDesc="Create a bash completion script",
@@ -32,10 +34,10 @@ usage_examples = [
 ]
 
 inputs = [
-    OptparseOption(Parameter=param_lookup('command_config_module')),
-    OptparseOption(Parameter=param_lookup('driver_name')),
+    OptparseOption(Parameter=cmd_in_lookup('command_config_module')),
+    OptparseOption(Parameter=cmd_in_lookup('driver_name')),
     OptparseOption(Parameter=None,
-                   InputType='new_filepath',
+                   Type='new_filepath',
                    ShortName='o',
                    Name='output-fp',
                    Required=True,
@@ -43,7 +45,7 @@ inputs = [
 ]
 
 outputs = [
-    OptparseResult(ResultKey='result',
-                   OutputHandler=write_string,
-                   OptionName='output-fp')
+    OptparseResult(Parameter=cmd_out_lookup('result'),
+                   Handler=write_string,
+                   InputName='output-fp')
 ]

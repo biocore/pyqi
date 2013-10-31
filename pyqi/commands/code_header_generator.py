@@ -17,7 +17,8 @@ __version__ = "0.2.0-dev"
 __maintainer__ = "Jai Ram Rideout"
 __email__ = "jai.rideout@gmail.com"
 
-from pyqi.core.command import Command, Parameter, ParameterCollection
+from pyqi.core.command import (Command, CommandIn, CommandOut, 
+    ParameterCollection)
 
 header_format = """#!/usr/bin/env python
 from __future__ import division
@@ -37,22 +38,27 @@ class CodeHeaderGenerator(Command):
                        "information, such as author, email address, "
                        "maintainer, version, etc.. This code can be placed at "
                        "the top of a Python file.")
-    Parameters = ParameterCollection([
-        Parameter(Name='author', DataType=str,
+
+    CommandIns = ParameterCollection([
+        CommandIn(Name='author', DataType=str,
                   Description='author/maintainer name', Required=True),
-        Parameter(Name='email', DataType=str,
+        CommandIn(Name='email', DataType=str,
                   Description='maintainer email address', Required=True),
-        Parameter(Name='license', DataType=str,
+        CommandIn(Name='license', DataType=str,
                   Description='license (e.g., BSD)', Required=True),
-        Parameter(Name='copyright', DataType=str,
+        CommandIn(Name='copyright', DataType=str,
                   Description='copyright (e.g., Copyright 2013, The pyqi '
                               'project)', Required=True),
-        Parameter(Name='version', DataType=str,
+        CommandIn(Name='version', DataType=str,
                   Description='version (e.g., 0.1)', Required=True),
-        Parameter(Name='credits', DataType=list,
+        CommandIn(Name='credits', DataType=list,
                   Description='list of other authors',
                   Required=False, Default=None)
     ])
+
+    CommandOuts = ParameterCollection([
+        CommandOut(Name='result', DataType=list,
+                   Description='the resulting header')])
 
     def run(self, **kwargs):
         # Build a string formatting dictionary for the file header.

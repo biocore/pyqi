@@ -26,14 +26,13 @@ from pyqi.core.exception import (IncompetentDeveloperError,
                                  MissingParameterError)
 
 class Parameter(object):
-    """A ``Command`` variable
+    """The ``Command`` variable type baseclass
 
-    A ``Command`` variable is interface agnostic and is analogous to a function
-    argument.
+    A ``Parameter`` is interface agnostic, and is used to describe an input
+    or output of a ``Command``.
     """
 
-    def __init__(self, Name, DataType, Description, Required=False,
-                 Default=None, DefaultDescription=None, ValidateValue=None):
+    def __init__(self, Name, DataType, Description, ValidateValue=None):
         """
         
         ``Name`` should be a valid Python name so that users can supply either
@@ -52,17 +51,10 @@ class Parameter(object):
                                             "start with a letter or "
                                             "underscore." % Name)
 
-        if Required and Default is not None:
-            raise IncompetentDeveloperError("Found required parameter '%s' "
-                    "with default value '%s'. Required parameters cannot have "
-                    "default values." % (Name, Default))
 
         self.Name = Name
         self.DataType = DataType
         self.Description = Description
-        self.Required = Required
-        self.Default = Default
-        self.DefaultDescription = DefaultDescription
         self.ValidateValue = ValidateValue
 
     def _is_valid_name(self, name):
@@ -77,6 +69,27 @@ class Parameter(object):
         name = re.sub('^[^a-zA-Z_]+', '', name)
 
         return name
+
+class CommandIn(Parameter):
+    """A ``Command`` input variable type"""
+    def __init__(self, Name, DataType, Description, Required=False, 
+                 Default=None, DefaultDescription=None, **kwargs):
+        self.Required = Required
+        self.Default = Default
+        self.DefaultDescription = DefaultDescription
+        
+        if Required and Default is not None:
+            raise IncompetentDeveloperError("Found required CommandIn '%s' "
+                    "with default value '%r'. Required CommandIns cannot have "
+                    "default values." % (Name, Default))
+        
+        super(CommandIn, self).__init__(Name, DataType, Description, **kwargs)
+
+class CommandOut(Parameter):
+    """A ``Command`` output variable type"""
+    def __init__(self, Name, DataType, Description, **kwargs):
+        super(CommandOut, self).__init__(Name, DataType, Description, 
+                                         **kwargs)
 
 class ParameterCollection(dict):
     """A collection of parameters with dict like lookup"""
@@ -110,7 +123,8 @@ class Command(object):
     """
     BriefDescription = "" # 1 sentence description
     LongDescription = """""" # longer, more detailed description
-    Parameters = ParameterCollection([])
+    CommandIns = ParameterCollection([])
+    CommandOuts = ParameterCollection([])
 
     def __init__(self, **kwargs):
         """ """
@@ -139,6 +153,9 @@ class Command(object):
             raise InvalidReturnTypeError("Unsupported result return type. "
                                          "Results must be stored in a "
                                          "dictionary.")
+
+        self._validate_result(result)
+
         return result
 
     def _validate_kwargs(self, kwargs):
@@ -150,25 +167,45 @@ class Command(object):
         self_str = str(self.__class__)
 
         # check required parameters
-        for p in self.Parameters.values():
+        for p in self.CommandIns.values():
             if p.Required and p.Name not in kwargs:
-                self._logger.fatal('Missing required parameter %s in %s' % (p.Name, self_str))
-                raise MissingParameterError("Missing required parameter %s in %s" % (p.Name, self_str))
+                err_msg = 'Missing required CommandIn %s in %s' % (p.Name, 
+                                                                   self_str)
+                self._logger.fatal(err_msg)
+                raise MissingParameterError(err_msg)
 
             if p.Name in kwargs and p.ValidateValue:
                 if not p.ValidateValue(kwargs[p.Name]):
-                    self._logger.fatal("Parameter %s cannot take value %s in %s" % (p.Name, kwargs[p.Name], self_str))
-                    raise ValueError("Parameter %s cannot take value %s in %s" % (p.Name, kwargs[p.Name], self_str))
+                    err_msg = "CommandIn %s cannot take value %s in %s" % \
+                                (p.Name, kwargs[p.Name], self_str)
+                    self._logger.fatal(err_msg)
+                    raise ValueError(err_msg)
 
         # make sure we only have things we expect
         for opt in kwargs:
-            if opt not in self.Parameters:
-                self._logger.fatal('Unknown parameter %s in %s' % (opt, self_str))
-                raise UnknownParameterError("Unknown parameter %s in %s" % (opt, self_str))
-        
+            if opt not in self.CommandIns:
+                err_msg = 'Unknown CommandIn %s in %s' % (opt, self_str)
+                self._logger.fatal(err_msg)
+                raise UnknownParameterError(err_msg)
+    
+    def _validate_result(self, result):
+        """Validate the result from a ``Command.run``"""
+        self_str = str(self.__class__)
+
+        for p in self.CommandOuts.values():
+            if p.Name not in result:
+                err_msg = "CommandOut %s not in %s" % (p.Name, self_str)
+                self._logger.fatal(err_msg)
+                raise UnknownParameterError(err_msg)
+        for k in result:
+            if k not in self.CommandOuts:
+                err_msg = "Unknown CommandOut %s in %s" % (k, self_str)
+                self._logger.fatal(err_msg)
+                raise UnknownParameterError(err_msg)
+
     def _set_defaults(self, kwargs):
         """Set defaults for optional parameters"""
-        for p in self.Parameters.values():
+        for p in self.CommandIns.values():
             if not p.Required and p.Name not in kwargs:
                 kwargs[p.Name] = p.Default
 
@@ -180,11 +217,21 @@ class Command(object):
         """
         raise NotImplementedError("All subclasses must implement run.")
 
-def make_parameter_collection_lookup_f(obj):
-    """Return a function for convenient parameter lookup.
+# I do not like this
+def make_command_in_collection_lookup_f(obj):
+    """Return a function for convenient ``CommandIns`` lookup.
 
     ``obj`` should be a Command (sub)class or instance.
     """
     def lookup_f(name):
-        return obj.Parameters[name]
+        return obj.CommandIns[name]
+    return lookup_f
+
+def make_command_out_collection_lookup_f(obj):
+    """Return a function for convenient ``CommandOuts`` lookup.
+
+    ``obj`` should be a Command (sub)class or instance.
+    """
+    def lookup_f(name):
+        return obj.CommandOuts[name]
     return lookup_f
