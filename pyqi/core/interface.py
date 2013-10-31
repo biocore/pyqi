@@ -70,7 +70,7 @@ class Interface(object):
         can override to perform validation that requires a list of all
         interface results. Validation that should be performed on a
         per-interface result basis should instead go into
-        ``InterfaceOutput._validate_result``.
+        ``InterfaceOutputOption._validate_result``.
         """
         param_names = [input_.getParameterName()
                        for input_ in inputs
@@ -125,7 +125,7 @@ class Interface(object):
         raise NotImplementedError("Must define _get_inputs")
 
     def _get_outputs(self):
-        """Return a list of ``InterfaceOutput`` objects
+        """Return a list of ``InterfaceOutputOption`` objects
         
         These are typically set in a command+interface specific configuration
         file and passed to ``pyqi.core.general_factory``
