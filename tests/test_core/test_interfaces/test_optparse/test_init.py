@@ -23,7 +23,7 @@ from pyqi.core.interfaces.optparse import (OptparseResult, OptparseOption,
                                            OptparseInterface, optparse_factory,
                                            optparse_main)
 from pyqi.core.exception import IncompetentDeveloperError
-from pyqi.core.command import Command, Parameter, ParameterCollection
+from pyqi.core.command import Command, CommandIn, CommandOut, ParameterCollection
 
 class OptparseResultTests(TestCase):
     # Nothing to test yet
@@ -31,18 +31,19 @@ class OptparseResultTests(TestCase):
 
 class OptparseOptionTests(TestCase):
     def setUp(self):
-        p = Parameter('number', int, 'some int', Required=False, Default=42,
+        p = CommandIn('number', int, 'some int', Required=False, Default=42,
                       DefaultDescription='forty-two')
         # With associated parameter.
-        self.opt1 = OptparseOption(p, int)
+        self.opt1 = OptparseOption(Parameter=p, Type=int)
 
         # Without associated parameter.
-        self.opt2 = OptparseOption(None, int, InputHandler=None, ShortName='n',
+        self.opt2 = OptparseOption(Parameter=None, Type=int, Handler=None, 
+                                   ShortName='n',
                                    Name='number', Required=False,
                                    Help='help!!!')
 
     def test_init(self):
-        self.assertEqual(self.opt1.InputType, int)
+        self.assertEqual(self.opt1.Type, int)
         self.assertEqual(self.opt1.Help, 'some int')
         self.assertEqual(self.opt1.Name, 'number')
         self.assertEqual(self.opt1.Default, 42)
@@ -106,10 +107,12 @@ class GeneralTests(TestCase):
     def setUp(self):
         self.obj = optparse_factory(ghetto,
                 [OptparseUsageExample('a','b','c')],
-                [OptparseOption(InputType=str,
-                                Parameter=ghetto.Parameters['c'],
+                [OptparseOption(Type=str,
+                                Parameter=ghetto.CommandIns['c'],
                                 ShortName='n')],
-                [OptparseResult(ResultKey='itsaresult', OutputHandler=oh)],
+                [OptparseResult(Type=str,
+                                Parameter=ghetto.CommandOuts['itsaresult'],
+                                Handler=oh)],
                 '2.0-dev')
 
     def test_optparse_factory(self):
@@ -121,7 +124,8 @@ class GeneralTests(TestCase):
         _ = optparse_main(self.obj, ['testing', '--c', 'bar'])
 
 class ghetto(Command):
-    Parameters = ParameterCollection([Parameter('c', str, 'b')])
+    CommandIns = ParameterCollection([CommandIn('c', str, 'b')])
+    CommandOuts = ParameterCollection([CommandOut('itsaresult', str, 'x')])
 
     def run(self, **kwargs):
         return {'itsaresult':10}
@@ -130,15 +134,15 @@ class fabulous(OptparseInterface):
     CommandConstructor = ghetto
 
     def _get_inputs(self):
-        return [OptparseOption(InputType=str,
-                Parameter=self.CommandConstructor.Parameters['c'],
+        return [OptparseOption(Type=str,
+                Parameter=self.CommandConstructor.CommandIns['c'],
                 ShortName='n')]
 
     def _get_usage_examples(self):
         return [OptparseUsageExample('a','b','c')]
 
     def _get_outputs(self):
-        return [OptparseResult(ResultKey='itsaresult', OutputHandler=oh)]
+        return [OptparseResult(Parameter=ghetto.CommandOuts['itsaresult'], Handler=oh)]
 
     def _get_version(self):
         return '2.0-dev'
@@ -152,10 +156,10 @@ class NoUsageExamples(fabulous):
 class DuplicateOptionMappings(fabulous):
     def _get_inputs(self):
         return [
-            OptparseOption(InputType=str,
-            Parameter=self.CommandConstructor.Parameters['c'], ShortName='n'),
+            OptparseOption(Type=str,
+            Parameter=self.CommandConstructor.CommandIns['c'], ShortName='n'),
 
-            OptparseOption(Parameter=self.CommandConstructor.Parameters['c'],
+            OptparseOption(Parameter=self.CommandConstructor.CommandIns['c'],
             Name='i-am-a-duplicate')
         ]
 
