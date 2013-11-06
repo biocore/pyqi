@@ -171,5 +171,4 @@ if __name__ == '__main__':
             cmd_obj = get_cmd_obj(cmd_cfg_mod, cmd_name)
 
             # execute FTW
-            print argv[1:]
             optparse_main(cmd_obj, argv[1:])
