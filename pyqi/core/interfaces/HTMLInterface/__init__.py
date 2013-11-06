@@ -26,7 +26,7 @@ from copy import copy
 from glob import glob
 from os.path import abspath, exists, isdir, isfile, split
 from pyqi.core.interface import (Interface, InterfaceOption,
-                                 InterfaceUsageExample, InterfaceResult, get_command_names, get_command_config)
+                                 InterfaceUsageExample, get_command_names, get_command_config)
 from pyqi.core.factory import general_factory
 from pyqi.core.exception import IncompetentDeveloperError
 from pyqi.core.command import Parameter
@@ -105,10 +105,10 @@ class HTMLInterface(OptparseInterface):
                 param_name = option.getParameterName()
                 optparse_clean_name = option.Name
 
-                if option.InputHandler is None:
+                if option.Handler is None:
                     value = self._optparse_input[optparse_clean_name]
                 else:
-                    value = option.InputHandler(
+                    value = option.Handler(
                             self._optparse_input[optparse_clean_name])
 
                 cmd_input_kwargs[param_name] = value
@@ -156,19 +156,15 @@ class HTMLInterface(OptparseInterface):
         handled_results = {}
 
         for output in self._get_outputs():
-            rk = output.ResultKey
-            if rk not in results:
-                raise IncompetentDeveloperError("Did not find the expected "
-                                                "output '%s' in results." % rk)
-
-            if output.OptionName is None:
-                handled_results[rk] = output.OutputHandler(rk, results[rk])
+            rk = output.Name
+        
+            if output.InputName is None:
+                handled_results[rk] = output.Handler(rk, results[rk])
             else:
-                optparse_clean_name = output.OptionName
+                optparse_clean_name = output.InputName
                 opt_value = self._optparse_input[optparse_clean_name]
-                handled_results[rk] = output.OutputHandler(rk, results[rk],
+                handled_results[rk] = output.Handler(rk, results[rk],
                                                            opt_value)
-
 
         return handled_results
 
@@ -187,28 +183,25 @@ def get_cmd_obj(cmd_cfg_mod, cmd):
                             cmd_cfg.inputs, cmd_cfg.outputs,
                             cmd_cfg.__version__)
 
-def command_output_factory(module, command, POST):
-    
-    def command_out(write):
-        #validate data, if wrong, return command_page_factory's command_page
 
-        write(POST)
 
-    return command_out
 def command_page_factory(module, command):
     
     templateHead = '<!DOCTYPE html><html><head><title>%s</title></head><body><h1>%s</h1>'
     templateClose = '</body></html>'
 
-    def descriptionator(usage):
-        returnString = '<div class="usage">'
-        returnString += '<h3>%s</h3>' % usage.ShortDesc
-        returnString += '<div class="longDesc">%s</div>' % usage.LongDesc
-        returnString += '<div class="ex">%s</div>' % usage.Ex
-        return returnString + '</div>'
+
+
+#    def descriptionator(usage):
+#        returnString = '<div class="usage">'
+#        returnString += '<h3>%s</h3>' % usage.ShortDesc
+#        returnString += '<div class="longDesc">%s</div>' % usage.LongDesc
+#        returnString += '<div class="ex">%s</div>' % usage.Ex
+#        return returnString + '</div>'
 
     def input_map(i):
         input_switch = {
+        'none':'%s:<input type="text" name="pyqi_%s" />%s', #THIS IS BAD AND I SHOULD FEEL BAD
         'str':'%s:<input type="text" name="pyqi_%s" />%s',
         'int':'%s:<input type="text" name="pyqi_%s" />%s',
         'long':'%s:<input type="text" name="pyqi_%s" />%s',
@@ -220,13 +213,15 @@ def command_page_factory(module, command):
         'new_filepath':'%s:<input type="text" name="pyqi_%s" />%s'
         }
 
-        iType = i.InputType
+        iType = i.Type
 
         if(type(iType) is not str):
-            if(type("") is iType):
+            if(type("") is type(iType)):
                 iType = 'str'
-            elif(type(1) is iType):
+            elif(type(1) is type(iType)):
                 iType = 'int'
+            elif(type(None) is type(iType)):
+                iType = 'none'
 
         returnString = '<div class="input">'
         returnString += input_switch[iType] % (i.Name, i.Name, i.Help)
@@ -248,9 +243,6 @@ def command_page_factory(module, command):
         write('<input type="submit">')
         write('</form>')
 
-        #print(cmd_config.outputs)
-        #print(cmd_config.param_lookup)
-        #print(cmd_config.CommandConstructor)
         write(templateClose)
 
     return command_page
@@ -270,14 +262,14 @@ def HTTPHandler_factory(module):
                 self._unrouted = False;
                 output_writer(self.wfile.write)
 
-        def download_route(self, path, output_writer, module, command, postvars):
+        def download_route(self, path, module, command, postvars):
             if self._unrouted and self.path == path:
                 cmd_obj = get_cmd_obj(module, command)()
                 result = cmd_obj(postvars)
                 filename = "unnamed.txt"
                 for output in cmd_obj._get_outputs():
-                    if output.ResultKey == "result":
-                        filename = cmd_obj._optparse_input[output.OptionName]
+                    if output.Parameter.Name == "result":
+                        filename = cmd_obj._optparse_input[output.InputName]
 
                 self.send_response(200)
                 self.send_header('Content-disposition', 'attachment; filename=' + filename)
@@ -323,7 +315,7 @@ def HTTPHandler_factory(module):
                 postvars = {}
 
             for command in get_command_names(module):
-                self.download_route("/"+command, command_output_factory(module,command, postvars), module, command, postvars)
+                self.download_route("/"+command, module, command, postvars)
 
 
 

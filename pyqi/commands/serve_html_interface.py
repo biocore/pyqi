@@ -9,19 +9,25 @@ __version__ = "0.0.1-dev"
 __maintainer__ = "Evan Bolyen"
 __email__ = "ebolyen@gmail.com"
 
-from pyqi.core.command import Command, Parameter, ParameterCollection
+from pyqi.core.command import  (Command, CommandIn, CommandOut, 
+    ParameterCollection)
 from pyqi.core.interfaces.HTMLInterface import start_server
 
 class ServeHTMLInterface(Command):
-    BriefDescription = "FILL IN A 1 SENTENCE DESCRIPTION"
-    LongDescription = "GO INTO MORE DETAIL"
-    Parameters = ParameterCollection([
-        Parameter(Name='port', DataType=int,
+    BriefDescription = "Bootstrap the HTMLInterface server"
+    LongDescription = "Start the HTMLInterface server and load the provided interface_module and port"
+    CommandIns = ParameterCollection([
+        CommandIn(Name='port', DataType=int,
                   Description='The port to run the server on', Required=False,
                   Default=8080),
 
-        Parameter(Name='interface_module', DataType=str,
+        CommandIn(Name='interface_module', DataType=str,
                   Description='The module to serve the interface for', Required=True)
+    ])
+
+    CommandOuts = ParameterCollection([
+        CommandOut(Name='result', DataType=str,
+                   Description='Does nothing.')
     ])
 
     def run(self, **kwargs):

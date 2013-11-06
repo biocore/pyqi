@@ -22,13 +22,14 @@ from pyqi.core.interfaces.optparse import (OptparseOption,
                                            OptparseUsageExample)
 from pyqi.core.interfaces.optparse.input_handler import string_list_handler
 from pyqi.core.interfaces.optparse.output_handler import write_list_of_strings
-from pyqi.core.command import make_parameter_collection_lookup_f
+from pyqi.core.command import make_command_in_collection_lookup_f, make_command_out_collection_lookup_f
 from pyqi.commands.serve_html_interface import CommandConstructor
 
 def printer(result_key, data, option_value=None):
   print data
 
-param_lookup = make_parameter_collection_lookup_f(CommandConstructor)
+cmdin_lookup = make_command_in_collection_lookup_f(CommandConstructor)
+cmdout_lookup = make_command_out_collection_lookup_f(CommandConstructor)
 
 usage_examples = [
     OptparseUsageExample(ShortDesc="Basic Command",
@@ -37,22 +38,22 @@ usage_examples = [
 ]
 
 inputs = [
-    OptparseOption(Parameter=param_lookup('port'),
-                   InputType='int',
+    OptparseOption(Parameter=cmdin_lookup('port'),
                    ShortName='p',
                    Name='port',
+                   Type='int',
                    Required=False,
                    Help='Port to run the server on.'),
 
-    OptparseOption(Parameter=param_lookup('interface_module'),
-                   InputType='str',
+    OptparseOption(Parameter=cmdin_lookup('interface_module'),
                    ShortName='m',
                    Name='interface_module',
+                   Type='str',
                    Required=True,
                    Help='The python interface module to run the server on.')
 ]
 
 outputs = [
-    OptparseResult(ResultKey='result',
-                   OutputHandler=printer)
+    OptparseResult(Parameter=cmdout_lookup('result'),
+                   Handler=printer)
 ]
