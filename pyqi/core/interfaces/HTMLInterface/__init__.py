@@ -8,15 +8,15 @@
 # The full license is in the file COPYING.txt, distributed with this software.
 #-----------------------------------------------------------------------------
 
-__author__ = "Greg Caporaso"
+__author__ = "Evan Bolyen"
 __copyright__ = "Copyright 2013, The pyqi project"
 __credits__ = ["Greg Caporaso", "Daniel McDonald", "Gavin Huttley",
                "Rob Knight", "Doug Wendel", "Jai Ram Rideout",
                "Jose Antonio Navas Molina"]
 __license__ = "BSD"
 __version__ = "0.2.0-dev"
-__maintainer__ = "Greg Caporaso"
-__email__ = "gregcaporaso@gmail.com"
+__maintainer__ = "Evan Bolyen"
+__email__ = "ebolyen@gmail.com"
 
 import os
 import types
