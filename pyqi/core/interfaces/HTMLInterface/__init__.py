@@ -25,7 +25,7 @@ from cgi import parse_header, parse_multipart, parse_qs
 from copy import copy
 from glob import glob
 from os.path import abspath, exists, isdir, isfile, split
-from pyqi.core.interface import (Interface, InterfaceOption,
+from pyqi.core.interface import (Interface, InterfaceOutputOption, 
                                  InterfaceUsageExample, get_command_names, get_command_config)
 from pyqi.core.factory import general_factory
 from pyqi.core.exception import IncompetentDeveloperError
@@ -34,8 +34,28 @@ from pyqi.core.command import Parameter
 from pyqi.core.interfaces.optparse import OptparseInterface, OptparseResult, OptparseOption, OptparseUsageExample
 
 
-class HTMLInterfaceResult(OptparseResult):
-    pass
+
+class HTMLInterfaceResult(InterfaceOutputOption):
+    def __init__(self, MIMEType=None, **kwargs):
+        super(HTMLInterfaceResult, self).__init__(**kwargs)
+        self.MIMEType = MIMEType;
+
+
+class HTMLDownload(HTMLInterfaceResult):
+    def __init__(self, FilenameLookup=None, DefaultFilename=None, MIMEType='application/octet-stream', FileExtension=None, **kwargs):
+        super(HTMLDownload, self).__init__(**kwargs)
+        self.FileExtension = FileExtension
+        self.FilenameLookup = FilenameLookup
+        self.DefaultFilename = DefaultFilename
+        self.ResultType = 'download'
+
+
+class HTMLPage(HTMLInterfaceResult):
+    def __init__(self, MIMEType='text/html', **kwargs):
+        super(HTMLPage, self).__init__(**kwargs)
+        self.MIMEType = MIMEType;
+        self.ResultType = 'page'
+
 
 class HTMLInterfaceOption(OptparseOption):
     pass
@@ -85,19 +105,9 @@ class HTMLInterface(OptparseInterface):
                 formatted_input[key[5:]] = value[0]
 
 
-        # Test that all required options were provided.
-       # if required_opts:
-            # dest may be different from the original option name because
-            # optparse converts names from dashed to underscored.
-         #   required_option_ids = [(o.dest, o.get_opt_string())
-            #                       for o in required.option_list]
-       #     for required_dest, required_name in required_option_ids:
-       #         if getattr(formatted_input, required_dest) is None:
-         #           print('Required option %s omitted.' % required_name)
-
         # Build up command input dictionary. This will be passed to
         # Command.__call__ as kwargs.
-        self._optparse_input = formatted_input
+        self._HTMLInterface_input = formatted_input
 
         cmd_input_kwargs = {}
         for option in self._get_inputs():
@@ -106,10 +116,10 @@ class HTMLInterface(OptparseInterface):
                 optparse_clean_name = option.Name
 
                 if option.Handler is None:
-                    value = self._optparse_input[optparse_clean_name]
+                    value = self._HTMLInterface_input[optparse_clean_name]
                 else:
                     value = option.Handler(
-                            self._optparse_input[optparse_clean_name])
+                            self._HTMLInterface_input[optparse_clean_name])
 
                 cmd_input_kwargs[param_name] = value
 
@@ -154,19 +164,57 @@ class HTMLInterface(OptparseInterface):
     def _output_handler(self, results):
         """Deal with things in output if we know how"""
         handled_results = {}
+        download_results = []
+
+        page_output = ""
+        page_seen = False
 
         for output in self._get_outputs():
             rk = output.Name
-        
-            if output.InputName is None:
-                handled_results[rk] = output.Handler(rk, results[rk])
-            else:
-                optparse_clean_name = output.InputName
-                opt_value = self._optparse_input[optparse_clean_name]
-                handled_results[rk] = output.Handler(rk, results[rk],
-                                                           opt_value)
 
-        return handled_results
+            if output.ResultType == 'download':
+                #Set up the filename for download
+                filename = "unnamed_pyqi_output"
+                extension = ""
+                if not output.FileExtension is None:
+                    extension = output.FileExtension
+
+                if output.FilenameLookup is None:
+                    if output.DefaultFilename is None:
+                        pass #the filename will remain the initialized string above
+                        #alternatively, we could throw an error, but that feels drastic
+                    else:
+                        filename = output.DefaultFilename
+                else:
+                    filename = self._HTMLInterface_input[output.FilenameLookup]
+
+                filehandle = filename + extension
+                download_content = ""
+                #Handle results
+                if output.InputName is None:
+                    download_content = output.Handler(rk, results[rk])
+                else:
+                    download_content = output.Handler(rk, results[rk], self._HTMLInterface_input[output.InputName])
+
+                download_results.append({
+                    'name':filehandle,
+                    'contents':download_results
+                    })
+
+            elif self.ResultType == 'page':
+                if not page_seen:
+                    page_seen = True
+                    if output.InputName is None:
+                        page_output = output.Handler(rk, results[rk])
+                    else:
+                        page_output = output.Handler(rk, results[rk], self._HTMLInterface_input[output.InputName])
+                else:
+                    raise IncompetentDeveloperError("It is not possible to display multiple pages.")
+            else:
+                raise IncompetentDeveloperError("Unkown output object.")
+
+        return page_output, download_results
+        
 
 def HTMLInterface_main():
     pass
@@ -266,16 +314,15 @@ def HTTPHandler_factory(module):
             if self._unrouted and self.path == path:
                 cmd_obj = get_cmd_obj(module, command)()
                 result = cmd_obj(postvars)
-                filename = "unnamed.txt"
-                for output in cmd_obj._get_outputs():
-                    if output.Parameter.Name == "result":
-                        filename = cmd_obj._optparse_input[output.InputName]
+              
+                filename = result[1][0]['name']
+                print filename
 
                 self.send_response(200)
                 self.send_header('Content-disposition', 'attachment; filename=' + filename)
                 self.send_header('Content-type', 'application/octet-stream')
                 self.end_headers()
-                self.wfile.write(result['result'])
+                self.wfile.write(result[1][0]['contents'])
 
 
         def do_GET(self):

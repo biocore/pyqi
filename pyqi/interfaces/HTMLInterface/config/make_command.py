@@ -18,10 +18,10 @@ __maintainer__ = "Daniel McDonald"
 __email__ = "mcdonadt@colorado.edu"
 
 from pyqi.core.interfaces.HTMLInterface import (HTMLInterfaceOption,
-                                           HTMLInterfaceResult,
+                                           HTMLDownload, HTMLPage,
                                            HTMLInterfaceUsageExample)
 from pyqi.core.interfaces.optparse.input_handler import string_list_handler
-from pyqi.core.interfaces.HTMLInterface.output_handler import download_list_of_strings
+from pyqi.core.interfaces.HTMLInterface.output_handler import newline_list_of_strings
 from pyqi.core.command import (make_command_in_collection_lookup_f,
     make_command_out_collection_lookup_f)
 from pyqi.commands.make_command import CommandConstructor
@@ -62,7 +62,9 @@ inputs = [
 
 outputs = [
     ### InputName is used to tie this output to output-fp, which is an input...
-    HTMLInterfaceResult(Parameter=cmd_out_lookup('result'),
-                   Handler=download_list_of_strings,
-                   InputName='download-file')
+    HTMLDownload(Parameter=cmd_out_lookup('result'),
+                   Handler=newline_list_of_strings,
+                   FilenameLookup='download-file',
+                   FileExtension='.py')
+    
 ]

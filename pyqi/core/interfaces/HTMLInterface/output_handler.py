@@ -22,15 +22,11 @@ from pyqi.core.exception import IncompetentDeveloperError
 import os
 
 
-def download_list_of_strings(result_key, data, option_value=None):
+def newline_list_of_strings(result_key, data, option_value=None):
     """Write a list of strings to a file, one per line.
     
     A newline will be added to the end of the file.
     """
-
-    if option_value is None:
-        raise IncompetentDeveloperError("Cannot download output without a "
-                                        "filepath.")
 
     output = "";
     
