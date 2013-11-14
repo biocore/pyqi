@@ -1,0 +1,27 @@
+html, body {
+	margin: 0px;
+	padding: 0px;
+    font-family: 'Trebuchet MS',sans-serif;
+}
+
+#content {
+	padding-left: 20px;
+}
+
+h1 {
+    background-color: rgb(242, 242, 242);
+    font-weight: normal;
+    color: rgb(32, 67, 92);
+    border-bottom: 2px solid rgb(204, 204, 204);
+
+	margin: 0px;
+    padding: 3px 0px 3px 10px;
+}
+
+.right {
+	text-align: right;
+}
+
+.required {
+	color: red;
+}

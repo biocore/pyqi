@@ -55,22 +55,30 @@ class HTMLPage(HTMLInterfaceResult):
         super(HTMLPage, self).__init__(**kwargs)
         self.MIMEType = MIMEType;
         self.ResultType = 'page'
+        print self.ResultType
 
 
 class HTMLInterfaceOption(OptparseOption):
     pass
 
-class HTMLInterfaceUsageExample(OptparseUsageExample):
-    pass
+#Saving this in case we find a reason for usage examples
+#class HTMLInterfaceUsageExample(InterfaceUsageExample):
+#    def __init__(self, **kwargs):
+#        super(HTMLInterfaceUsageExample, self).__init__(Ex=None, **kwargs)
+#
+#    def _validate_usage_example(self):
+#        pass
 
 class HTMLInterface(OptparseInterface):
 
+    def _set_command(self, cmd):
+        self._command = cmd
 
     def _validate_usage_examples(self, usage_examples):
         super(OptparseInterface, self)._validate_usage_examples(usage_examples)
 
-        if len(usage_examples) < 1:
-            raise IncompetentDeveloperError("There are no usage examples "
+        if len(usage_examples) > 1:
+            raise IncompetentDeveloperError("There shouldn't be usage examples "
                                             "associated with this command.")
 
     def _the_in_validator(self, in_):
@@ -127,46 +135,16 @@ class HTMLInterface(OptparseInterface):
 
     def _build_usage_lines(self, required_options):
         """ Build the usage string from components """
-        line1 = 'usage: %prog [options] ' + \
-                '{%s}' % ' '.join(['%s %s' % (str(rp),rp.Name.upper())
-                                   for rp in required_options])
 
-        formatted_usage_examples = []
-        for usage_example in self._get_usage_examples():
-            short_description = usage_example.ShortDesc.strip(':').strip()
-            long_description = usage_example.LongDesc.strip(':').strip()
-            example = usage_example.Ex.strip()
-
-            if short_description:
-                formatted_usage_examples.append('%s: %s\n %s' % 
-                                                (short_description,
-                                                 long_description, example))
-            else:
-                formatted_usage_examples.append('%s\n %s' %
-                                                (long_description,example))
-
-        formatted_usage_examples = '\n\n'.join(formatted_usage_examples)
-
-        lines = (line1,
-                 '', # Blank line
-                 self.OptionalInputLine,
-                 self.RequiredInputLine,
-                 '', # Blank line
-                 self.CmdInstance.LongDescription,
-                 '', # Blank line
-                 'Example usage: ',
-                 'Print help message and exit',
-                 ' %prog -h\n',
-                 formatted_usage_examples)
-
-        return '\n'.join(lines)
+        #This is almost sad, but I'm not sure theres anything else to do.
+        return '<p>%s</p>' % self.CmdInstance.LongDescription
 
     def _output_handler(self, results):
         """Deal with things in output if we know how"""
         handled_results = {}
         download_results = []
 
-        page_output = ""
+        page_output = None
         page_seen = False
 
         for output in self._get_outputs():
@@ -198,16 +176,22 @@ class HTMLInterface(OptparseInterface):
 
                 download_results.append({
                     'name':filehandle,
-                    'contents':download_results
+                    'contents':download_content
                     })
 
-            elif self.ResultType == 'page':
+            elif output.ResultType == 'page':
                 if not page_seen:
                     page_seen = True
                     if output.InputName is None:
-                        page_output = output.Handler(rk, results[rk])
+                        page_output = {
+                            'mime_type':output.MIMEType,
+                            'contents':output.Handler(rk, results[rk])
+                        } 
                     else:
-                        page_output = output.Handler(rk, results[rk], self._HTMLInterface_input[output.InputName])
+                        page_output = {
+                            'mime_type': output.MIMEType, 
+                            'contents': output.Handler(rk, results[rk], self._HTMLInterface_input[output.InputName])
+                        }
                 else:
                     raise IncompetentDeveloperError("It is not possible to display multiple pages.")
             else:
@@ -226,17 +210,18 @@ def HTMLInterface_factory(command_constructor, usage_examples, inputs, outputs,
 
 def get_cmd_obj(cmd_cfg_mod, cmd):
     """Get a ``Command`` object"""
-    cmd_cfg, _ = get_command_config(cmd_cfg_mod, cmd)
-    return HTMLInterface_factory(cmd_cfg.CommandConstructor, cmd_cfg.usage_examples, 
+    cmd_cfg,_ = get_command_config(cmd_cfg_mod, cmd)
+    cmd_obj = HTMLInterface_factory(cmd_cfg.CommandConstructor, cmd_cfg.usage_examples, 
                             cmd_cfg.inputs, cmd_cfg.outputs,
-                            cmd_cfg.__version__)
+                            cmd_cfg.__version__)()
+    #The interface needs to know what command it is, because %prog doesn't mean anything without optparse
+    cmd_obj._set_command(cmd)
+    return cmd_obj
 
 
 
 def command_page_factory(module, command):
     
-    templateHead = '<!DOCTYPE html><html><head><title>%s</title></head><body><h1>%s</h1>'
-    templateClose = '</body></html>'
 
 
 
@@ -248,17 +233,20 @@ def command_page_factory(module, command):
 #        return returnString + '</div>'
 
     def input_map(i):
+
+        default_input = '<tr><td class="right">%s</td><td><input type="text" name="pyqi_%s" /></td></tr><tr><td></td><td>%s</td></tr><tr><td>&nbsp;</td></tr>'
+
         input_switch = {
-        'none':'%s:<input type="text" name="pyqi_%s" />%s', #THIS IS BAD AND I SHOULD FEEL BAD
-        'str':'%s:<input type="text" name="pyqi_%s" />%s',
-        'int':'%s:<input type="text" name="pyqi_%s" />%s',
-        'long':'%s:<input type="text" name="pyqi_%s" />%s',
-        'float':'%s:<input type="text" name="pyqi_%s" />%s',
-        'complex':'%s:<input type="text" name="pyqi_%s" />%s',
-        'choice':'%s:<input type="text" name="pyqi_%s" />%s',
-        'multiple_choice':'%s:<input type="text" name="pyqi_%s" />%s',
-        'upload_file':'%s:<input type="text" name="pyqi_%s" />%s',
-        'new_filepath':'%s:<input type="text" name="pyqi_%s" />%s'
+        'none':default_input,
+        'str':default_input,
+        'int':default_input,
+        'long':default_input,
+        'float':default_input,
+        'complex':default_input,
+        'choice':default_input,
+        'multiple_choice':default_input,
+        'upload_file':default_input,
+        'new_filepath':default_input
         }
 
         iType = i.Type
@@ -271,23 +259,35 @@ def command_page_factory(module, command):
             elif(type(None) is type(iType)):
                 iType = 'none'
 
-        returnString = '<div class="input">'
-        returnString += input_switch[iType] % (i.Name, i.Name, i.Help)
+        return input_switch[iType] % ( ('<span class="required">*</span>' + i.Name if i.Required  else i.Name), i.Name, i.Help)
         
 
 
-        return returnString + '</div>'
 
     def command_page(write):
 
-        cmd_obj = get_cmd_obj(module, command)()
+
+        templateHead = '<!DOCTYPE html><html><head><title>%s</title>'
+        styles = '<style>'
+        with open(__file__[:-12]+"/assets/style.css", "U") as f:
+            styles += f.read()
+        styles +='</style>'
+        templateHead += styles + '</head><body><h1>%s</h1><div id="content">'
+        templateClose = '</div></body></html>'
+
+
+        cmd_obj = get_cmd_obj(module, command)
         write(templateHead % (command, command))
 
         write(cmd_obj._build_usage_lines([opt for opt in cmd_obj._get_inputs() if opt.Required]))
 
+        write('<p>An (<span class="required">*</span>) denotes a required field.</p>')
+
         write('<form method="POST">')
+        write('<table>')
         for i in cmd_obj._get_inputs():
             write(input_map(i))
+        write('</table>')
         write('<input type="submit">')
         write('</form>')
 
@@ -312,17 +312,27 @@ def HTTPHandler_factory(module):
 
         def download_route(self, path, module, command, postvars):
             if self._unrouted and self.path == path:
-                cmd_obj = get_cmd_obj(module, command)()
+                cmd_obj = get_cmd_obj(module, command)
                 result = cmd_obj(postvars)
-              
-                filename = result[1][0]['name']
-                print filename
+                
+                if result[0] is None:
 
-                self.send_response(200)
-                self.send_header('Content-disposition', 'attachment; filename=' + filename)
-                self.send_header('Content-type', 'application/octet-stream')
-                self.end_headers()
-                self.wfile.write(result[1][0]['contents'])
+
+                    filename = result[1][0]['name']
+                    
+
+                    self.send_response(200)
+
+
+                    self.send_header('Content-disposition', 'attachment; filename=' + filename)
+                    self.send_header('Content-type', 'application/octet-stream')
+                    self.end_headers()
+                    self.wfile.write(result[1][0]['contents'])
+                else:
+                    self.send_response(200)
+                    self.send_header('Content-type', result[0]['mime_type'])
+                    self.end_headers()
+                    self.wfile.write(result[0]['contents'])
 
 
         def do_GET(self):

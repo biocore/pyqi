@@ -143,8 +143,10 @@ class MakeOptparse(CodeHeaderGenerator):
 
         # construct inputs based off of CommandIns
         cmdin_formatted = []
+        print 1
         for cmdin in sorted(kwargs['command'].CommandIns.values(),
                             key=attrgetter('Name')):
+            print 2
             if cmdin.Required:
                 default_block = ''
             else:
