@@ -269,8 +269,12 @@ def command_page_factory(module, command):
 
         templateHead = '<!DOCTYPE html><html><head><title>%s</title>'
         styles = '<style>'
+
+        # It would be better if I made a routing system for all files in assets
         with open(__file__[:-12]+"/assets/style.css", "U") as f:
             styles += f.read()
+        #but until then, the above works.
+
         styles +='</style>'
         templateHead += styles + '</head><body><h1>%s</h1><div id="content">'
         templateClose = '</div></body></html>'
@@ -386,5 +390,8 @@ def start_server(port, module):
     """Start a server for the HTMLInterface on the specified port"""
 
     server = HTTPServer(("", port), HTTPHandler_factory(module))
-    server.serve_forever()
+    try:
+        server.serve_forever()
+    except KeyboardInterrupt:
+        pass
 
