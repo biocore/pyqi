@@ -40,8 +40,6 @@ inputs = [
     HTMLInterfaceOption(Parameter=cmd_in_lookup('credits'),
                    Handler=string_list_handler,
                    Help='comma-separated list of other authors'),
-    #OptparseOption(Parameter=cmd_in_lookup('test_code'),
-    #              Type=None, Action='store_true'),
     HTMLInterfaceOption(Parameter=None,
                    Type='new_filepath',
                    Name='download-file',
@@ -50,12 +48,14 @@ inputs = [
 ]
 
 outputs = [
-    ### InputName is used to tie this output to output-fp, which is an input...
-#    HTMLDownload(Parameter=cmd_out_lookup('result'),
-#                   Handler=newline_list_of_strings,
-#                   FilenameLookup='download-file',
-#                   FileExtension='.py')
-     HTMLPage(Parameter=cmd_out_lookup('result'),
-              Handler=newline_list_of_strings) 
+    HTMLDownload(Parameter=cmd_out_lookup('result'),
+                   Handler=newline_list_of_strings,
+                   FilenameLookup='download-file',
+                   FileExtension='.py')
+
+#Comment out the above and uncomment the below for an example of a page.
+
+#     HTMLPage(Parameter=cmd_out_lookup('result'),
+#              Handler=newline_list_of_strings) 
     
 ]

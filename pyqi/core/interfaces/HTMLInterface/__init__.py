@@ -10,9 +10,7 @@
 
 __author__ = "Evan Bolyen"
 __copyright__ = "Copyright 2013, The pyqi project"
-__credits__ = ["Greg Caporaso", "Daniel McDonald", "Gavin Huttley",
-               "Rob Knight", "Doug Wendel", "Jai Ram Rideout",
-               "Jose Antonio Navas Molina"]
+__credits__ = ["Evan Bolyen", "Greg Caporaso", "Daniel McDonald", "Jai Ram Rideout",]
 __license__ = "BSD"
 __version__ = "0.2.0-dev"
 __maintainer__ = "Evan Bolyen"
@@ -223,15 +221,6 @@ def get_cmd_obj(cmd_cfg_mod, cmd):
 def command_page_factory(module, command):
     
 
-
-
-#    def descriptionator(usage):
-#        returnString = '<div class="usage">'
-#        returnString += '<h3>%s</h3>' % usage.ShortDesc
-#        returnString += '<div class="longDesc">%s</div>' % usage.LongDesc
-#        returnString += '<div class="ex">%s</div>' % usage.Ex
-#        return returnString + '</div>'
-
     def input_map(i):
 
         default_input = '<tr><td class="right">%s</td><td><input type="text" name="pyqi_%s" /></td></tr><tr><td></td><td>%s</td></tr><tr><td>&nbsp;</td></tr>'
@@ -271,9 +260,10 @@ def command_page_factory(module, command):
         styles = '<style>'
 
         # It would be better if I made a routing system for all files in assets
+        # This would also probably be done in tandem with the proper seperation of server and execution.
         with open(__file__[:-12]+"/assets/style.css", "U") as f:
             styles += f.read()
-        #but until then, the above works.
+        # but until then, the above works.
 
         styles +='</style>'
         templateHead += styles + '</head><body><h1>%s</h1><div id="content">'
@@ -319,19 +309,17 @@ def HTTPHandler_factory(module):
                 cmd_obj = get_cmd_obj(module, command)
                 result = cmd_obj(postvars)
                 
+                #There reason result is a tuple instead of a single item is because I believe it is possible to initiate a download using
+                #an Iframe and still render a page, however these would require some concepts only available in a more explicit server environment.
+                #Namely: we would need a execution environment seperate from the server environment and a datastore to link them
                 if result[0] is None:
-
-
                     filename = result[1][0]['name']
-                    
-
                     self.send_response(200)
-
-
                     self.send_header('Content-disposition', 'attachment; filename=' + filename)
                     self.send_header('Content-type', 'application/octet-stream')
                     self.end_headers()
                     self.wfile.write(result[1][0]['contents'])
+
                 else:
                     self.send_response(200)
                     self.send_header('Content-type', result[0]['mime_type'])
@@ -355,7 +343,7 @@ def HTTPHandler_factory(module):
 
             
             def r(write):#host.domain.tld/help
-                write("help")
+                write("This is still a very in development interface, there is no help.")
             self.route("/help", r)
 
 
@@ -365,7 +353,8 @@ def HTTPHandler_factory(module):
                 self.wfile.close()
 
         def do_POST(self):
-
+            #From stackoverflow: 
+            #   http://stackoverflow.com/questions/4233218/python-basehttprequesthandler-post-variables
             ctype, pdict = parse_header(self.headers.getheader('content-type'))
             if ctype == 'multipart/form-data':
                 postvars = parse_multipart(self.rfile, pdict)
@@ -374,6 +363,9 @@ def HTTPHandler_factory(module):
                 postvars = parse_qs(self.rfile.read(length), keep_blank_values=1)
             else:
                 postvars = {}
+
+
+
 
             for command in get_command_names(module):
                 self.download_route("/"+command, module, command, postvars)
