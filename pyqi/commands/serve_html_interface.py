@@ -33,10 +33,15 @@ class ServeHTMLInterface(Command):
                   Description='The module to serve the interface for', Required=True)
     ])
 
-    CommandOuts = None
+    CommandOuts = ParameterCollection([
+          CommandOut(Name='result',DataType=str, 
+                    Description='Signals the termination of the HTMLInterface server')
+          ])
 
     def run(self, **kwargs):
         """Start the HTMLInterface server with the port and interface_module"""
-        start_server(kwargs['port'], kwargs['interface_module'])
+        fin = start_server(kwargs['port'], kwargs['interface_module'])
+
+        return {'result': fin}
 
 CommandConstructor = ServeHTMLInterface

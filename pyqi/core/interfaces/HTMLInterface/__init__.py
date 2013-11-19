@@ -385,5 +385,5 @@ def start_server(port, module):
     try:
         server.serve_forever()
     except KeyboardInterrupt:
-        pass
+        return "--Finished serving HTMLInterface--"
 

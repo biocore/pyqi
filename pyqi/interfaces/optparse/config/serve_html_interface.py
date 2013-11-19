@@ -28,6 +28,10 @@ from pyqi.commands.serve_html_interface import CommandConstructor
 cmdin_lookup = make_command_in_collection_lookup_f(CommandConstructor)
 cmdout_lookup = make_command_out_collection_lookup_f(CommandConstructor)
 
+def printer(result_key, data, option_value=None):
+    print ""
+    print data
+
 usage_examples = [
     OptparseUsageExample(ShortDesc="Basic Command",
                          LongDesc="Create a basic Command with appropriate attribution",
@@ -48,4 +52,7 @@ inputs = [
                    Help='The python interface module to run the server on.')
 ]
 
-outputs = []
+outputs = [
+    OptparseResult(Parameter=cmdout_lookup('result'),
+                   Handler=printer)
+]
