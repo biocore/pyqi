@@ -51,7 +51,6 @@ class HTMLPage(HTMLInterfaceResult):
         super(HTMLPage, self).__init__(**kwargs)
         self.MIMEType = MIMEType;
         self.ResultType = 'page'
-        print self.ResultType
 
 
 class HTMLInterfaceOption(InterfaceInputOption):
@@ -146,7 +145,10 @@ class HTMLInterface(Interface):
 
     def _the_in_validator(self, in_):
         """Validate input coming from the postvars"""
-        pass
+        if not isinstance(in_, FieldStorage):
+            raise IncompetentDeveloperError("Unsupported input '%r'. Input "
+                                            "must be FieldStorage." % in_)
+
 
     def _the_out_validator(self, out_):
         """Validate output coming from the command call"""
@@ -170,7 +172,6 @@ class HTMLInterface(Interface):
         if t == "complex" or t is complex:
             return complex(postdata.value)
         if t == "upload_file":
-            print postdata.value
             return postdata.file.read()
 
         return postdata.value
@@ -184,7 +185,6 @@ class HTMLInterface(Interface):
 
         # Parse our input.
         formatted_input = {}
-        print in_
 
         for key in in_.keys():
             formatted_input[key[5:]] = in_[key]
@@ -477,30 +477,13 @@ def HTMLInterfaceHTTPHandler_factory(module):
 
         def do_POST(self):
 
-            form = FieldStorage(
-            fp=self.rfile,
-            headers=self.headers,
-            environ={'REQUEST_METHOD':'POST',
-                     'CONTENT_TYPE':self.headers['Content-Type'],
-                     })
-
-            #print form
-
-
-            #From stackoverflow: 
-            #   http://stackoverflow.com/questions/4233218/python-basehttprequesthandler-post-variables
-            #ctype, pdict = parse_header(self.headers.getheader('content-type'))
-            #if ctype == 'multipart/form-data':
-            #    postvars = parse_multipart(self.rfile, pdict)
-            #elif ctype == 'application/x-www-form-urlencoded':
-            #    length = int(self.headers.getheader('content-length'))
-            #    postvars = parse_qs(self.rfile.read(length), keep_blank_values=1)
-            #else:
-            #    postvars = {}
-            #print postvars
+            postvars = FieldStorage(fp=self.rfile,
+                headers=self.headers,
+                environ={'REQUEST_METHOD':'POST',
+                        'CONTENT_TYPE':self.headers['Content-Type']})
 
             for command in module_commands:
-                self.post_route(command, form)
+                self.post_route(command, postvars)
 
             self.end_routes()
 
