@@ -187,14 +187,17 @@ class HTMLInterface(Interface):
         formatted_input = {}
 
         for key in in_.keys():
-            formatted_input[key[5:]] = in_[key]
+            mod_key = key[5:]
+            formatted_input[mod_key] = in_[key]
+            if formatted_input[mod_key].value == "":
+                formatted_input[mod_key] = None
 
 
         cmd_input_kwargs = {}
         for option in self._get_inputs():
             if option.Name not in formatted_input:
                 formatted_input[option.Name] = None
-
+                
             if option.Required and formatted_input[option.Name] is None:
                 errors.append("Error: %s is required." % option.Name)
                 continue
