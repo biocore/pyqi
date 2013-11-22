@@ -41,7 +41,6 @@ inputs = [
                    Handler=string_list_handler,
                    Help='comma-separated list of other authors'),
     HTMLInterfaceOption(Parameter=None,
-                   Type='new_filepath',
                    Name='download-file',
                    Required=True,
                    Help='The name of the file to download which conatins generated Python code. (e.g. MyCommand.py)')

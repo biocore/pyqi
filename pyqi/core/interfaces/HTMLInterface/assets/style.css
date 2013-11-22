@@ -25,3 +25,10 @@ h1 {
 .required {
 	color: red;
 }
+
+.error {
+	color: red;
+	border: 1px solid red;
+	padding: 5px;
+	background: pink;
+}
