@@ -27,10 +27,4 @@ def newline_list_of_strings(result_key, data, option_value=None):
     
     A newline will be added to the end of the file.
     """
-
-    output = "";
-    
-    for line in data:
-        output += line + '\n';
-
-    return output;
+    return "\n".join(data)

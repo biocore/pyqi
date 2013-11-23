@@ -46,8 +46,7 @@ inputs = [
                    Help='The name of the file to download which conatins generated Python code. (e.g. MyCommand.py)')
 ]
 
-outputs = [
-    HTMLDownload(Parameter=cmd_out_lookup('result'),
+outputs = HTMLDownload(Parameter=cmd_out_lookup('result'),
                    Handler=newline_list_of_strings,
                    FilenameLookup='download-file',
                    FileExtension='.py')
@@ -57,4 +56,4 @@ outputs = [
 #     HTMLPage(Parameter=cmd_out_lookup('result'),
 #              Handler=newline_list_of_strings) 
     
-]
+

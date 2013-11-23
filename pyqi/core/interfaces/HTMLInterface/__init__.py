@@ -54,47 +54,34 @@ class HTMLPage(HTMLInterfaceResult):
 
 
 class HTMLInterfaceOption(InterfaceInputOption):
-    
-    def __init__(self, Choices=None, **kwargs):
-        self.Choices = Choices
-        super(HTMLInterfaceOption, self).__init__(**kwargs)
-        
 
-    accepted_types = [
-            "str",
-            "none",
-            "int",
-            "float",
-            "long",
-            "complex",
-            "multiple_choice",
-            "upload_file"
-        ]
+    api_mapping = {
+        None: None,
+        "None": None,
+        str: str,
+        "str": str,
+        int: int,
+        "int": int,
+        float: float,
+        "float": float,
+        long: long,
+        "long": long,
+        complex: complex,
+        "complex": complex,
+        "multiple_choice": "multiple_choice",
+        "upload_file": "upload_file"
+    }
+
+    def __init__(self, Choices=None, Type=str, **kwargs):
+        self.Choices = Choices
+        super(HTMLInterfaceOption, self).__init__(Type=Type, **kwargs)
 
     def _validate_option(self):
+        original_type = self.Type
+        self.Type = self.api_mapping.get(self.Type, "unkown")
 
-        # convert python type objets to strings so they can be processed later
-        if self.Type is str:
-            self.Type = "str"
-        elif self.Type is None:
-            self.Type = "none"
-        elif self.Type is int:
-            self.Type = "int"
-        elif self.Type is float:
-            self.Type = "float"
-        elif self.Type is long:
-            self.Type = "long"
-        elif self.Type is complex:
-            self.Type = "complex"
-
-        unkown_type = True
-        for t in self.accepted_types:
-            if self.Type == t:
-                unkown_type = False
-                break
-
-        if unkown_type:
-            raise IncompetentDeveloperError("Unsupported Type in HTMLInterfaceOption: %s" % str(self.Type))
+        if self.Type == "unkown":
+            raise IncompetentDeveloperError("Unsupported Type in HTMLInterfaceOption: %s" % str(original_type))
 
         #From optparse's __init__.py, inside class PyqiOption
         if self.Type == "multiple_choice":
@@ -109,7 +96,6 @@ class HTMLInterfaceOption(InterfaceInputOption):
             raise OptionError(
                 "must not supply Choices for type %r" % self.type, self)
 
-
 #Saving this in case we find a reason for usage examples
 
 #class HTMLInterfaceUsageExample(InterfaceUsageExample):
@@ -123,15 +109,17 @@ class HTMLInterface(Interface):
     def __call__(self, in_, *args, **kwargs):
         self._the_in_validator(in_)
         cmd_input, errors = self._input_handler(in_, *args, **kwargs)
-        if len(errors) == 0:        
+        if errors:
+            return {
+                    'type': 'error',
+                    'errors': errors
+                }
+        else:        
             cmd_result = self.CmdInstance(**cmd_input)
             self._the_out_validator(cmd_result)       
             return self._output_handler(cmd_result)
-        else:
-            return {
-                'type': 'error',
-                'errors': errors
-            }
+
+            
 
     def _set_command(self, cmd):
         self._command = cmd
@@ -158,25 +146,19 @@ class HTMLInterface(Interface):
 
     def _cast_as(self, postdata, t):
         """Casts str(postdata.value) as an object of the correct type 't'"""
-        if postdata is None:
-            return None
 
-        if t == "str" or t is str:  
-            return str(postdata.value)
-        if t == "int" or t is int:
-            return int(postdata.value)
-        if t == "float" or t is float:
-            return float(postdata.value)
-        if t == "long" or t is long:
-            return long(postdata.value)
-        if t == "complex" or t is complex:
-            return complex(postdata.value)
-        if t == "upload_file":
-            return postdata.file.read()
+        cast = {
+            None: lambda: None,
+            str: lambda x: str(x.value),
+            int: lambda x: int(x.value),
+            float: lambda x: float(x.value),
+            long: lambda x: long(x.value),
+            complex: lambda x: complex(x.value),
+            "upload_file": lambda x: x.file.read(),
+            "multiple_choice": lambda x: x.value
+        }
 
-        return postdata.value
-
-
+        return cast[t](postdata) if postdata is not None else None
 
     def _input_handler(self, in_, *args, **kwargs):
         """reformat from http post data."""
@@ -186,18 +168,16 @@ class HTMLInterface(Interface):
         # Parse our input.
         formatted_input = {}
 
-        for key in in_.keys():
-            mod_key = key[5:]
+        for key in in_:
+            mod_key = key[5:] #removes: 'pyqi_' which is 5 characters long
             formatted_input[mod_key] = in_[key]
             if formatted_input[mod_key].value == "":
                 formatted_input[mod_key] = None
-
 
         cmd_input_kwargs = {}
         for option in self._get_inputs():
             if option.Name not in formatted_input:
                 formatted_input[option.Name] = None
-
 
             if option.Required and formatted_input[option.Name] is None:
                 errors.append("Error: %s is required." % option.Name)
@@ -208,15 +188,13 @@ class HTMLInterface(Interface):
             except (ValueError, TypeError):
                 errors.append("Error: %s must be type %s" % (option.Name, option.Type) );
 
-
             if option.Parameter is not None:
                 param_name = option.getParameterName()
-                optparse_clean_name = option.Name
 
                 if option.Handler is None:
-                    value = formatted_input[optparse_clean_name]
+                    value = formatted_input[option.Name]
                 else:
-                    value = option.Handler(formatted_input[optparse_clean_name])
+                    value = option.Handler(formatted_input[option.Name])
 
                 cmd_input_kwargs[param_name] = value
 
@@ -229,127 +207,110 @@ class HTMLInterface(Interface):
         #This is almost sad, but I'm not sure theres anything else to do.
         return '<p>%s</p>' % self.CmdInstance.LongDescription
 
+    def _output_download_handler(self, output, handled_results):
+        """Handle the output for type: 'download' """
+        #Set up the filename for download
+        filename = "unnamed_pyqi_output"
+        extension = ""
+        if not output.FileExtension is None:
+            extension = output.FileExtension
+
+        if output.FilenameLookup is None:
+            if output.DefaultFilename is not None:
+                filename = output.DefaultFilename
+        else:
+            lookup_filename = self._HTMLInterface_input[output.FilenameLookup]
+            if lookup_filename is not None:
+                filename = lookup_filename
+
+        filehandle = filename + extension
+
+        return {
+            'type':'download',
+            'filename':filehandle,
+            'contents':handled_results
+            }
+
+    def _output_page_handler(self, output, handled_results):
+        """Handle the output for type: 'page' """
+        return {
+            'type':'page',
+            'mime_type':output.MIMEType,
+            'contents':handled_results
+        }
+
     def _output_handler(self, results):
         """Deal with things in output if we know how"""
 
-
         output = self._get_outputs()
-        if type(output) is list:
-            if len(output) > 1:
-                raise IncompetentDeveloperError("There can be only one... output")
-            else:
-                output = output[0]
-
+        if len(output) > 1:
+            raise IncompetentDeveloperError("There can be only one... output")
+        else:
+            output = output[0]
 
         rk = output.Name
-
+        if output.InputName is None:
+            handled_results = output.Handler(rk, results[rk])
+        else:
+            handled_results = output.Handler(rk, results[rk], self._HTMLInterface_input[output.InputName])
+    
         if output.ResultType == 'download':
-            #Set up the filename for download
-            filename = "unnamed_pyqi_output"
-            extension = ""
-            if not output.FileExtension is None:
-                extension = output.FileExtension
-
-            if output.FilenameLookup is None:
-                if output.DefaultFilename is not None:
-                    filename = output.DefaultFilename
-            else:
-                lookup_filename = self._HTMLInterface_input[output.FilenameLookup]
-                if lookup_filename is not None:
-                    filename = lookup_filename
-
-            filehandle = filename + extension
-            download_content = ""
-            #Handle results
-            if output.InputName is None:
-                download_content = output.Handler(rk, results[rk])
-            else:
-                download_content = output.Handler(rk, results[rk], self._HTMLInterface_input[output.InputName])
-
-            return {
-                'type':'download',
-                'filename':filehandle,
-                'contents':download_content
-                }
+            return self._output_download_handler(output, handled_results)
 
         elif output.ResultType == 'page':
-
-            if output.InputName is None:
-                handled_results = output.Handler(rk, results[rk])
-            else:
-                handled_results = output.Handler(rk, results[rk], self._HTMLInterface_input[output.InputName])
-        
-            return {
-                'type':'page',
-                'mime_type':output.MIMEType,
-                'contents':handled_results
-            }
+            return self._output_page_handler(output, handled_results)
 
         else:
             raise IncompetentDeveloperError("Output must subclass HTMLPage or HTMLDownload")
 
 
     def _input_map(self, i):
+        """Return the HTML needed for user input given an HTMLInterfaceOption"""
 
-        def string_input():
-            html_input = '<tr><td class="right">%s</td>' % ('<span class="required">*</span>' + i.Name if i.Required  else i.Name)
-            html_input += '<td><input type="text" name="pyqi_%s" /></td></tr>' % i.Name
-            html_input += '<tr><td></td><td>%s</td></tr><tr><td>&nbsp;</td></tr>' % i.Help
-            return html_input
-
-        def number_input():
-            html_input =  '<tr><td class="right">%s</td>' 
-            html_input += '<td><input type="number" name="pyqi_%s" /></td></tr>' 
-            html_input += '<tr><td></td><td>%s</td></tr><tr><td>&nbsp;</td></tr>'
-            return html_input
-            
-        def mchoice_input():
-            html_input = '<tr><td class="right">%s</td><td>' % ('<span class="required">*</span>' + i.Name if i.Required  else i.Name)
-            for choice in i.Choices:
-                html_input += '%s<input type="radio" name="pyqi_%s" value="%s" />' % (choice, i.Name, choice)
-
-            html_input += '</td></tr><tr><td></td><td>%s</td></tr><tr><td>&nbsp;</td></tr>' % i.Help
-            return html_input
-            
-        def upload_input():
-            html_input =  '<tr><td class="right">%s</td>' % ('<span class="required">*</span>' + i.Name if i.Required  else i.Name)
-            html_input += '<td><input type="file" name="pyqi_%s" /></td></tr>' % i.Name
-            html_input += '<tr><td></td><td>%s</td></tr><tr><td>&nbsp;</td></tr>' % i.Name
-            return html_input
-            
+        string_input = lambda: '<input type="text" name="pyqi_%s" />' % i.Name
+        number_input = lambda: '<input type="number" name="pyqi_%s" />' % i.Name
+        upload_input = lambda: '<input type="file" name="pyqi_%s" />' % i.Name
+        mchoice_input = lambda: ''.join(
+            [ ('(%s<input type="radio" name="pyqi_%s" value="%s" />)' % (choice, i.Name, choice)) 
+                for choice in i.Choices ]
+        )
 
         input_switch = {
-            "str": string_input,
-            "none": string_input,
-            "int": number_input,
-            "float": number_input,
-            "long": number_input,
-            "complex": string_input,
+            None: string_input,
+            str: string_input,
+            int: number_input,
+            float: number_input,
+            long: number_input,
+            complex: string_input,
             "multiple_choice": mchoice_input,
             "upload_file": upload_input
         }
 
-
-        return input_switch[i.Type]()
+        return ''.join(['<tr><td class="right">',
+                        (''.join(['<span class="required">*</span>', i.Name]) if i.Required  else i.Name),
+                       '</td><td>',
+                       input_switch[i.Type](),
+                       '</td></tr><tr><td></td><td>',
+                        i.Help,
+                       '</td></tr><tr><td>&nbsp;</td></tr>'
+                       ])
+       
 
     def command_page_writer(self, write, errors):
+        """Write an HTML page which contains a form for user input"""
 
-
-        templateHead = '<!DOCTYPE html><html><head><title>%s</title>'
-        styles = '<style>'
+        write('<!DOCTYPE html><html><head><title>%s</title>' % self._command)
+        write('<style>')
 
         # It would be better if I made a routing system for all files in assets
         # This would also probably be done in tandem with the proper seperation of server and execution.
         with open(__file__[:-12]+"/assets/style.css", "U") as f:
-            styles += f.read()
+            write(f.read())
         # but until then, the above works.
 
-        styles +='</style>'
-        templateHead += styles + '</head><body><h1>%s</h1><div id="content">'
-        templateClose = '</div></body></html>'
+        write('</style>')
+        write('</head><body><h1>%s</h1><div id="content">' % self._command)
 
-
-        write(templateHead % (self._command, self._command))
         write(self._build_usage_lines([opt for opt in self._get_inputs() if opt.Required]))
 
         write('<p>An (<span class="required">*</span>) denotes a required field.</p>')
@@ -385,22 +346,18 @@ def get_cmd_obj(cmd_cfg_mod, cmd):
     cmd_obj._set_command(cmd)
     return cmd_obj
 
-
-
-
-
-
-
 def HTMLInterfaceHTTPHandler_factory(module):
     """Return a subclassed BaseHTTPRequestHandler with module in scope."""
 
     module_commands = get_command_names(module)
 
     class HTMLInterfaceHTTPHandler(BaseHTTPRequestHandler):
+        """Handle incoming HTTP requests"""
 
         _unrouted = True;
 
         def route(self, path, output_writer):
+            """Define a route for an output_writer"""
             if self._unrouted and self.path == path:
                 self.send_response(200)
                 self.send_header('Content-type', 'text/html')
@@ -411,6 +368,7 @@ def HTMLInterfaceHTTPHandler_factory(module):
                 self._unrouted = False;
 
         def command_route(self, command):
+            """Define a route for a command and write the command page"""
             if self._unrouted and self.path == "/" + command:
                 cmd_obj = get_cmd_obj(module, command)
 
@@ -423,6 +381,7 @@ def HTMLInterfaceHTTPHandler_factory(module):
                 self._unrouted = False
 
         def post_route(self, command, postvars):
+            """Define a route for user response and write the output or else provide errors"""
             if self._unrouted and self.path == "/" + command:
                 cmd_obj = get_cmd_obj(module, command)
                 result = cmd_obj(postvars)
@@ -450,6 +409,7 @@ def HTMLInterfaceHTTPHandler_factory(module):
                 self._unrouted = False
 
         def end_routes(self):
+            """If a route hasn't matched the path up to now, return a 404 and close stream"""
             if self._unrouted:
                 self.send_response(404)
                 self.end_headers()
@@ -458,9 +418,7 @@ def HTMLInterfaceHTTPHandler_factory(module):
                 self._unrouted = False
 
         def do_GET(self):
-
-            #Why does python have no robust concept of anonymous functions? Is a function keyword so inelegant?
-
+            """Handle GET requests"""
             def r(write):#host.domain.tld/
                 write("<ul>")
                 for command in module_commands:
@@ -480,7 +438,7 @@ def HTMLInterfaceHTTPHandler_factory(module):
             self.end_routes()
 
         def do_POST(self):
-
+            """Handle POST requests"""
             postvars = FieldStorage(fp=self.rfile,
                 headers=self.headers,
                 environ={'REQUEST_METHOD':'POST',
@@ -498,9 +456,7 @@ def HTMLInterfaceHTTPHandler_factory(module):
 #This will generally be called from a generated command.
 def start_server(port, module):
     """Start a server for the HTMLInterface on the specified port"""
-
     interface_server = HTTPServer(("", port), HTMLInterfaceHTTPHandler_factory(module))
-
     try:
         interface_server.serve_forever()
 
