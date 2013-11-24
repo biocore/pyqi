@@ -23,7 +23,7 @@ option_value - if the handler is tied to an output option, the value of that
 __author__ = "Daniel McDonald"
 __copyright__ = "Copyright 2013, The pyqi project"
 __credits__ = ["Daniel McDonald", "Greg Caporaso", "Doug Wendel",
-               "Jai Ram Rideout"]
+               "Jai Ram Rideout", "Evan Bolyen"]
 __license__ = "BSD"
 __version__ = "0.1-dev"
 __maintainer__ = "Daniel McDonald"
@@ -72,3 +72,10 @@ def print_list_of_strings(result_key, data, option_value=None):
     """
     for line in data:
         print line
+
+def print_string(result_key, data, option_value=None):
+    """Print the string
+
+    A newline will be printed before the data"""
+    print ""
+    print data

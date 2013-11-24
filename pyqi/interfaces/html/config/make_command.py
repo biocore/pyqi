@@ -8,19 +8,17 @@
 # The full license is in the file COPYING.txt, distributed with this software.
 #-----------------------------------------------------------------------------
 
-__author__ = "Daniel McDonald"
+__author__ = "Evan Bolyen"
 __copyright__ = "Copyright 2013, The pyqi project"
-__credits__ = ["Daniel McDonald", "Greg Caporaso", "Doug Wendel",
-               "Jai Ram Rideout"]
+__credits__ = ["Evan Bolyen"]
 __license__ = "BSD"
 __version__ = "0.2.0-dev"
-__maintainer__ = "Daniel McDonald"
-__email__ = "mcdonadt@colorado.edu"
+__maintainer__ = "Evan Bolyen"
+__email__ = "ebolyen@gmail.com"
 
-from pyqi.core.interfaces.HTMLInterface import (HTMLInterfaceOption,
-                                           HTMLDownload, HTMLPage)
-from pyqi.core.interfaces.optparse.input_handler import string_list_handler
-from pyqi.core.interfaces.HTMLInterface.output_handler import newline_list_of_strings
+from pyqi.core.interfaces.html import (HTMLInputOption, HTMLDownload, HTMLPage)
+from pyqi.core.interfaces.html.input_handler import string_list_handler, string_to_true_false
+from pyqi.core.interfaces.html.output_handler import newline_list_of_strings
 from pyqi.core.command import (make_command_in_collection_lookup_f,
     make_command_out_collection_lookup_f)
 from pyqi.commands.make_command import CommandConstructor
@@ -28,26 +26,28 @@ from pyqi.commands.make_command import CommandConstructor
 cmd_in_lookup = make_command_in_collection_lookup_f(CommandConstructor)
 cmd_out_lookup = make_command_out_collection_lookup_f(CommandConstructor)
 
-usage_examples = []
-
 inputs = [
-    HTMLInterfaceOption(Parameter=cmd_in_lookup('name')),
-    HTMLInterfaceOption(Parameter=cmd_in_lookup('author')),
-    HTMLInterfaceOption(Parameter=cmd_in_lookup('email')),
-    HTMLInterfaceOption(Parameter=cmd_in_lookup('license')),
-    HTMLInterfaceOption(Parameter=cmd_in_lookup('copyright')),
-    HTMLInterfaceOption(Parameter=cmd_in_lookup('version'), Name='command-version'),
-    HTMLInterfaceOption(Parameter=cmd_in_lookup('credits'),
+    HTMLInputOption(Parameter=cmd_in_lookup('name')),
+    HTMLInputOption(Parameter=cmd_in_lookup('author')),
+    HTMLInputOption(Parameter=cmd_in_lookup('email')),
+    HTMLInputOption(Parameter=cmd_in_lookup('license')),
+    HTMLInputOption(Parameter=cmd_in_lookup('copyright')),
+    HTMLInputOption(Parameter=cmd_in_lookup('version'), Name='command-version'),
+    HTMLInputOption(Parameter=cmd_in_lookup('credits'),
                    Handler=string_list_handler,
                    Help='comma-separated list of other authors'),
-    HTMLInterfaceOption(Parameter=None,
+    HTMLInputOption(Parameter=cmd_in_lookup('test_code'),
+                   Type="multiple_choice",
+                   Choices=["True", "False"],
+                   Handler=string_to_true_false,
+                   Help='Should a stubbed out python test file be generated instead'),
+    HTMLInputOption(Parameter=None,
                    Name='download-file',
                    Required=True,
-                   Help='The name of the file to download which conatins generated Python code. (e.g. MyCommand.py)')
+                   Help='The name of the file to download which conatins generated Python code. (e.g. MyCommand)')
 ]
 
-outputs = [
-    HTMLDownload(Parameter=cmd_out_lookup('result'),
+output = HTMLDownload(Parameter=cmd_out_lookup('result'),
                    Handler=newline_list_of_strings,
                    FilenameLookup='download-file',
                    FileExtension='.py')
@@ -57,4 +57,4 @@ outputs = [
 #     HTMLPage(Parameter=cmd_out_lookup('result'),
 #              Handler=newline_list_of_strings) 
     
-]
+

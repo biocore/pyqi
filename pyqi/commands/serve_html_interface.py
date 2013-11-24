@@ -12,14 +12,14 @@ from __future__ import division
 
 __author__ = "Evan Bolyen"
 __copyright__ = "Copyright 2013, The pyqi project"
-__credits__ = ["Evan Bolyen", "Daniel McDonald", "Jai Ram Rideout", "Greg Caporaso"]
+__credits__ = ["Evan Bolyen"]
 __license__ = "BSD"
-__version__ = "0.0.1-dev"
+__version__ = "0.2.0-dev"
 __maintainer__ = "Evan Bolyen"
 __email__ = "ebolyen@gmail.com"
 
 from pyqi.core.command import (Command, CommandIn, CommandOut, ParameterCollection)
-from pyqi.core.interfaces.HTMLInterface import start_server
+from pyqi.core.interfaces.html import start_server
 
 class ServeHTMLInterface(Command):
     BriefDescription = "Start the HTMLInterface server"

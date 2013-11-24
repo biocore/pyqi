@@ -10,7 +10,7 @@
 
 __author__ = "Evan Bolyen"
 __copyright__ = "Copyright 2013, The pyqi project"
-__credits__ = ["Evan Bolyen", "Greg Caporaso", "Daniel McDonald", "Jai Ram Rideout",]
+__credits__ = ["Evan Bolyen", "Jai Ram Rideout", "Daniel McDonald", "Greg Caporaso"]
 __license__ = "BSD"
 __version__ = "0.2.0-dev"
 __maintainer__ = "Evan Bolyen"
@@ -18,6 +18,7 @@ __email__ = "ebolyen@gmail.com"
 
 import os
 import types
+import os.path
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 from cgi import parse_header, parse_multipart, parse_qs, FieldStorage
 from copy import copy
@@ -31,57 +32,61 @@ from pyqi.core.command import Parameter
 
 
 
-class HTMLInterfaceResult(InterfaceOutputOption):
+class HTMLResult(InterfaceOutputOption):
     def __init__(self, MIMEType=None, **kwargs):
-        super(HTMLInterfaceResult, self).__init__(**kwargs)
+        super(HTMLResult, self).__init__(**kwargs)
         self.MIMEType = MIMEType;
 
 
-class HTMLDownload(HTMLInterfaceResult):
+class HTMLDownload(HTMLResult):
     def __init__(self, FileExtension=None, FilenameLookup=None, DefaultFilename=None, MIMEType='application/octet-stream', **kwargs):
-        super(HTMLDownload, self).__init__(**kwargs)
+        super(HTMLDownload, self).__init__(MIMEType=MIMEType, **kwargs)
         self.FileExtension = FileExtension
         self.FilenameLookup = FilenameLookup
         self.DefaultFilename = DefaultFilename
-        self.ResultType = 'download'
 
 
-class HTMLPage(HTMLInterfaceResult):
+class HTMLPage(HTMLResult):
     def __init__(self, MIMEType='text/html', **kwargs):
-        super(HTMLPage, self).__init__(**kwargs)
-        self.MIMEType = MIMEType;
-        self.ResultType = 'page'
+        super(HTMLPage, self).__init__(MIMEType=MIMEType, **kwargs)
 
 
-class HTMLInterfaceOption(InterfaceInputOption):
+class HTMLInputOption(InterfaceInputOption):
 
-    api_mapping = {
-        None: None,
+    primitive_mapping = {
         "None": None,
-        str: str,
         "str": str,
-        int: int,
         "int": int,
-        float: float,
         "float": float,
-        long: long,
         "long": long,
-        complex: complex,
-        "complex": complex,
-        "multiple_choice": "multiple_choice",
-        "upload_file": "upload_file"
+        "complex": complex
+    }
+
+    type_handlers = {
+        None: lambda: None,
+        str: lambda x: str(x.value),
+        int: lambda x: int(x.value),
+        float: lambda x: float(x.value),
+        long: lambda x: long(x.value),
+        complex: lambda x: complex(x.value),
+        "upload_file": lambda x: x.file.read(),
+        "multiple_choice": lambda x: x.value
     }
 
     def __init__(self, Choices=None, Type=str, **kwargs):
         self.Choices = Choices
-        super(HTMLInterfaceOption, self).__init__(Type=Type, **kwargs)
+        super(HTMLInputOption, self).__init__(Type=self._convert_primitive_strings(Type), **kwargs)
+
+    def _convert_primitive_strings(self, t):
+        """Convert the type `t` to a python type object if it is a primitive string.
+           Otherwise, leave unchanged"""
+        return self.primitive_mapping.get(t, t)
 
     def _validate_option(self):
-        original_type = self.Type
-        self.Type = self.api_mapping.get(self.Type, "unkown")
 
-        if self.Type == "unkown":
-            raise IncompetentDeveloperError("Unsupported Type in HTMLInterfaceOption: %s" % str(original_type))
+        if self.Type not in self.type_handlers:
+            raise IncompetentDeveloperError("Unsupported Type in HTMLInputOption: %s" % self.Type)
+
 
         #From optparse's __init__.py, inside class PyqiOption
         if self.Type == "multiple_choice":
@@ -96,14 +101,15 @@ class HTMLInterfaceOption(InterfaceInputOption):
             raise OptionError(
                 "must not supply Choices for type %r" % self.type, self)
 
-#Saving this in case we find a reason for usage examples
-
-#class HTMLInterfaceUsageExample(InterfaceUsageExample):
-#    def __init__(self, **kwargs):
-#        super(HTMLInterfaceUsageExample, self).__init__(Ex=None, **kwargs)
-
-
 class HTMLInterface(Interface):
+
+    style_css = os.path.join(os.path.dirname(__file__), 'assets/style.css')
+
+    def __init__(self, InputPrefix='pyqi_', **kwargs):
+        self._html_input_prefix = InputPrefix
+        self._html_interface_input = {}
+        super(HTMLInterface, self).__init__(**kwargs)
+    
 
     #Override
     def __call__(self, in_, *args, **kwargs):
@@ -119,15 +125,23 @@ class HTMLInterface(Interface):
             self._the_out_validator(cmd_result)       
             return self._output_handler(cmd_result)
 
-            
 
-    def _set_command(self, cmd):
-        self._command = cmd
+    def _validate_inputs_outputs(self, inputs, outputs):
+        super(HTMLInterface, self)._validate_inputs_outputs(inputs, outputs)  
+        
+        if len(outputs) > 1:
+            raise IncompetentDeveloperError("There can be only one... output")
+
+        if not ( isinstance(outputs[0], HTMLPage) or isinstance(outputs[0], HTMLDownload) ):
+            raise IncompetentDeveloperError("Output must subclass HTMLPage or HTMLDownload")
+
+
+
 
     def _validate_usage_examples(self, usage_examples):
         super(HTMLInterface, self)._validate_usage_examples(usage_examples)
 
-        if len(usage_examples) > 1:
+        if usage_examples:
             raise IncompetentDeveloperError("There shouldn't be usage examples "
                                             "associated with this command.")
 
@@ -147,18 +161,7 @@ class HTMLInterface(Interface):
     def _cast_as(self, postdata, t):
         """Casts str(postdata.value) as an object of the correct type 't'"""
 
-        cast = {
-            None: lambda: None,
-            str: lambda x: str(x.value),
-            int: lambda x: int(x.value),
-            float: lambda x: float(x.value),
-            long: lambda x: long(x.value),
-            complex: lambda x: complex(x.value),
-            "upload_file": lambda x: x.file.read(),
-            "multiple_choice": lambda x: x.value
-        }
-
-        return cast[t](postdata) if postdata is not None else None
+        return HTMLInputOption.type_handlers[t](postdata) if postdata is not None else None
 
     def _input_handler(self, in_, *args, **kwargs):
         """reformat from http post data."""
@@ -169,9 +172,9 @@ class HTMLInterface(Interface):
         formatted_input = {}
 
         for key in in_:
-            mod_key = key[5:] #removes: 'pyqi_' which is 5 characters long
+            mod_key = key[ len(self._html_input_prefix): ] 
             formatted_input[mod_key] = in_[key]
-            if formatted_input[mod_key].value == "":
+            if not formatted_input[mod_key].value:
                 formatted_input[mod_key] = None
 
         cmd_input_kwargs = {}
@@ -198,7 +201,7 @@ class HTMLInterface(Interface):
 
                 cmd_input_kwargs[param_name] = value
 
-        self._HTMLInterface_input = formatted_input
+        self._html_interface_input = formatted_input
         return cmd_input_kwargs, errors
 
     def _build_usage_lines(self, required_options):
@@ -212,14 +215,14 @@ class HTMLInterface(Interface):
         #Set up the filename for download
         filename = "unnamed_pyqi_output"
         extension = ""
-        if not output.FileExtension is None:
+        if output.FileExtension is not None:
             extension = output.FileExtension
 
         if output.FilenameLookup is None:
             if output.DefaultFilename is not None:
                 filename = output.DefaultFilename
         else:
-            lookup_filename = self._HTMLInterface_input[output.FilenameLookup]
+            lookup_filename = self._html_interface_input[output.FilenameLookup]
             if lookup_filename is not None:
                 filename = lookup_filename
 
@@ -242,36 +245,30 @@ class HTMLInterface(Interface):
     def _output_handler(self, results):
         """Deal with things in output if we know how"""
 
-        output = self._get_outputs()
-        if len(output) > 1:
-            raise IncompetentDeveloperError("There can be only one... output")
-        else:
-            output = output[0]
+        output = self._get_outputs()[0]
 
         rk = output.Name
         if output.InputName is None:
             handled_results = output.Handler(rk, results[rk])
         else:
-            handled_results = output.Handler(rk, results[rk], self._HTMLInterface_input[output.InputName])
+            handled_results = output.Handler(rk, results[rk], self._html_interface_input[output.InputName])
     
-        if output.ResultType == 'download':
+        if isinstance(output, HTMLDownload):
             return self._output_download_handler(output, handled_results)
 
-        elif output.ResultType == 'page':
+        elif isinstance(output, HTMLPage):
             return self._output_page_handler(output, handled_results)
 
-        else:
-            raise IncompetentDeveloperError("Output must subclass HTMLPage or HTMLDownload")
 
 
     def _input_map(self, i):
         """Return the HTML needed for user input given an HTMLInterfaceOption"""
-
-        string_input = lambda: '<input type="text" name="pyqi_%s" />' % i.Name
-        number_input = lambda: '<input type="number" name="pyqi_%s" />' % i.Name
-        upload_input = lambda: '<input type="file" name="pyqi_%s" />' % i.Name
+        input_name = ''.join([self._html_input_prefix, i.Name])
+        string_input = lambda: '<input type="text" name="%s" />' % input_name
+        number_input = lambda: '<input type="number" name="%s" />' % input_name
+        upload_input = lambda: '<input type="file" name="%s" />' % input_name
         mchoice_input = lambda: ''.join(
-            [ ('(%s<input type="radio" name="pyqi_%s" value="%s" />)' % (choice, i.Name, choice)) 
+            [ ('(%s<input type="radio" name="%s" value="%s" />)' % (choice, input_name, choice)) 
                 for choice in i.Choices ]
         )
 
@@ -299,17 +296,17 @@ class HTMLInterface(Interface):
     def command_page_writer(self, write, errors):
         """Write an HTML page which contains a form for user input"""
 
-        write('<!DOCTYPE html><html><head><title>%s</title>' % self._command)
+        write('<!DOCTYPE html><html><head><title>%s</title>' % self.CommandName)
         write('<style>')
 
         # It would be better if I made a routing system for all files in assets
         # This would also probably be done in tandem with the proper seperation of server and execution.
-        with open(__file__[:-12]+"/assets/style.css", "U") as f:
+        with open(HTMLInterface.style_css, "U") as f:
             write(f.read())
         # but until then, the above works.
 
         write('</style>')
-        write('</head><body><h1>%s</h1><div id="content">' % self._command)
+        write('</head><body><h1>%s</h1><div id="content">' % self.CommandName)
 
         write(self._build_usage_lines([opt for opt in self._get_inputs() if opt.Required]))
 
@@ -330,23 +327,23 @@ class HTMLInterface(Interface):
         
 
 
-def HTMLInterface_factory(command_constructor, usage_examples, inputs, outputs,
-                     version):
-    return general_factory(command_constructor, usage_examples, inputs,
+def html_interface_factory(command_constructor, usage_examples, inputs, outputs,
+                     version, command_name):
+    interface_class = general_factory(command_constructor, usage_examples, inputs,
                            outputs, version, HTMLInterface)
+    interface_class.CommandName = command_name
+    return interface_class
 
 def get_cmd_obj(cmd_cfg_mod, cmd):
     """Get a ``Command`` object"""
     cmd_cfg,_ = get_command_config(cmd_cfg_mod, cmd)
-    cmd_class = HTMLInterface_factory(cmd_cfg.CommandConstructor, cmd_cfg.usage_examples, 
-                            cmd_cfg.inputs, cmd_cfg.outputs,
-                            cmd_cfg.__version__)
+    cmd_class = html_interface_factory(cmd_cfg.CommandConstructor, [], 
+                            cmd_cfg.inputs, [cmd_cfg.output],
+                            cmd_cfg.__version__, cmd)
     cmd_obj = cmd_class()
-    #The interface needs to know what command it is
-    cmd_obj._set_command(cmd)
     return cmd_obj
 
-def HTMLInterfaceHTTPHandler_factory(module):
+def get_http_handler(module):
     """Return a subclassed BaseHTTPRequestHandler with module in scope."""
 
     module_commands = get_command_names(module)
@@ -354,7 +351,10 @@ def HTMLInterfaceHTTPHandler_factory(module):
     class HTMLInterfaceHTTPHandler(BaseHTTPRequestHandler):
         """Handle incoming HTTP requests"""
 
-        _unrouted = True;
+        def __init__(self, *args, **kwargs):
+            self._unrouted = True
+            #Apparently this is an 'oldstyle' class, which doesn't allow the use of super()
+            BaseHTTPRequestHandler.__init__(self, *args, **kwargs)
 
         def route(self, path, output_writer):
             """Define a route for an output_writer"""
@@ -456,7 +456,7 @@ def HTMLInterfaceHTTPHandler_factory(module):
 #This will generally be called from a generated command.
 def start_server(port, module):
     """Start a server for the HTMLInterface on the specified port"""
-    interface_server = HTTPServer(("", port), HTMLInterfaceHTTPHandler_factory(module))
+    interface_server = HTTPServer(("", port), get_http_handler(module))
     try:
         interface_server.serve_forever()
 

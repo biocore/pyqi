@@ -11,20 +11,13 @@
 
 __author__ = "Evan Bolyen"
 __copyright__ = "Copyright 2013, The pyqi project"
-__credits__ = ["Daniel McDonald", "Greg Caporaso", "Doug Wendel",
-               "Jai Ram Rideout"]
+__credits__ = ["Evan Bolyen"]
 __license__ = "BSD"
-__version__ = "0.1-dev"
+__version__ = "0.2.0-dev"
 __maintainer__ = "Evan Bolyen"
 __email__ = "ebolyen@gmail.com"
 
-from pyqi.core.exception import IncompetentDeveloperError
-import os
-
 
 def newline_list_of_strings(result_key, data, option_value=None):
-    """Write a list of strings to a file, one per line.
-    
-    A newline will be added to the end of the file.
-    """
+    """Return a string from a list of strings while appending newline"""
     return "\n".join(data)

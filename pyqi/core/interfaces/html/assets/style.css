@@ -1,11 +1,11 @@
 html, body {
-	margin: 0px;
-	padding: 0px;
+    margin: 0px;
+    padding: 0px;
     font-family: 'Trebuchet MS',sans-serif;
 }
 
 #content {
-	padding-left: 20px;
+    padding-left: 20px;
 }
 
 h1 {
@@ -14,21 +14,21 @@ h1 {
     color: rgb(32, 67, 92);
     border-bottom: 2px solid rgb(204, 204, 204);
 
-	margin: 0px;
+    margin: 0px;
     padding: 3px 0px 3px 10px;
 }
 
 .right {
-	text-align: right;
+    text-align: right;
 }
 
 .required {
-	color: red;
+    color: red;
 }
 
 .error {
-	color: red;
-	border: 1px solid red;
-	padding: 5px;
-	background: pink;
+    color: red;
+    border: 1px solid red;
+    padding: 5px;
+    background: pink;
 }
