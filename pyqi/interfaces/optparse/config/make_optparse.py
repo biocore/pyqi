@@ -23,10 +23,12 @@ from pyqi.core.interfaces.optparse import (OptparseOption, OptparseUsageExample,
 from pyqi.core.interfaces.optparse.input_handler import (command_handler,
                                                          string_list_handler)
 from pyqi.core.interfaces.optparse.output_handler import write_list_of_strings
-from pyqi.core.command import make_parameter_collection_lookup_f
+from pyqi.core.command import (make_command_in_collection_lookup_f,
+    make_command_out_collection_lookup_f)
 from pyqi.commands.make_optparse import CommandConstructor
 
-param_lookup = make_parameter_collection_lookup_f(CommandConstructor)
+cmdin_lookup = make_command_in_collection_lookup_f(CommandConstructor)
+cmdout_lookup = make_command_out_collection_lookup_f(CommandConstructor)
 
 usage_examples = [
     OptparseUsageExample(ShortDesc="Create an optparse config template",
@@ -38,24 +40,24 @@ usage_examples = [
 ]
 
 inputs = [
-    OptparseOption(Parameter=param_lookup('command'),
+    OptparseOption(Parameter=cmdin_lookup('command'),
                    ShortName='c',
-                   InputHandler=command_handler),
-    OptparseOption(Parameter=param_lookup('command_module'),
+                   Handler=command_handler),
+    OptparseOption(Parameter=cmdin_lookup('command_module'),
                    ShortName='m'),
-    OptparseOption(Parameter=param_lookup('author'),
+    OptparseOption(Parameter=cmdin_lookup('author'),
                    ShortName='a'),
-    OptparseOption(Parameter=param_lookup('email'),
+    OptparseOption(Parameter=cmdin_lookup('email'),
                    ShortName='e'),
-    OptparseOption(Parameter=param_lookup('license'),
+    OptparseOption(Parameter=cmdin_lookup('license'),
                    ShortName='l'),
-    OptparseOption(Parameter=param_lookup('copyright')),
-    OptparseOption(Parameter=param_lookup('version'), Name='config-version'),
-    OptparseOption(Parameter=param_lookup('credits'),
-                   InputHandler=string_list_handler,
+    OptparseOption(Parameter=cmdin_lookup('copyright')),
+    OptparseOption(Parameter=cmdin_lookup('version'), Name='config-version'),
+    OptparseOption(Parameter=cmdin_lookup('credits'),
+                   Handler=string_list_handler,
                    Help='comma-separated list of other authors'),
     OptparseOption(Parameter=None,
-                   InputType='new_filepath',
+                   Type='new_filepath',
                    ShortName='o',
                    Name='output-fp',
                    Required=True,
@@ -63,7 +65,7 @@ inputs = [
 ]
 
 outputs = [
-    OptparseResult(ResultKey='result',
-                   OutputHandler=write_list_of_strings,
-                   OptionName='output-fp')
+    OptparseResult(Parameter=cmdout_lookup('result'),
+                   Handler=write_list_of_strings,
+                   InputName='output-fp')
 ]
