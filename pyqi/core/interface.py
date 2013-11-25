@@ -11,7 +11,7 @@
 __author__ = "Greg Caporaso"
 __copyright__ = "Copyright 2013, The pyqi project"
 __credits__ = ["Greg Caporaso", "Daniel McDonald", "Doug Wendel",
-               "Jai Ram Rideout"]
+               "Jai Ram Rideout", "Evan Bolyen"]
 __license__ = "BSD"
 __version__ = "0.2.0-dev"
 __maintainer__ = "Greg Caporaso"
@@ -193,6 +193,23 @@ class InterfaceOption(object):
             return self.Parameter.Name
 
 class InterfaceInputOption(InterfaceOption):
+
+    primitive_mapping = {
+        "None": None,
+        "bool": bool,
+        "str": str,
+        "int": int,
+        "float": float,
+        "long": long,
+        "complex": complex,
+        "tuple": tuple,
+        "dict": dict,
+        "list": list,
+        "set": set,
+        "unicode": unicode,
+        "frozenset": frozenset
+    }
+
     def __init__(self, Action=None, Required=False, Default=None, 
                  ShortName=None, DefaultDescription=None, 
                  convert_to_dashed_name=True, **kwargs):
@@ -222,7 +239,14 @@ class InterfaceInputOption(InterfaceOption):
         if self.Parameter is not None and not self.Parameter.Required and Required:
             self.Required = True
 
+        self._convert_primitive_strings()
         self._validate_option()
+
+    def _convert_primitive_strings(self):
+        """Convert our Type to a python type object if it is a primitive string.
+           Otherwise, leave unchanged"""
+        self.Type = self.primitive_mapping.get(self.Type, self.Type)
+
 
 class InterfaceOutputOption(InterfaceOption):
     def __init__(self, InputName=None, **kwargs):

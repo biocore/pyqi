@@ -32,6 +32,7 @@ from pyqi.core.command import Parameter
 
 
 
+
 class HTMLResult(InterfaceOutputOption):
     def __init__(self, MIMEType=None, **kwargs):
         super(HTMLResult, self).__init__(**kwargs)
@@ -53,15 +54,6 @@ class HTMLPage(HTMLResult):
 
 class HTMLInputOption(InterfaceInputOption):
 
-    primitive_mapping = {
-        "None": None,
-        "str": str,
-        "int": int,
-        "float": float,
-        "long": long,
-        "complex": complex
-    }
-
     type_handlers = {
         None: lambda: None,
         str: lambda x: str(x.value),
@@ -75,12 +67,7 @@ class HTMLInputOption(InterfaceInputOption):
 
     def __init__(self, Choices=None, Type=str, **kwargs):
         self.Choices = Choices
-        super(HTMLInputOption, self).__init__(Type=self._convert_primitive_strings(Type), **kwargs)
-
-    def _convert_primitive_strings(self, t):
-        """Convert the type `t` to a python type object if it is a primitive string.
-           Otherwise, leave unchanged"""
-        return self.primitive_mapping.get(t, t)
+        super(HTMLInputOption, self).__init__(Type=Type, **kwargs)
 
     def _validate_option(self):
 
@@ -103,7 +90,61 @@ class HTMLInputOption(InterfaceInputOption):
 
 class HTMLInterface(Interface):
 
-    style_css = os.path.join(os.path.dirname(__file__), 'assets/style.css')
+    #Relative mapping wasn't working on a collegue's MacBook when pyqi was run outside of it's directory
+    #Until I understand why that was the case and how to fix it, I am putting the style css here. 
+    #This is not a permanent solution.
+    css_style = '\n'.join([
+        'html, body {',
+        '   margin: 0px;',
+        '   padding: 0px;',
+        '   font-family: "Trebuchet MS",sans-serif;',
+        '}',
+
+        '#content {',
+        '   padding-left: 20px;',
+        '}',
+
+        'h1 {',
+        '   background-color: rgb(242, 242, 242);',
+        '   font-weight: normal;',
+        '   color: rgb(32, 67, 92);',
+        '   border-bottom: 2px solid rgb(204, 204, 204);',
+
+        '   margin: 0px;',
+        '   padding: 3px 0px 3px 10px;',
+        '}',
+
+        '.right {',
+        '    text-align: right;',
+        '}',
+
+        '.required {',
+        '    color: red;',
+        '}',
+
+        '.error {',
+        '    color: red;',
+        '    border: 1px solid red;',
+        '    padding: 5px;',
+        '    background: pink;',
+        '}',
+
+        'ul {',
+        '    list-style-type: none;',
+        '    font-size: 20px;',
+        '    float: left;',
+        '}',
+        'li {',
+        '    padding: 5px;',
+        '    margin-bottom:5px;',
+        '    border: 1px solid rgb(204, 204, 204);',
+        '    background: rgb(242, 242, 242);',
+        '}'
+
+        'a, a:visited, a:active{',
+        '    color: rgb(32, 67, 92);',
+        '}'
+      ])
 
     def __init__(self, InputPrefix='pyqi_', **kwargs):
         self._html_input_prefix = InputPrefix
@@ -261,14 +302,18 @@ class HTMLInterface(Interface):
 
 
 
-    def _input_map(self, i):
+    def _input_map(self, i, default):
         """Return the HTML needed for user input given an HTMLInterfaceOption"""
-        input_name = ''.join([self._html_input_prefix, i.Name])
-        string_input = lambda: '<input type="text" name="%s" />' % input_name
-        number_input = lambda: '<input type="number" name="%s" />' % input_name
+
+        input_name = self._html_input_prefix + i.Name
+        string_input = lambda: '<input type="text" name="%s" value="%s"/>' % (input_name, default)
+        number_input = lambda: '<input type="number" name="%s" value="%s"/>' % (input_name, default)
+
+        #html input files cannot have default values. 
+        #If the html interface worked as a data service, this would be possible as submit would be ajax.
         upload_input = lambda: '<input type="file" name="%s" />' % input_name
         mchoice_input = lambda: ''.join(
-            [ ('(%s<input type="radio" name="%s" value="%s" />)' % (choice, input_name, choice)) 
+            [ ('(%s<input type="radio" name="%s" value="%s" %s/>)' % (choice, input_name, choice, 'checked="true"' if default == choice else '')) 
                 for choice in i.Choices ]
         )
 
@@ -284,7 +329,7 @@ class HTMLInterface(Interface):
         }
 
         return ''.join(['<tr><td class="right">',
-                        (''.join(['<span class="required">*</span>', i.Name]) if i.Required  else i.Name),
+                        ('<span class="required">*</span>' + i.Name) if i.Required  else i.Name,
                        '</td><td>',
                        input_switch[i.Type](),
                        '</td></tr><tr><td></td><td>',
@@ -293,17 +338,13 @@ class HTMLInterface(Interface):
                        ])
        
 
-    def command_page_writer(self, write, errors):
+    def command_page_writer(self, write, errors, postvars):
         """Write an HTML page which contains a form for user input"""
 
         write('<!DOCTYPE html><html><head><title>%s</title>' % self.CommandName)
         write('<style>')
 
-        # It would be better if I made a routing system for all files in assets
-        # This would also probably be done in tandem with the proper seperation of server and execution.
-        with open(HTMLInterface.style_css, "U") as f:
-            write(f.read())
-        # but until then, the above works.
+        write(self.css_style)
 
         write('</style>')
         write('</head><body><h1>%s</h1><div id="content">' % self.CommandName)
@@ -318,7 +359,17 @@ class HTMLInterface(Interface):
         write('<form method="POST" enctype="multipart/form-data">')
         write('<table>')
         for i in self._get_inputs():
-            write(self._input_map(i))
+            default = ''
+            full_name = self._html_input_prefix + i.Name
+
+            if full_name in postvars and i.Type is not 'upload_file':
+                default = postvars[full_name].value
+            
+            elif i.Default is not None:
+                default = i.Default
+
+            write(self._input_map(i, default))
+
         write('</table>')
         write('<input type="submit">')
         write('</form>')
@@ -356,6 +407,23 @@ def get_http_handler(module):
             #Apparently this is an 'oldstyle' class, which doesn't allow the use of super()
             BaseHTTPRequestHandler.__init__(self, *args, **kwargs)
 
+
+        def index(self, write):
+            write("<html><head><title>")
+            write("PyQi: " + module)
+            write("</title>")
+            write("<style>")
+            write(HTMLInterface.css_style)
+            write("</style>")
+            write("</head><body>")
+            write("<h1>Available Commands:</h1>")
+            write("<ul>")
+            for command in module_commands:
+                write( '<li><a href="/%s">%s</a></li>'%(command, command) )
+            write("</ul>")
+            write("</body></html>")
+
+
         def route(self, path, output_writer):
             """Define a route for an output_writer"""
             if self._unrouted and self.path == path:
@@ -375,7 +443,7 @@ def get_http_handler(module):
                 self.send_response(200)
                 self.send_header('Content-type', 'text/html')
                 self.end_headers()
-                cmd_obj.command_page_writer(self.wfile.write, [])
+                cmd_obj.command_page_writer(self.wfile.write, [], {})
                 
                 self.wfile.close()
                 self._unrouted = False
@@ -384,13 +452,19 @@ def get_http_handler(module):
             """Define a route for user response and write the output or else provide errors"""
             if self._unrouted and self.path == "/" + command:
                 cmd_obj = get_cmd_obj(module, command)
-                result = cmd_obj(postvars)
+                try:
+                    result = cmd_obj(postvars)
+                except Exception as e:
+                    result = {
+                        'type':'error',
+                        'errors':[e]
+                    }
                 
                 if result['type'] == 'error':
                     self.send_response(400)
                     self.send_header('Content-type', 'text/html')
                     self.end_headers()
-                    cmd_obj.command_page_writer(self.wfile.write, result['errors'])
+                    cmd_obj.command_page_writer(self.wfile.write, result['errors'], postvars)
 
                 elif result['type'] == 'page':       
                     self.send_response(200)
@@ -419,14 +493,10 @@ def get_http_handler(module):
 
         def do_GET(self):
             """Handle GET requests"""
-            def r(write):#host.domain.tld/
-                write("<ul>")
-                for command in module_commands:
-                    write( '<li><a href="/%s">%s</a></li>'%(command, command) )
-                write("</ul>")
-            self.route("/", r)
-            self.route("/index", r)
-            self.route("/home", r)
+
+            self.route("/", self.index)
+            self.route("/index", self.index)
+            self.route("/home", self.index)
 
             def r(write):#host.domain.tld/help
                 write("This is still a very in development interface, there is no help.")
@@ -457,9 +527,11 @@ def get_http_handler(module):
 def start_server(port, module):
     """Start a server for the HTMLInterface on the specified port"""
     interface_server = HTTPServer(("", port), get_http_handler(module))
+    print "-- Starting server at 'http://localhost:%d' --" % port
+    print "To close the server, type 'ctrl-c' into this window."
     try:
         interface_server.serve_forever()
 
     except KeyboardInterrupt:
-        return "--Finished serving HTMLInterface--"
+        return "-- Finished serving HTMLInterface --"
 
