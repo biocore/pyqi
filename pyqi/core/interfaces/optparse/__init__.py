@@ -309,7 +309,7 @@ def check_existing_filepaths(option, opt, value):
     paths = []
     for v in value.split(','):
         fps = glob(v)
-        if len(fps) == 0:            
+        if len(fps) == 0:
             raise OptionValueError(
              "No filepaths match pattern/name '%s'. "
              "All patterns must be matched at least once." % v)
@@ -331,10 +331,36 @@ def check_existing_dirpath(option, opt, value):
     else:
         return value
 
+def check_existing_dirpaths(option, opt, value):
+    paths = []
+    for v in value.split(','):
+        dps = glob(v)
+        if len(dps) == 0:
+            raise OptionValueError(
+                "No dirpaths match pattern/name '%s'."
+                "All patterns must be matched at least once." % v)
+        else:
+            paths.extend(dps)
+    values = []
+    for v in paths:
+        check_existing_dirpath(option, opt, v)
+        values.append(v)
+    return values
+
 def check_new_filepath(option, opt, value):
+    if exists(value):
+        if isdir(value):
+            raise OptionValueError(
+                "option %s: output file exists and it is a directory: %r" %(opt,
+                    value))
     return value
         
 def check_new_dirpath(option, opt, value):
+    if exists(value):
+        if isfile(value):
+            raise OptionValueError(
+                "option %s: output directory exists and it is a file: %r" %(opt,
+                    value))
     return value
     
 def check_existing_path(option, opt, value):
@@ -375,6 +401,7 @@ class PyqiOption(Option):
                             "existing_filepaths",
                             "new_filepath",
                             "existing_dirpath",
+                            "existing_dirpaths",
                             "new_dirpath",
                             "multiple_choice",
                             "blast_db")
@@ -396,6 +423,9 @@ class PyqiOption(Option):
     # for cases where the user is passing an existing directory
     # (e.g., containing a set of input files)
     TYPE_CHECKER["existing_dirpath"] = check_existing_dirpath
+    # for cases where the user passes one or more existing directories
+    # as a comma-separated list - paths are returned as a list
+    TYPE_CHECKER["existing_dirpaths"] = check_existing_dirpaths
     # for cases where the user is passing a new directory to be 
     # create (e.g., an output dir which will contain many result files)
     TYPE_CHECKER["new_dirpath"] = check_new_dirpath

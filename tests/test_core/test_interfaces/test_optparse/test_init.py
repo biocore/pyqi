@@ -11,7 +11,7 @@
 __author__ = "Daniel McDonald"
 __copyright__ = "Copyright 2013, The pyqi project"
 __credits__ = ["Greg Caporaso", "Daniel McDonald", "Doug Wendel",
-               "Jai Ram Rideout"]
+               "Jai Ram Rideout", "Jose Antonio Navas Molina"]
 __license__ = "BSD"
 __version__ = "0.2.0-dev"
 __maintainer__ = "Daniel McDonald"
@@ -21,9 +21,23 @@ from unittest import TestCase, main
 from pyqi.core.interfaces.optparse import (OptparseResult, OptparseOption,
                                            OptparseUsageExample,
                                            OptparseInterface, optparse_factory,
-                                           optparse_main)
+                                           optparse_main, PyqiOption,
+                                           OptionValueError,
+                                           check_existing_filepath,
+                                           check_existing_filepaths,
+                                           check_existing_dirpath,
+                                           check_existing_dirpaths,
+                                           check_new_filepath,
+                                           check_new_dirpath,
+                                           check_existing_path, check_new_path,
+                                           check_multiple_choice,
+                                           check_blast_db)
 from pyqi.core.exception import IncompetentDeveloperError
-from pyqi.core.command import Command, CommandIn, CommandOut, ParameterCollection
+from pyqi.core.command import (Command, CommandIn, CommandOut,
+                               ParameterCollection, Parameter)
+from tempfile import mkstemp, mkdtemp
+from os import remove, rmdir
+from os.path import commonprefix
 
 class OptparseResultTests(TestCase):
     # Nothing to test yet
@@ -162,6 +176,194 @@ class DuplicateOptionMappings(fabulous):
             OptparseOption(Parameter=self.CommandConstructor.CommandIns['c'],
             Name='i-am-a-duplicate')
         ]
+
+class TypeCheckTests(TestCase):
+    def setUp(self):
+        self._paths_to_clean_up = []
+        self._dirs_to_clean_up = []
+
+    def tearDown(self):
+        map(remove, self._paths_to_clean_up)
+        map(rmdir, self._dirs_to_clean_up)
+
+    def test_check_existing_filepath(self):
+        # Check that returns the correct value when the file exists
+        tmp_f, tmp_path = mkstemp()
+        self._paths_to_clean_up = [tmp_path]
+        option = PyqiOption('-f', '--file_test', type='existing_filepath')
+        obs = check_existing_filepath(option, '-f', tmp_path)
+        self.assertEqual(obs, tmp_path)
+        # Check that raises an error when the file doesn't exists
+        self.assertRaises(OptionValueError, check_existing_filepath, option,
+            '-f', '/hopefully/a/non/existing/file')
+        # Check that raises an error when the path exists and is a directory
+        tmp_dirpath = mkdtemp()
+        self._dirs_to_clean_up = [tmp_dirpath]
+        self.assertRaises(OptionValueError, check_existing_filepath, option,
+            '-f', tmp_dirpath)
+
+    def test_check_existing_filepaths(self):
+        # Check that returns a list with the paths, in the same order as 
+        # the input comma separated list
+        tmp_f1, tmp_path1 = mkstemp(prefix='pyqi_tmp_')
+        tmp_f2, tmp_path2 = mkstemp(prefix='pyqi_tmp_')
+        self._paths_to_clean_up = [tmp_path1, tmp_path2]
+        option = PyqiOption('-f', '--files_test', type='existing_filepaths')
+        exp = [tmp_path1, tmp_path2]
+        value = ",".join(exp)
+        obs = check_existing_filepaths(option, '-f', value)
+        self.assertEqual(obs, exp)
+        # Check that returns a list with the paths when using wildcards
+        # note that the order is not important now
+        value = commonprefix(exp) + '*'
+        obs = check_existing_filepaths(option, '-f', value)
+        self.assertEqual(set(obs), set(exp))
+        # Check that raises an error when the wildcard does not match any file
+        self.assertRaises(OptionValueError, check_existing_filepaths, option,
+            '-f', '/hopefully/a/non/existing/path*')
+        # Check that raises an error when one of the files does not exist
+        value = ",".join([tmp_path1,tmp_path2,'/hopefully/a/non/existing/file'])
+        self.assertRaises(OptionValueError, check_existing_filepaths, option,
+            '-f', value)
+        # Check that raises an error when one of the paths is a folder
+        tmp_dirpath = mkdtemp()
+        self._dirs_to_clean_up = [tmp_dirpath]
+        value = ",".join([tmp_path1, tmp_path2, tmp_dirpath])
+        self.assertRaises(OptionValueError, check_existing_filepaths, option,
+            '-f', value)
+
+    def test_check_existing_dirpath(self):
+        # Check that returns the correct value when the directory exists
+        tmp_dirpath = mkdtemp()
+        self._dirs_to_clean_up = [tmp_dirpath]
+        option = PyqiOption('-d', '--dir_test', type='existing_dirpath')
+        obs = check_existing_dirpath(option, '-d', tmp_dirpath)
+        self.assertEqual(obs, tmp_dirpath)
+        # Check that raises an error when the folder doesn't exists
+        self.assertRaises(OptionValueError, check_existing_dirpath, option,
+            '-f', '/hopefully/a/non/existing/directory')
+        # Check that raises an error when the path exists and is a file
+        tmp_f, tmp_path = mkstemp()
+        self._paths_to_clean_up = [tmp_path]
+        self.assertRaises(OptionValueError, check_existing_dirpath, option,
+            '-f', tmp_path)
+
+    def test_check_existing_dirpaths(self):
+        # Check that returns a list with the paths, in the same order as the
+        # input comma separated list
+        tmp_dirpath1 = mkdtemp(prefix='pyqi_tmp_')
+        tmp_dirpath2 = mkdtemp(prefix='pyqi_tmp_')
+        self._dirs_to_clean_up = [tmp_dirpath1, tmp_dirpath2]
+        option = PyqiOption('-d', '--dirs_test', type='existing_dirpaths')
+        exp = [tmp_dirpath1, tmp_dirpath2]
+        value = ",".join(exp)
+        obs = check_existing_dirpaths(option, '-d', value)
+        self.assertEqual(obs, exp)
+        # Check that returns a list with the paths when using wildcars
+        # note that the order is not important now
+        value = commonprefix(exp) + '*'
+        obs = check_existing_dirpaths(option, '-d', value)
+        self.assertEqual(set(obs), set(exp))
+        # Check that raises an error when the wildcard does not match any path
+        self.assertRaises(OptionValueError, check_existing_dirpaths, option,
+            '-f', '/hopefully/a/non/existing/path*')
+        # Check that raises an error when one of the directories does not exist
+        value = ",".join([tmp_dirpath1, tmp_dirpath2,
+            '/hopefully/a/non/existing/path*'])
+        self.assertRaises(OptionValueError, check_existing_dirpaths, option,
+            '-f', value)
+        # Check that raises an error when one of the paths is a file
+        tmp_f, tmp_path = mkstemp()
+        self._paths_to_clean_up = [tmp_path]
+        value = ",".join([tmp_dirpath1, tmp_dirpath2, tmp_path])
+        self.assertRaises(OptionValueError, check_existing_dirpaths, option,
+            '-f', value)
+
+    def test_check_new_filepath(self):
+        # Check that it doesn't raise an error if the path does not exist
+        option = PyqiOption('-n', '--new_file', type="new_filepath")
+        exp = '/hopefully/a/non/existing/file'
+        obs = check_new_filepath(option, '-n', exp)
+        self.assertEqual(obs, exp)
+        # Check that it doesn't raise an error if the path exists and is a file
+        tmp_f, tmp_path = mkstemp()
+        self._paths_to_clean_up = [tmp_path]
+        obs = check_new_filepath(option, '-n', tmp_path)
+        self.assertEqual(obs, tmp_path)
+        # Check that it raises an error if the path exist and is a directory
+        tmp_dirpath = mkdtemp()
+        self._dirs_to_clean_up = [tmp_dirpath]
+        self.assertRaises(OptionValueError, check_new_filepath, option, '-n',
+            tmp_dirpath)
+
+    def test_check_new_dirpath(self):
+        # Check that it doesn't raise an error if the path does not exist
+        option = PyqiOption('-n', '--new_dir', type='new_dirpath')
+        exp = '/hopefully/a/non/existing/dir'
+        obs = check_new_dirpath(option, '-n', exp)
+        self.assertEqual(obs, exp)
+        # Check that it doesn't raise an error if the path exists and is a directory
+        tmp_dirpath = mkdtemp()
+        self._dirs_to_clean_up = [tmp_dirpath]
+        obs = check_new_dirpath(option, '-n', tmp_dirpath)
+        self.assertEqual(obs, tmp_dirpath)
+        # Check that it raises an error if the path exists and is a file
+        tmp_f, tmp_path = mkstemp()
+        self._paths_to_clean_up = [tmp_path]
+        self.assertRaises(OptionValueError, check_new_dirpath, option, '-n',
+            tmp_path)
+
+    def test_check_existing_path(self):
+        # Check that it doesn't raise an error if an existing file is passed
+        option = PyqiOption('-p', '--path_test', type='existing_path')
+        tmp_f, tmp_path = mkstemp()
+        self._paths_to_clean_up = [tmp_path]
+        obs = check_existing_path(option, '-p', tmp_path)
+        self.assertEqual(obs, tmp_path)
+        # Check that it doesn't raise an error if an existing directory is passed
+        tmp_dirpath = mkdtemp()
+        self._dirs_to_clean_up = [tmp_dirpath]
+        obs = check_existing_path(option, '-p', tmp_dirpath)
+        self.assertEqual(obs, tmp_dirpath)
+        # Check that it raises an error if the path doesn't exist
+        self.assertRaises(OptionValueError, check_existing_path, option, '-n',
+            '/hopefully/a/non/existing/path')
+
+    def test_check_new_path(self):
+        # Really? Too much work...
+        option = PyqiOption('-n', '--new_path', type="new_path")
+        exp = '/nothing/to/test/here'
+        obs = check_new_path(option, '-n', exp)
+        self.assertEqual(obs, exp)
+
+    def test_check_multiple_choice(self):
+        # Check that it doesn't raise an error when the value is in the list
+        option = PyqiOption('-m', '--multiple', type="multiple_choice",
+            mchoices=['choice_A', 'choice_B', 'choice_C'])
+        exp = ["choice_B"]
+        obs = check_multiple_choice(option, '-m', exp[0])
+        self.assertEqual(obs, exp)
+        exp = ["choice_B","choice_C"]
+        obs = check_multiple_choice(option, '-m', ",".join(exp))
+        self.assertEqual(obs, exp)
+        # Check that it raises an error when the value is not in the list
+        self.assertRaises(OptionValueError, check_multiple_choice, option, '-n',
+            "choice_not_listed")
+        self.assertRaises(OptionValueError, check_multiple_choice, option, '-n',
+            "choice_A,choice_not_listed")
+
+    def test_check_blast_db(self):
+        # Check that it doesn't raise an error when a blastdb-like prefix is passed
+        option = PyqiOption('-b', '--blast_test', type="blast_db")
+        tmp_f1, tmp_path1 = mkstemp(prefix='pyqi_tmp_')
+        tmp_f2, tmp_path2 = mkstemp(prefix='pyqi_tmp_')
+        self._paths_to_clean_up = [tmp_path1, tmp_path2]
+        exp = commonprefix([tmp_path1, tmp_path2])
+        obs = check_blast_db(option, '-b', exp)
+        self.assertEqual(obs, exp)
+        # Check that raises an error if the base folder does not exist
+        self.assertRaises(OptionValueError, check_blast_db, option, '-b',
+            '/hopefully/a/non/existing/path')
 
 usage_lines = """usage: %prog [options] {}
 
