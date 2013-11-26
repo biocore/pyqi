@@ -67,9 +67,9 @@ class HTMLInputOption(InterfaceInputOption):
 
     def __init__(self, Choices=None, Type=str, **kwargs):
         self.Choices = Choices
+        super(HTMLInputOption, self).__init__(Type=Type, **kwargs)
         if Type == bool:
             self.Choices = [True, False]
-        super(HTMLInputOption, self).__init__(Type=Type, **kwargs)
 
     def cast_value(self, postdata):
         """Casts str(postdata.value) as an object of the correct type"""
@@ -85,9 +85,6 @@ class HTMLInputOption(InterfaceInputOption):
                 default = ""
         
         if self.Choices:
-            print default
-            print self.Choices[0]
-            print self.Choices[0] == default
 
         input_name = HTMLInterface.html_input_prefix + self.Name
         string_input = lambda: '<input type="text" name="%s" value="%s"/>' % (input_name, default)
@@ -130,12 +127,14 @@ class HTMLInputOption(InterfaceInputOption):
         #From optparse's __init__.py, inside class PyqiOption
         if self.Type == "multiple_choice":
             if self.Choices is None:
-                raise OptionError(
-                    "must supply a list of mchoices for type '%s'" % self.type, self)
-            elif type(self.Choices) not in (types.TupleType, types.ListType):
-                raise OptionError(
+                raise IncompetentDeveloperError(
+                    "must supply a list of Choices for type '%s'" % self.type, self)
+            elif type(self.Choices) not in (_type_handlers.TupleType, types.ListType):
+                raise IncompetentDeveloperError(
                     "choices must be a list of strings ('%s' supplied)"
                     % str(type(self.Choices)).split("'")[1], self)
+        elif self.Choices is not None:
+            raise IncompetentDeveloperError("must not supply Choices for type %r" % self.type, self)
 
 class HTMLInterface(Interface):
     html_input_prefix = "pyqi_"
