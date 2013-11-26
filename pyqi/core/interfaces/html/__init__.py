@@ -72,7 +72,7 @@ class HTMLInputOption(InterfaceInputOption):
         super(HTMLInputOption, self).__init__(Type=Type, **kwargs)
 
     def cast_value(self, postdata):
-        """Casts str(postdata.value) as an object of the correct type 't'"""
+        """Casts str(postdata.value) as an object of the correct type"""
 
         return self._type_handlers[self.Type](postdata) if postdata is not None else None
 
@@ -122,12 +122,10 @@ class HTMLInputOption(InterfaceInputOption):
                        '</td></tr><tr><td>&nbsp;</td></tr>'
                        ])
    
-
     def _validate_option(self):
 
         if self.Type not in self._type_handlers:
             raise IncompetentDeveloperError("Unsupported Type in HTMLInputOption: %s" % self.Type)
-
 
         #From optparse's __init__.py, inside class PyqiOption
         if self.Type == "multiple_choice":
