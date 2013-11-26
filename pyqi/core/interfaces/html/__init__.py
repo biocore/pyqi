@@ -139,7 +139,7 @@ class HTMLInterface(Interface):
         '    margin-bottom:5px;',
         '    border: 1px solid rgb(204, 204, 204);',
         '    background: rgb(242, 242, 242);',
-        '}'
+        '}',
 
         'a, a:visited, a:active{',
         '    color: rgb(32, 67, 92);',
