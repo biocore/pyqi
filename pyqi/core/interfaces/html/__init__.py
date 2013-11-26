@@ -37,7 +37,6 @@ class HTMLResult(InterfaceOutputOption):
             raise IncompetentDeveloperError("A valid MIMEType must be provided")
         self.MIMEType = MIMEType;
 
-
 class HTMLDownload(HTMLResult):
     def __init__(self, FileExtension=None, FilenameLookup=None, DefaultFilename=None, MIMEType='application/octet-stream', **kwargs):
         super(HTMLDownload, self).__init__(MIMEType=MIMEType, **kwargs)
@@ -45,14 +44,11 @@ class HTMLDownload(HTMLResult):
         self.FilenameLookup = FilenameLookup
         self.DefaultFilename = DefaultFilename
 
-
 class HTMLPage(HTMLResult):
     def __init__(self, MIMEType='text/html', **kwargs):
         super(HTMLPage, self).__init__(MIMEType=MIMEType, **kwargs)
 
-
 class HTMLInputOption(InterfaceInputOption):
-
     _type_handlers = {
         None: lambda: None,
         str: lambda x: str(x.value),
@@ -73,8 +69,7 @@ class HTMLInputOption(InterfaceInputOption):
 
     def cast_value(self, postdata):
         """Casts str(postdata.value) as an object of the correct type"""
-
-        return self._type_handlers[self.Type](postdata) if postdata is not None else None
+       return self._type_handlers[self.Type](postdata) if postdata is not None else None
 
     def get_html(self, default):
         """Return the HTML needed for user input given a default value"""
@@ -118,7 +113,6 @@ class HTMLInputOption(InterfaceInputOption):
                        ])
    
     def _validate_option(self):
-
         if self.Type not in self._type_handlers:
             raise IncompetentDeveloperError("Unsupported Type in HTMLInputOption: %s" % self.Type)
 
@@ -197,7 +191,6 @@ class HTMLInterface(Interface):
         self._html_interface_input = {}
         super(HTMLInterface, self).__init__(**kwargs)
     
-
     #Override
     def __call__(self, in_, *args, **kwargs):
         self._the_in_validator(in_)
@@ -212,7 +205,6 @@ class HTMLInterface(Interface):
             self._the_out_validator(cmd_result)       
             return self._output_handler(cmd_result)
 
-
     def _validate_inputs_outputs(self, inputs, outputs):
         super(HTMLInterface, self)._validate_inputs_outputs(inputs, outputs)  
         
@@ -221,9 +213,6 @@ class HTMLInterface(Interface):
 
         if not ( isinstance(outputs[0], HTMLPage) or isinstance(outputs[0], HTMLDownload) ):
             raise IncompetentDeveloperError("Output must subclass HTMLPage or HTMLDownload")
-
-
-
 
     def _validate_usage_examples(self, usage_examples):
         super(HTMLInterface, self)._validate_usage_examples(usage_examples)
@@ -237,7 +226,6 @@ class HTMLInterface(Interface):
         if not isinstance(in_, FieldStorage):
             raise IncompetentDeveloperError("Unsupported input '%r'. Input "
                                             "must be FieldStorage." % in_)
-
 
     def _the_out_validator(self, out_):
         """Validate output coming from the command call"""
@@ -288,8 +276,6 @@ class HTMLInterface(Interface):
 
     def _build_usage_lines(self, required_options):
         """ Build the usage string from components """
-
-        #This is almost sad, but I'm not sure theres anything else to do.
         return '<p class="usage_example">%s</p>' % self.CmdInstance.LongDescription
 
     def _output_download_handler(self, output, handled_results):
@@ -346,7 +332,6 @@ class HTMLInterface(Interface):
 
     def command_page_writer(self, write, errors, postvars):
         """Write an HTML page which contains a form for user input"""
-
         write('<!DOCTYPE html><html><head><title>%s</title>' % self.CommandName)
         write('<style>')
 
@@ -377,8 +362,6 @@ class HTMLInterface(Interface):
         write('</form>')
 
         write('</div></body></html>')
-        
-
 
 def html_interface_factory(command_constructor, usage_examples, inputs, outputs,
                      version, command_name):
@@ -398,7 +381,6 @@ def get_cmd_obj(cmd_cfg_mod, cmd):
 
 def get_http_handler(module):
     """Return a subclassed BaseHTTPRequestHandler with module in scope."""
-
     module_commands = get_command_names(module)
 
     class HTMLInterfaceHTTPHandler(BaseHTTPRequestHandler):
@@ -408,7 +390,6 @@ def get_http_handler(module):
             self._unrouted = True
             #Apparently this is an 'oldstyle' class, which doesn't allow the use of super()
             BaseHTTPRequestHandler.__init__(self, *args, **kwargs)
-
 
         def index(self, write):
             write("<html><head><title>")
@@ -424,7 +405,6 @@ def get_http_handler(module):
                 write( '<li><a href="/%s">%s</a></li>'%(command, command) )
             write("</ul>")
             write("</body></html>")
-
 
         def route(self, path, output_writer):
             """Define a route for an output_writer"""
@@ -524,7 +504,6 @@ def get_http_handler(module):
 
     return HTMLInterfaceHTTPHandler
 
-
 #This will generally be called from a generated command.
 def start_server(port, module):
     """Start a server for the HTMLInterface on the specified port"""
@@ -536,4 +515,3 @@ def start_server(port, module):
 
     except KeyboardInterrupt:
         return "-- Finished serving HTMLInterface --"
-

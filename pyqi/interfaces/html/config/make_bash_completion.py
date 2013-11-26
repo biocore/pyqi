@@ -16,7 +16,6 @@ __version__ = "0.2.0-dev"
 __maintainer__ = "Evan Bolyen"
 __email__ = "ebolyen@gmail.com"
 
-
 from pyqi.core.interfaces.html import (HTMLInputOption, HTMLDownload, HTMLPage)
 from pyqi.core.interfaces.html.output_handler import newline_list_of_strings
 from pyqi.core.command import (make_command_in_collection_lookup_f,

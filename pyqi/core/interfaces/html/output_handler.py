@@ -17,7 +17,6 @@ __version__ = "0.2.0-dev"
 __maintainer__ = "Evan Bolyen"
 __email__ = "ebolyen@gmail.com"
 
-
 def newline_list_of_strings(result_key, data, option_value=None):
     """Return a string from a list of strings while appending newline"""
     return "\n".join(data)
