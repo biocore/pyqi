@@ -289,10 +289,13 @@ class HTMLInterface(Interface):
         output = self._get_outputs()[0]
 
         rk = output.Name
-        if output.InputName is None:
-            handled_results = output.Handler(rk, results[rk])
+        if output.Handler is not None:
+            if output.InputName is None:
+                handled_results = output.Handler(rk, results[rk])
+            else:
+                handled_results = output.Handler(rk, results[rk], self._html_interface_input[output.InputName])
         else:
-            handled_results = output.Handler(rk, results[rk], self._html_interface_input[output.InputName])
+            handled_results = results[rk]
     
         if isinstance(output, HTMLDownload):
             return self._output_download_handler(output, handled_results)

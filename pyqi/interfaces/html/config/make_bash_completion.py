@@ -37,7 +37,6 @@ inputs = [
 ]
 
 output = HTMLDownload(Parameter=cmd_out_lookup('result'),
-                   Handler=newline_list_of_strings,
                    FilenameLookup='download-file',
                    FileExtension='.sh')
 
