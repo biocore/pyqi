@@ -36,4 +36,4 @@ def command_handler(option_value):
 
 def string_to_true_false(option_value):
 	"""Return a boolean from a string"""
-	return bool(option_value)
+	return option_value == "True"

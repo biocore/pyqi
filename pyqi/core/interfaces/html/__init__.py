@@ -30,12 +30,11 @@ from pyqi.core.factory import general_factory
 from pyqi.core.exception import IncompetentDeveloperError
 from pyqi.core.command import Parameter
 
-
-
-
 class HTMLResult(InterfaceOutputOption):
     def __init__(self, MIMEType=None, **kwargs):
         super(HTMLResult, self).__init__(**kwargs)
+        if MIMEType is None:
+            raise IncompetentDeveloperError("A valid MIMEType must be provided")
         self.MIMEType = MIMEType;
 
 
@@ -249,7 +248,7 @@ class HTMLInterface(Interface):
         """ Build the usage string from components """
 
         #This is almost sad, but I'm not sure theres anything else to do.
-        return '<p>%s</p>' % self.CmdInstance.LongDescription
+        return '<p class="usage_example">%s</p>' % self.CmdInstance.LongDescription
 
     def _output_download_handler(self, output, handled_results):
         """Handle the output for type: 'download' """
@@ -332,7 +331,7 @@ class HTMLInterface(Interface):
         }
 
         return ''.join(['<tr><td class="right">',
-                        ('<span class="required">*</span>' + i.Name) if i.Required  else i.Name,
+                        ('<span class="required">*</span>' + i.Name) if i.Required else i.Name,
                        '</td><td>',
                        input_switch[i.Type](),
                        '</td></tr><tr><td></td><td>',
@@ -392,7 +391,7 @@ def get_cmd_obj(cmd_cfg_mod, cmd):
     """Get a ``Command`` object"""
     cmd_cfg,_ = get_command_config(cmd_cfg_mod, cmd)
     cmd_class = html_interface_factory(cmd_cfg.CommandConstructor, [], 
-                            cmd_cfg.inputs, [cmd_cfg.output],
+                            cmd_cfg.inputs, cmd_cfg.outputs,
                             cmd_cfg.__version__, cmd)
     cmd_obj = cmd_class()
     return cmd_obj
@@ -440,7 +439,7 @@ def get_http_handler(module):
 
         def command_route(self, command):
             """Define a route for a command and write the command page"""
-            if self._unrouted and self.path == "/" + command:
+            if self._unrouted and self.path == ("/" + command):
                 cmd_obj = get_cmd_obj(module, command)
 
                 self.send_response(200)
@@ -453,7 +452,7 @@ def get_http_handler(module):
 
         def post_route(self, command, postvars):
             """Define a route for user response and write the output or else provide errors"""
-            if self._unrouted and self.path == "/" + command:
+            if self._unrouted and self.path == ("/" + command):
                 cmd_obj = get_cmd_obj(module, command)
                 try:
                     result = cmd_obj(postvars)

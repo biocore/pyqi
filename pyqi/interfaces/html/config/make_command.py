@@ -48,14 +48,14 @@ inputs = [
                    Help='The name of the file to download which conatins generated Python code. (e.g. my_command)')
 ]
 
-output = HTMLDownload(Parameter=cmd_out_lookup('result'),
+outputs = [ HTMLDownload(Parameter=cmd_out_lookup('result'),
                    Handler=newline_list_of_strings,
                    FilenameLookup='download-file',
-                   FileExtension='.py')
+                   FileExtension='.py') ]
 
 #Comment out the above and uncomment the below for an example of a page.
 
-#     HTMLPage(Parameter=cmd_out_lookup('result'),
-#              Handler=newline_list_of_strings) 
+#    [ TMLPage(Parameter=cmd_out_lookup('result'),
+#              Handler=newline_list_of_strings) ]
     
 

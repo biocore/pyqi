@@ -193,8 +193,7 @@ class InterfaceOption(object):
             return self.Parameter.Name
 
 class InterfaceInputOption(InterfaceOption):
-
-    primitive_mapping = {
+    _primitive_mapping = {
         "None": None,
         "bool": bool,
         "str": str,
@@ -245,8 +244,7 @@ class InterfaceInputOption(InterfaceOption):
     def _convert_primitive_strings(self):
         """Convert our Type to a python type object if it is a primitive string.
            Otherwise, leave unchanged"""
-        self.Type = self.primitive_mapping.get(self.Type, self.Type)
-
+        self.Type = self._primitive_mapping.get(self.Type, self.Type)
 
 class InterfaceOutputOption(InterfaceOption):
     def __init__(self, InputName=None, **kwargs):

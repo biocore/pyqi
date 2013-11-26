@@ -36,7 +36,7 @@ inputs = [
                    Help='The name of the bash completion script to download. (e.g. my_file)')
 ]
 
-output = HTMLDownload(Parameter=cmd_out_lookup('result'),
+outputs = [ HTMLDownload(Parameter=cmd_out_lookup('result'),
                    FilenameLookup='download-file',
-                   FileExtension='.sh')
+                   FileExtension='.sh') ]
 
