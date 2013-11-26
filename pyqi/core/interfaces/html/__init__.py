@@ -71,13 +71,11 @@ class HTMLInputOption(InterfaceInputOption):
         """Casts str(postdata.value) as an object of the correct type"""
         return self._type_handlers[self.Type](postdata) if postdata is not None else None
 
-    def get_html(self, prefix, value=None):
+    def get_html(self, prefix, value=""):
         """Return the HTML needed for user input given a default value"""
-        if value is None:
-            if self.Default is not None:
-                value = self.Default
-            else:
-                value = ""
+        if (not value) and (self.Default is not None):
+            value = self.Default
+            
 
         input_name = prefix + self.Name
         string_input = lambda: '<input type="text" name="%s" value="%s"/>' % (input_name, value)
