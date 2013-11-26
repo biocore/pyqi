@@ -31,6 +31,7 @@ from pyqi.core.exception import IncompetentDeveloperError
 from pyqi.core.command import Parameter
 
 class HTMLResult(InterfaceOutputOption):
+    """Base class for results for an HTML config file"""
     def __init__(self, MIMEType=None, **kwargs):
         super(HTMLResult, self).__init__(**kwargs)
         if MIMEType is None:
@@ -38,17 +39,21 @@ class HTMLResult(InterfaceOutputOption):
         self.MIMEType = MIMEType;
 
 class HTMLDownload(HTMLResult):
-    def __init__(self, FileExtension=None, FilenameLookup=None, DefaultFilename=None, MIMEType='application/octet-stream', **kwargs):
+    """Result class for downloading a file from the server"""
+    def __init__(self, FileExtension=None, FilenameLookup=None, DefaultFilename=None, 
+            MIMEType='application/octet-stream', **kwargs):
         super(HTMLDownload, self).__init__(MIMEType=MIMEType, **kwargs)
         self.FileExtension = FileExtension
         self.FilenameLookup = FilenameLookup
         self.DefaultFilename = DefaultFilename
 
 class HTMLPage(HTMLResult):
+    """Result class for displaying a page for an HTML config file"""
     def __init__(self, MIMEType='text/html', **kwargs):
         super(HTMLPage, self).__init__(MIMEType=MIMEType, **kwargs)
 
 class HTMLInputOption(InterfaceInputOption):
+    """Define an input option for an HTML config file"""
     _type_handlers = {
         None: lambda: None,
         str: lambda x: str(x.value),
@@ -84,7 +89,8 @@ class HTMLInputOption(InterfaceInputOption):
         #If the html interface worked as a data service, this would be possible as submit would be ajax.
         upload_input = lambda: '<input type="file" name="%s" />' % input_name
         mchoice_input = lambda: ''.join(
-            [ ('(%s<input type="radio" name="%s" value="%s" %s/>)' % (choice, input_name, choice, 'checked="true"' if value == choice else '')) 
+            [ ('(%s<input type="radio" name="%s" value="%s" %s/>)' 
+                    % (choice, input_name, choice, 'checked="true"' if value == choice else '')) 
                 for choice in self.Choices ]
         )
 
@@ -126,6 +132,7 @@ class HTMLInputOption(InterfaceInputOption):
             raise IncompetentDeveloperError("must not supply Choices for type %r" % self.type, self)
 
 class HTMLInterface(Interface):
+    """An HTML interface"""
     #Relative mapping wasn't working on a collegue's MacBook when pyqi was run outside of it's directory
     #Until I understand why that was the case and how to fix it, I am putting the style css here. 
     #This is not a permanent solution.
@@ -316,7 +323,8 @@ class HTMLInterface(Interface):
             if output.InputName is None:
                 handled_results = output.Handler(rk, results[rk])
             else:
-                handled_results = output.Handler(rk, results[rk], self._html_interface_input[output.InputName])
+                handled_results = output.Handler(rk, results[rk], 
+                    self._html_interface_input[output.InputName])
         else:
             handled_results = results[rk]
     
@@ -453,7 +461,7 @@ def get_http_handler(module):
                 elif result['type'] == 'download':
                     self.send_response(200)
                     self.send_header('Content-type', 'application/octet-stream')
-                    self.send_header('Content-disposition', 'attachment; filename=' + result['filename'])
+                    self.send_header('Content-disposition', 'attachment; filename='+result['filename'])
                     self.end_headers()
                     self.wfile.write(result['contents'])
                     
