@@ -76,7 +76,6 @@ class HTMLInputOption(InterfaceInputOption):
         if (not value) and (self.Default is not None):
             value = self.Default
             
-
         input_name = prefix + self.Name
         string_input = lambda: '<input type="text" name="%s" value="%s"/>' % (input_name, value)
         number_input = lambda: '<input type="number" name="%s" value="%s"/>' % (input_name, value)
