@@ -83,8 +83,6 @@ class HTMLInputOption(InterfaceInputOption):
                 default = self.Default
             else:
                 default = ""
-        
-        if self.Choices:
 
         input_name = HTMLInterface.html_input_prefix + self.Name
         string_input = lambda: '<input type="text" name="%s" value="%s"/>' % (input_name, default)
