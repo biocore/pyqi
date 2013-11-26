@@ -69,25 +69,25 @@ class HTMLInputOption(InterfaceInputOption):
 
     def cast_value(self, postdata):
         """Casts str(postdata.value) as an object of the correct type"""
-       return self._type_handlers[self.Type](postdata) if postdata is not None else None
+        return self._type_handlers[self.Type](postdata) if postdata is not None else None
 
-    def get_html(self, default):
+    def get_html(self, prefix, value=None):
         """Return the HTML needed for user input given a default value"""
-        if default is None:
+        if value is None:
             if self.Default is not None:
-                default = self.Default
+                value = self.Default
             else:
-                default = ""
+                value = ""
 
-        input_name = HTMLInterface.html_input_prefix + self.Name
-        string_input = lambda: '<input type="text" name="%s" value="%s"/>' % (input_name, default)
-        number_input = lambda: '<input type="number" name="%s" value="%s"/>' % (input_name, default)
+        input_name = prefix + self.Name
+        string_input = lambda: '<input type="text" name="%s" value="%s"/>' % (input_name, value)
+        number_input = lambda: '<input type="number" name="%s" value="%s"/>' % (input_name, value)
 
         #html input files cannot have default values. 
         #If the html interface worked as a data service, this would be possible as submit would be ajax.
         upload_input = lambda: '<input type="file" name="%s" />' % input_name
         mchoice_input = lambda: ''.join(
-            [ ('(%s<input type="radio" name="%s" value="%s" %s/>)' % (choice, input_name, choice, 'checked="true"' if default == choice else '')) 
+            [ ('(%s<input type="radio" name="%s" value="%s" %s/>)' % (choice, input_name, choice, 'checked="true"' if value == choice else '')) 
                 for choice in self.Choices ]
         )
 
@@ -129,8 +129,6 @@ class HTMLInputOption(InterfaceInputOption):
             raise IncompetentDeveloperError("must not supply Choices for type %r" % self.type, self)
 
 class HTMLInterface(Interface):
-    html_input_prefix = "pyqi_"
-
     #Relative mapping wasn't working on a collegue's MacBook when pyqi was run outside of it's directory
     #Until I understand why that was the case and how to fix it, I am putting the style css here. 
     #This is not a permanent solution.
@@ -187,7 +185,8 @@ class HTMLInterface(Interface):
         '}'
       ])
 
-    def __init__(self, **kwargs):
+    def __init__(self, input_prefix="pyqi_", **kwargs):
+        self._html_input_prefix = input_prefix
         self._html_interface_input = {}
         super(HTMLInterface, self).__init__(**kwargs)
     
@@ -242,7 +241,7 @@ class HTMLInterface(Interface):
         formatted_input = {}
 
         for key in in_:
-            mod_key = key[ len(self.html_input_prefix): ] 
+            mod_key = key[ len(self._html_input_prefix): ] 
             formatted_input[mod_key] = in_[key]
             if not formatted_input[mod_key].value:
                 formatted_input[mod_key] = None
@@ -350,12 +349,12 @@ class HTMLInterface(Interface):
         write('<form method="POST" enctype="multipart/form-data">')
         write('<table>')
         for i in self._get_inputs():
-            default = None
-            full_name = self.html_input_prefix + i.Name
+            full_name = self._html_input_prefix + i.Name
             if full_name in postvars and i.Type is not 'upload_file':
                 default = i.cast_value(postvars[full_name])
-    
-            write(i.get_html(default))
+                write(i.get_html(self._html_input_prefix, value=default))
+            else:
+                write(i.get_html(self._html_input_prefix))
 
         write('</table>')
         write('<input type="submit">')
