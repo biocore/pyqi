@@ -25,7 +25,7 @@ import pyqi.interfaces.optparse.config.make_bash_completion
 class TopLevelTests(TestCase):
     def test_get_command_names(self):
         """Test that command names are returned from a config directory."""
-        exp = ['make-bash-completion', 'make-command', 'make-optparse']
+        exp = ['make-bash-completion', 'make-command', 'make-optparse', 'serve-html-interface']
         obs = get_command_names('pyqi.interfaces.optparse.config')
         self.assertEqual(obs, exp)
 
