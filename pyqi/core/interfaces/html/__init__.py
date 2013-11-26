@@ -53,9 +53,10 @@ class HTMLPage(HTMLResult):
 
 class HTMLInputOption(InterfaceInputOption):
 
-    type_handlers = {
+    _type_handlers = {
         None: lambda: None,
         str: lambda x: str(x.value),
+        bool: lambda x: x.value == "True",
         int: lambda x: int(x.value),
         float: lambda x: float(x.value),
         long: lambda x: long(x.value),
@@ -66,11 +67,65 @@ class HTMLInputOption(InterfaceInputOption):
 
     def __init__(self, Choices=None, Type=str, **kwargs):
         self.Choices = Choices
+        if Type == bool:
+            self.Choices = [True, False]
         super(HTMLInputOption, self).__init__(Type=Type, **kwargs)
+
+    def cast_value(self, postdata):
+        """Casts str(postdata.value) as an object of the correct type 't'"""
+
+        return self._type_handlers[self.Type](postdata) if postdata is not None else None
+
+    def get_html(self, default):
+        """Return the HTML needed for user input given a default value"""
+        if default is None:
+            if self.Default is not None:
+                default = self.Default
+            else:
+                default = ""
+        
+        if self.Choices:
+            print default
+            print self.Choices[0]
+            print self.Choices[0] == default
+
+        input_name = HTMLInterface.html_input_prefix + self.Name
+        string_input = lambda: '<input type="text" name="%s" value="%s"/>' % (input_name, default)
+        number_input = lambda: '<input type="number" name="%s" value="%s"/>' % (input_name, default)
+
+        #html input files cannot have default values. 
+        #If the html interface worked as a data service, this would be possible as submit would be ajax.
+        upload_input = lambda: '<input type="file" name="%s" />' % input_name
+        mchoice_input = lambda: ''.join(
+            [ ('(%s<input type="radio" name="%s" value="%s" %s/>)' % (choice, input_name, choice, 'checked="true"' if default == choice else '')) 
+                for choice in self.Choices ]
+        )
+
+        input_switch = {
+            None: string_input,
+            str: string_input,
+            bool: mchoice_input,
+            int: number_input,
+            float: number_input,
+            long: number_input,
+            complex: string_input,
+            "multiple_choice": mchoice_input,
+            "upload_file": upload_input
+        }
+
+        return ''.join(['<tr><td class="right">',
+                        ('<span class="required">*</span>' + self.Name) if self.Required else self.Name,
+                       '</td><td>',
+                       input_switch[self.Type](),
+                       '</td></tr><tr><td></td><td>',
+                        self.Help,
+                       '</td></tr><tr><td>&nbsp;</td></tr>'
+                       ])
+   
 
     def _validate_option(self):
 
-        if self.Type not in self.type_handlers:
+        if self.Type not in self._type_handlers:
             raise IncompetentDeveloperError("Unsupported Type in HTMLInputOption: %s" % self.Type)
 
 
@@ -83,11 +138,9 @@ class HTMLInputOption(InterfaceInputOption):
                 raise OptionError(
                     "choices must be a list of strings ('%s' supplied)"
                     % str(type(self.Choices)).split("'")[1], self)
-        elif self.Choices is not None:
-            raise OptionError(
-                "must not supply Choices for type %r" % self.type, self)
 
 class HTMLInterface(Interface):
+    html_input_prefix = "pyqi_"
 
     #Relative mapping wasn't working on a collegue's MacBook when pyqi was run outside of it's directory
     #Until I understand why that was the case and how to fix it, I am putting the style css here. 
@@ -145,8 +198,7 @@ class HTMLInterface(Interface):
         '}'
       ])
 
-    def __init__(self, InputPrefix='pyqi_', **kwargs):
-        self._html_input_prefix = InputPrefix
+    def __init__(self, **kwargs):
         self._html_interface_input = {}
         super(HTMLInterface, self).__init__(**kwargs)
     
@@ -198,11 +250,6 @@ class HTMLInterface(Interface):
             raise IncompetentDeveloperError("Unsupported result '%r'. Result "
                                             "must be a dict." % out_)
 
-    def _cast_as(self, postdata, t):
-        """Casts str(postdata.value) as an object of the correct type 't'"""
-
-        return HTMLInputOption.type_handlers[t](postdata) if postdata is not None else None
-
     def _input_handler(self, in_, *args, **kwargs):
         """reformat from http post data."""
 
@@ -212,7 +259,7 @@ class HTMLInterface(Interface):
         formatted_input = {}
 
         for key in in_:
-            mod_key = key[ len(self._html_input_prefix): ] 
+            mod_key = key[ len(self.html_input_prefix): ] 
             formatted_input[mod_key] = in_[key]
             if not formatted_input[mod_key].value:
                 formatted_input[mod_key] = None
@@ -226,8 +273,8 @@ class HTMLInterface(Interface):
                 errors.append("Error: %s is required." % option.Name)
                 continue
             try:
-                formatted_input[option.Name] = self._cast_as(formatted_input[option.Name], 
-                                                            option.Type)
+                formatted_input[option.Name] = option.cast_value(formatted_input[option.Name])
+
             except (ValueError, TypeError):
                 errors.append("Error: %s must be type %s" % (option.Name, option.Type) );
 
@@ -302,44 +349,6 @@ class HTMLInterface(Interface):
         elif isinstance(output, HTMLPage):
             return self._output_page_handler(output, handled_results)
 
-
-
-    def _input_map(self, i, default):
-        """Return the HTML needed for user input given an HTMLInterfaceOption"""
-
-        input_name = self._html_input_prefix + i.Name
-        string_input = lambda: '<input type="text" name="%s" value="%s"/>' % (input_name, default)
-        number_input = lambda: '<input type="number" name="%s" value="%s"/>' % (input_name, default)
-
-        #html input files cannot have default values. 
-        #If the html interface worked as a data service, this would be possible as submit would be ajax.
-        upload_input = lambda: '<input type="file" name="%s" />' % input_name
-        mchoice_input = lambda: ''.join(
-            [ ('(%s<input type="radio" name="%s" value="%s" %s/>)' % (choice, input_name, choice, 'checked="true"' if default == choice else '')) 
-                for choice in i.Choices ]
-        )
-
-        input_switch = {
-            None: string_input,
-            str: string_input,
-            int: number_input,
-            float: number_input,
-            long: number_input,
-            complex: string_input,
-            "multiple_choice": mchoice_input,
-            "upload_file": upload_input
-        }
-
-        return ''.join(['<tr><td class="right">',
-                        ('<span class="required">*</span>' + i.Name) if i.Required else i.Name,
-                       '</td><td>',
-                       input_switch[i.Type](),
-                       '</td></tr><tr><td></td><td>',
-                        i.Help,
-                       '</td></tr><tr><td>&nbsp;</td></tr>'
-                       ])
-       
-
     def command_page_writer(self, write, errors, postvars):
         """Write an HTML page which contains a form for user input"""
 
@@ -361,16 +370,12 @@ class HTMLInterface(Interface):
         write('<form method="POST" enctype="multipart/form-data">')
         write('<table>')
         for i in self._get_inputs():
-            default = ''
-            full_name = self._html_input_prefix + i.Name
-
+            default = None
+            full_name = self.html_input_prefix + i.Name
             if full_name in postvars and i.Type is not 'upload_file':
-                default = postvars[full_name].value
-            
-            elif i.Default is not None:
-                default = i.Default
-
-            write(self._input_map(i, default))
+                default = i.cast_value(postvars[full_name])
+    
+            write(i.get_html(default))
 
         write('</table>')
         write('<input type="submit">')

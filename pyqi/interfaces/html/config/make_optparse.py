@@ -18,7 +18,7 @@ __email__ = "ebolyen@gmail.com"
 
 from pyqi.core.interfaces.optparse.input_handler import command_handler
 from pyqi.core.interfaces.html import (HTMLInputOption, HTMLDownload, HTMLPage)
-from pyqi.core.interfaces.html.input_handler import string_list_handler, string_to_true_false
+from pyqi.core.interfaces.optparse.input_handler import string_list_handler
 from pyqi.core.interfaces.html.output_handler import newline_list_of_strings
 from pyqi.core.command import (make_command_in_collection_lookup_f,
     make_command_out_collection_lookup_f)
@@ -43,7 +43,7 @@ inputs = [
     HTMLInputOption(Parameter=None,
                    Name='download-file',
                    Required=True,
-                   Help='The name of the file to download which conatins generated Python code. (e.g. my_optparse_config)')
+                   Help='The name of the file to download which contains generated Python code. (e.g. my_optparse_config)')
 ]
 
 outputs = [ HTMLDownload(Parameter=cmd_out_lookup('result'),

@@ -42,7 +42,6 @@ inputs = [
 
     OptparseOption(Parameter=cmdin_lookup('interface_module'),
                    ShortName='m',
-                   Type=str,
                    Required=True)
 ]
 
