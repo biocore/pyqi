@@ -32,8 +32,6 @@ def command_handler(option_value):
     mod = __import__(module, fromlist=[klass])
     return getattr(mod, klass)()
 
-
-
 def string_to_true_false(option_value):
 	"""Return a boolean from a string"""
 	return option_value == "True"
