@@ -10,13 +10,7 @@
 
 """Utility functionality for the pyqi project."""
 
-__author__ = "Greg Caporaso"
-__copyright__ = "Copyright 2013, The pyqi project"
 __credits__ = ["Greg Caporaso", "Jai Ram Rideout"]
-__license__ = "BSD"
-__version__ = "0.2.0-dev"
-__maintainer__ = "Greg Caporaso"
-__email__ = "gregcaporaso@gmail.com"
 
 from os import remove
 from os.path import split, splitext
