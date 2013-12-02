@@ -11,6 +11,7 @@
     :license: BSD, see Flask's LICENSE file for more details.
 
 """
+import importlib
 import sys
 import os
 import re
@@ -67,13 +68,14 @@ def set_filename_version(filename, version_number, pattern):
 
     if not changed:
         fail('Could not find %s in %s', pattern, filename)
+    
+    if not DRY_RUN:
+        with open(filename, 'w') as f:
+            f.write(contents)
 
-    with open(filename, 'w') as f:
-        f.write(contents)
-
-def set_init_version(version):
+def set_init_version(pkg_name, version):
     info('Setting __init__.py version to %s', version)
-    set_filename_version('pyqi/__init__.py', version, '__version__')
+    set_filename_version('%s/__init__.py' % pkg_name, version, '__version__')
 
 def set_setup_version(version):
     info('Setting setup.py version to %s', version)
@@ -102,7 +104,7 @@ def get_git_tags():
     return stdout.splitlines()
 
 def git_is_clean():
-    cmd = ['git','diff','--quiet']
+    cmd = ['git','diff','--porcelain']
     stdout, stderr, retval = pyqi_system_call(cmd, dry_run=DRY_RUN)
     return retval == 0
 
@@ -122,9 +124,31 @@ def make_git_tag(tag):
         fail("Could not git tag, \nSTDOUT:\n%s\n\nSTDERR:\n%s", stdout, 
                 stderr)
 
-def main():
-    os.chdir(os.path.join(os.path.dirname(__file__), '..'))
+def usage():
+    script_name = os.path.basename(sys.argv[0])
+    print >> sys.stderr, "Usage: %s pkg_name [real-run]" % script_name
+    sys.exit(1)
 
+def main():
+    if len(sys.argv) < 2:
+        usage()
+
+    if len(sys.argv) == 3:
+        if sys.argv[2] != 'real-run':
+            usage()
+        global DRY_RUN
+        DRY_RUN = True
+
+    pkg_name = sys.argv[1]
+
+    try:
+        pkg_module = importlib.import_module(pkg_name)
+    except ImportError:
+        print >> sys.stderr, "Could not import %s!" % pkg_name
+        sys.exit(1)
+
+    os.chdir(os.path.join(os.path.dirname(pkg_module.__file__), '..'))
+    
     rv = parse_changelog()
     if rv is None:
         fail('Could not parse changelog')
@@ -144,14 +168,13 @@ def main():
     if not git_is_clean():
         fail('You have uncommitted changes in git')
 
-    set_init_version(version)
+    set_init_version(pkg_name, version)
     set_setup_version(version)
     make_git_commit('Bump version number to %s', version)
     make_git_tag(version)
     build_and_upload()
-    set_init_version(dev_version)
+    set_init_version(pkg_name, dev_version)
     set_setup_version(dev_version)
-
 
 if __name__ == '__main__':
     main()
