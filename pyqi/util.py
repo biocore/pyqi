@@ -24,30 +24,35 @@ from sys import stdout, stderr
 from subprocess import Popen, PIPE, STDOUT
 from pyqi.core.log import StdErrLogger
 
-def pyqi_system_call(cmd, shell=True):
+def pyqi_system_call(cmd, shell=True, dry_run=False):
     """Call cmd and return (stdout, stderr, return_value).
 
-    cmd can be either a string containing the command to be run, or a sequence
-    of strings that are the tokens of the command.
-
-    Please see Python's subprocess.Popen for a description of the shell
-    parameter and how cmd is interpreted differently based on its value.
+    cmd: can be either a string containing the command to be run, or a 
+     sequence of strings that are the tokens of the command.
+    shell: value passed directly to Popen (default: True). See Python's 
+     subprocess.Popen for a description of the shell parameter and how cmd
+     is interpreted differently based on its value.
+    dry_run: if True, print cmd and return ("", "", 0) (default: False)
     
     This function is ported from QIIME (http://www.qiime.org), previously
     named qiime_system_call. QIIME is a GPL project, but we obtained permission
     from the authors of this function to port it to pyqi (and keep it under
     pyqi's BSD license).
     """
-    proc = Popen(cmd,
-                 shell=shell,
-                 universal_newlines=True,
-                 stdout=PIPE,
-                 stderr=PIPE)
-    # communicate pulls all stdout/stderr from the PIPEs to 
-    # avoid blocking -- don't remove this line!
-    stdout, stderr = proc.communicate()
-    return_value = proc.returncode
-    return stdout, stderr, return_value
+    if dry_run:
+        print cmd
+        return "", "", 0
+    else:
+        proc = Popen(cmd,
+                     shell=shell,
+                     universal_newlines=True,
+                     stdout=PIPE,
+                     stderr=PIPE)
+        # communicate pulls all stdout/stderr from the PIPEs to 
+        # avoid blocking -- don't remove this line!
+        stdout, stderr = proc.communicate()
+        return_value = proc.returncode
+        return stdout, stderr, return_value
 
 def remove_files(list_of_filepaths, error_on_missing=True):
     """Remove list of filepaths, optionally raising an error if any are missing
