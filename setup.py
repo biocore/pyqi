@@ -17,7 +17,6 @@ __version__ = '0.2.0-dev'
 __maintainer__ = "Greg Caporaso"
 __email__ = "gregcaporaso@gmail.com"
 
-#from distutils.core import setup
 from setuptools import Command, setup
 from glob import glob
 import sys
