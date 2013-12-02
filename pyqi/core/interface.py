@@ -160,7 +160,7 @@ class InterfaceOption(object):
     def __init__(self, Parameter=None, Type=None, Handler=None, Name=None,
                  Help=None):
         self.Parameter = Parameter
-
+        
         if self.Parameter is None:
             if Name is None:
                 raise IncompetentDeveloperError("Must specify a Name for the "
@@ -235,9 +235,12 @@ class InterfaceInputOption(InterfaceOption):
         # If a parameter is required, the option is always required, but
         # if a parameter is not required, but the option does require it,
         # then we make the option required.
-        if self.Parameter is not None and not self.Parameter.Required and Required:
-            self.Required = True
+        if self.Parameter is not None: 
+            self.Required = self.Parameter.Required
 
+            if not self.Parameter.Required and Required:
+                self.Required = True
+        
         self._convert_primitive_strings()
         self._validate_option()
 
