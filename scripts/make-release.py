@@ -104,7 +104,7 @@ def get_git_tags():
     return stdout.splitlines()
 
 def git_is_clean():
-    cmd = ['git','diff','--porcelain']
+    cmd = ['git','diff','--quiet']
     stdout, stderr, retval = pyqi_system_call(cmd, dry_run=DRY_RUN)
     return retval == 0
 
