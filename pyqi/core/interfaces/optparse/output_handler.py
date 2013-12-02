@@ -20,14 +20,8 @@ option_value - if the handler is tied to an output option, the value of that
 # The full license is in the file COPYING.txt, distributed with this software.
 #-----------------------------------------------------------------------------
 
-__author__ = "Daniel McDonald"
-__copyright__ = "Copyright 2013, The pyqi project"
 __credits__ = ["Daniel McDonald", "Greg Caporaso", "Doug Wendel",
                "Jai Ram Rideout", "Evan Bolyen"]
-__license__ = "BSD"
-__version__ = "0.1-dev"
-__maintainer__ = "Daniel McDonald"
-__email__ = "mcdonadt@colorado.edu"
 
 from pyqi.core.exception import IncompetentDeveloperError
 import os

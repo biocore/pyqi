@@ -9,14 +9,8 @@
 #-----------------------------------------------------------------------------
 from __future__ import division
 
-__author__ = "Jai Ram Rideout"
-__copyright__ = "Copyright 2013, The pyqi project"
 __credits__ = ["Greg Caporaso", "Daniel McDonald", "Doug Wendel",
                "Jai Ram Rideout"]
-__license__ = "BSD"
-__version__ = "0.2.0-dev"
-__maintainer__ = "Jai Ram Rideout"
-__email__ = "jai.rideout@gmail.com"
 
 from unittest import TestCase, main
 from pyqi.core.interface import get_command_names, get_command_config

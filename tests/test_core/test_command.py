@@ -9,14 +9,8 @@
 #-----------------------------------------------------------------------------
 from __future__ import division
 
-__author__ = "Daniel McDonald"
-__copyright__ = "Copyright 2013, The pyqi project"
 __credits__ = ["Greg Caporaso", "Daniel McDonald", "Doug Wendel",
                "Jai Ram Rideout"]
-__license__ = "BSD"
-__version__ = "0.2.0-dev"
-__maintainer__ = "Daniel McDonald"
-__email__ = "mcdonadt@colorado.edu"
 
 from unittest import TestCase, main
 from pyqi.core.command import CommandIn, CommandOut, ParameterCollection, Command
