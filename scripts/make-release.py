@@ -15,10 +15,10 @@ import sys
 import os
 import re
 from datetime import datetime, date
-from subprocess import Popen, PIPE
+from pyqi.util import pyqi_system_call
 
 _date_clean_re = re.compile(r'(\d+)(st|nd|rd|th)')
-
+DRY_RUN=True
 
 def parse_changelog():
     with open('ChangeLog.md') as f:
@@ -43,7 +43,6 @@ def parse_changelog():
             datestr = match.group(1)
             return version, parse_date(datestr)
 
-
 def bump_version(version):
     try:
         parts = map(int, version.split('.'))
@@ -52,11 +51,9 @@ def bump_version(version):
     parts[-1] += 1
     return '.'.join(map(str, parts))
 
-
 def parse_date(string):
     string = _date_clean_re.sub(r'\1', string)
     return datetime.strptime(string, '%B %d %Y')
-
 
 def set_filename_version(filename, version_number, pattern):
     changed = []
@@ -74,46 +71,56 @@ def set_filename_version(filename, version_number, pattern):
     with open(filename, 'w') as f:
         f.write(contents)
 
-
 def set_init_version(version):
     info('Setting __init__.py version to %s', version)
     set_filename_version('pyqi/__init__.py', version, '__version__')
-
 
 def set_setup_version(version):
     info('Setting setup.py version to %s', version)
     set_filename_version('setup.py', version, '__version__')
 
-
 def build_and_upload():
-    Popen([sys.executable, 'setup.py', 'sdist', 'upload']).wait()
-    pass
+    cmd = [sys.executable, 'setup.py', 'sdist', 'upload']
+    stdout, stderr, retval = pyqi_system_call(cmd, dry_run=DRY_RUN)
+    if retval is not 0:
+        fail("Could not build and upload, \nSTDOUT:\n%s\n\nSTDERR:\n%s", stdout, 
+                stderr)
 
 def fail(message, *args):
     print >> sys.stderr, 'Error:', message % args
     sys.exit(1)
 
-
 def info(message, *args):
     print >> sys.stderr, message % args
 
-
 def get_git_tags():
-    return set(Popen(['git', 'tag'], stdout=PIPE).communicate()[0].splitlines())
+    cmd = ['git', 'tag']
+    stdout, stderr, retval = pyqi_system_call(cmd, dry_run=DRY_RUN)
+    if retval is not 0:
+        fail("Could not git tag, \nSTDOUT:\n%s\n\nSTDERR:\n%s", stdout, stderr)
 
+    return stdout.splitlines()
 
 def git_is_clean():
-    return Popen(['git', 'diff', '--quiet']).wait() == 0
-
+    cmd = ['git','diff','--quiet']
+    stdout, stderr, retval = pyqi_system_call(cmd, dry_run=DRY_RUN)
+    return retval == 0
 
 def make_git_commit(message, *args):
     message = message % args
-    Popen(['git', 'commit', '-am', message]).wait()
+    cmd = ['git', 'commit', '-am', message]
+    stdout, stderr, retval = pyqi_system_call(cmd, dry_run=DRY_RUN)
+    if retval is not 0:
+        fail("Could not git commit, \nSTDOUT:\n%s\n\nSTDERR:\n%s", stdout, 
+                stderr)
 
 def make_git_tag(tag):
     info('Tagging "%s"', tag)
-    Popen(['git', 'tag', tag]).wait()
-
+    cmd = ['git', 'tag', tag]
+    stdout, stderr, retval = pyqi_system_call(cmd, dry_run=DRY_RUN)
+    if retval is not 0:
+        fail("Could not git tag, \nSTDOUT:\n%s\n\nSTDERR:\n%s", stdout, 
+                stderr)
 
 def main():
     os.chdir(os.path.join(os.path.dirname(__file__), '..'))
