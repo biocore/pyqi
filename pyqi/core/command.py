@@ -141,13 +141,13 @@ class Command(object):
 
         try:
             result = self.run(**kwargs)
-        except Exception, e:
+        except Exception:
             self._logger.fatal('Error executing command: %s' % self_str)
 
             formatted_lines = traceback.format_exc().splitlines()
             sys.stderr.write(formatted_lines[0] + "\n")
-            #We start at the 3rd line to skip the traceback for this file.
-            sys.stderr.write( "\n".join(formatted_lines[3:] + ['']) )
+            # We start at the 3rd line to provide a relative traceback.
+            sys.stderr.write("\n".join(formatted_lines[3:] + ['']))
             sys.exit(1)
 
         else:
