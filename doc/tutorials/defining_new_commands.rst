@@ -138,8 +138,8 @@ The following illustrates a complete python file defining a new pyqi ``Command``
 	    ])
 
 	    CommandOuts = ParameterCollection([
-	        CommandOut(Name='num_seqs', DataType=int, Description='number of sequences')
-	        CommandOut(Name='min_length', DataType=int, Description='minimum sequence length')
+	        CommandOut(Name='num_seqs', DataType=int, Description='number of sequences'),
+	        CommandOut(Name='min_length', DataType=int, Description='minimum sequence length'),
 	        CommandOut(Name='max_length', DataType=int, Description='maximum sequence length')
 	    ])
 
