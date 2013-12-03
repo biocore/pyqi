@@ -508,7 +508,7 @@ def get_http_handler(module):
 def start_server(port, module):
     """Start a server for the HTMLInterface on the specified port"""
     interface_server = HTTPServer(("", port), get_http_handler(module))
-    print "-- Starting server at 'http://localhost:%d' --" % port
+    print "-- Starting server at http://localhost:%d --" % port
     print "To close the server, type 'ctrl-c' into this window."
     try:
         interface_server.serve_forever()
