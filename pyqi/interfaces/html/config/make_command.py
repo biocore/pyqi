@@ -32,7 +32,6 @@ inputs = [
                    Help='comma-separated list of other authors'),
     HTMLInputOption(Parameter=cmd_in_lookup('test_code'),
                    Type=bool,
-                   Default=False,
                    Help='Should a stubbed out python test file be generated instead'),
     HTMLInputOption(Parameter=None,
                    Name='download-file',
@@ -49,5 +48,3 @@ outputs = [ HTMLDownload(Parameter=cmd_out_lookup('result'),
 
 #    [ HTMLPage(Parameter=cmd_out_lookup('result'),
 #              Handler=newline_list_of_strings) ]
-    
-

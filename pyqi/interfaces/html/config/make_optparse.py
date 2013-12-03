@@ -23,9 +23,8 @@ cmd_out_lookup = make_command_out_collection_lookup_f(CommandConstructor)
 
 inputs = [
     HTMLInputOption(Parameter=cmd_in_lookup('command'), 
-                    Required=True, 
                     Handler=command_handler),
-    HTMLInputOption(Parameter=cmd_in_lookup('command_module'), Required=True),
+    HTMLInputOption(Parameter=cmd_in_lookup('command_module')),
     HTMLInputOption(Parameter=cmd_in_lookup('author')),
     HTMLInputOption(Parameter=cmd_in_lookup('email')),
     HTMLInputOption(Parameter=cmd_in_lookup('license')),
