@@ -16,32 +16,32 @@ After installing pyqi, you can easily stub (i.e., create templates for) new comm
 
 To create our sequence collection summarizer, we can start by stubbing a ``SequenceCollectionSummarizer`` class::
 
-	pyqi make-command -n SequenceCollectionSummarizer -a "Greg Caporaso" -c "Copyright 2013, Greg Caporaso" -e "gregcaporaso@gmail.com" -l BSD --command-version 0.0.1 -o sequence_collection_summarizer.py
+	pyqi make-command -n SequenceCollectionSummarizer --credits "Greg Caporaso" -o sequence_collection_summarizer.py
 
-If you run this command locally, substituting your own name and email address where applicable, you'll have a new file called ``sequence_collection_summarizer.py``, which will look roughly like the following::
+If you run this command locally, substituting your own name where applicable, you'll have a new file called ``sequence_collection_summarizer.py``, which will look roughly like the following::
 
 	#!/usr/bin/env python
 	from __future__ import division
 
-	__author__ = "Greg Caporaso"
-	__copyright__ = "Copyright 2013, Greg Caporaso"
 	__credits__ = ["Greg Caporaso"]
-	__license__ = "BSD"
-	__version__ = "0.0.1"
-	__maintainer__ = "Greg Caporaso"
-	__email__ = "gregcaporaso@gmail.com"
 
-	from pyqi.core.command import Command, Parameter, ParameterCollection
+	from pyqi.core.command import (Command, CommandIn, CommandOut, 
+	    ParameterCollection)
 
 	class SequenceCollectionSummarizer(Command):
 	    BriefDescription = "FILL IN A 1 SENTENCE DESCRIPTION"
 	    LongDescription = "GO INTO MORE DETAIL"
-	    Parameters = ParameterCollection([
-	        Parameter(Name='foo', DataType=str,
+	    CommandIns = ParameterCollection([
+	        CommandIn(Name='foo', DataType=str,
 	                  Description='some required parameter', Required=True),
-	        Parameter(Name='bar', DataType=int,
+	        CommandIn(Name='bar', DataType=int,
 	                  Description='some optional parameter', Required=False,
 	                  Default=1)
+	    ])
+
+	    CommandOuts = ParameterCollection([
+	        CommandOut(Name="result_1", DataType=str, Description="xyz"),
+	        CommandOut(Name="result_2", DataType=str, Description="123"),
 	    ])
 
 	    def run(self, **kwargs):
@@ -57,26 +57,34 @@ Defining a command
 
 There are several values that you'll need to fill in to define your command based on the stub that is created by ``make-command``. The first, which are the easiest, are ``BriefDescription`` and ``LongDescription``. ``BriefDescription`` should be a one sentence description of your command, and ``LongDescription`` should be a more detailed explanation (usually 2-3 sentences). These are used in auto-generated documentation.
 
-Next, you'll need to define the parameters that your new command can take. Each of these parameters will be an instance of the ``pyqi.core.command.Parameter`` class.
+Next, you'll need to define the parameters that your new command can take as input. Each of these parameters will be an instance of the ``pyqi.core.command.CommandIn`` class.
 
 Our ``SequenceCollectionSummarizer`` command will take one required parameter and one optional parameter. The required parameter will be called ``seqs``, and will be a list (or some other iterable type) of tuples of (sequence identifier, sequence) pairs. For example::
 
 	[('sequence1','ACCGTGGACCAA'),('sequence2','TGTGGA'), ...]
 
-We'll also need to provide a description of this parameter (used in documentation), its type, and indicate that it is required. The final Parameter definition should look like this::
+We'll also need to provide a description of this parameter (used in documentation), its type, and indicate that it is required. The final ``CommandIn`` definition should look like this::
 
-	Parameter(Name='seqs', DataType=list,
-	         Description='sequences to be summarized', Required=True)
+	CommandIn(Name='seqs', DataType=list,
+	          Description='sequences to be summarized', Required=True)
 
 The optional parameter will be called ``suppress_length_summary``, and if passed will indicate that we don't want information on sequence lengths included in our output summary. The ``Parameter`` definition in this case should look like this::
 
-	Parameter(Name='suppress_length_summary', DataType=bool,
-	         Description='do not generate summary information on the sequence lengths', 
-	         Required=False, Default=False)
+	CommandIn(Name='suppress_length_summary', DataType=bool,
+	          Description='do not generate summary information on the sequence lengths', 
+	          Required=False, Default=False)
 
-The only additional ``Parameter`` that is passed here, relative to our ``seqs`` parameter, is ``Default``. Because this parameter isn't required, it's necessary to give it a default value here. All of the ``Parameters`` should be included in a ``pyqi.core.command.ParameterCollection`` object (as in the stubbed file).
+The only additional parameter that is passed here, relative to our ``seqs`` parameter, is ``Default``. Because this parameter isn't required, it's necessary to give it a default value here. All of the ``CommandIns`` should be included in a ``pyqi.core.command.ParameterCollection`` object (as in the stubbed file).
 
-.. note:: There are a few restrictions on what ``Name`` can be set to for a ``Parameter``. It must be a `valid python identifier <http://docs.python.org/2/reference/lexical_analysis.html#identifiers>`_ (e.g., it cannot contain ``-`` characters or begin with a number) so the ``Command`` can be called with named options instead of passing a dict. ``Parameter`` names also must be unique for a ``Command``.
+.. note:: There are a few restrictions on what ``Name`` can be set to for a ``Parameter`` (e.g., a ``CommandIn`` or a ``CommandOut``). It must be a `valid python identifier <http://docs.python.org/2/reference/lexical_analysis.html#identifiers>`_ (e.g., it cannot contain ``-`` characters or begin with a number) so the ``Command`` can be called with named options instead of passing a dict. ``Parameter`` names also must be unique for a ``Command``.
+
+Next, you'll need to define the results that the ``Command`` generates as output. In this example, our ``Command`` will generate three results: the number of sequences, the minimum sequence length, and the maximum sequence length. Each of these results will be an instance of the ``pyqi.core.command.CommandOut`` class. We define the name of the result, its type, and a description. The final ``CommandOuts`` should look like this::
+
+	CommandOut(Name='num_seqs', DataType=int, Description='number of sequences'),
+	CommandOut(Name='min_length', DataType=int, Description='minimum sequence length'),
+	CommandOut(Name='max_length', DataType=int, Description='maximum sequence length')
+
+All of the ``CommandOuts`` should be included in a ``pyqi.core.command.ParameterCollection`` object (as in the stubbed file).
 
 Next, we'll need to define what our ``Command`` will actually do. This is done in the ``run`` method, and all results are returned in a dictionary. The run method for our ``SequenceCollectionSummarizer`` object would look like the following::
 
@@ -96,9 +104,9 @@ Next, we'll need to define what our ``Command`` will actually do. This is done i
 	        min_length = min(sequence_lengths)
 	        max_length = max(sequence_lengths)
    
-	    return {'num-seqs':num_seqs,
-	            'min-length':min_length,
-	            'max-length':max_length}
+	    return {'num_seqs':num_seqs,
+	            'min_length':min_length,
+	            'max_length':max_length}
 
 In practice, if your ``Command`` is more complex than our ``SequenceCollectionSummarizer`` (which it probably is), you can define other methods that are called by ``run``. These should likely be private methods.
 
@@ -112,25 +120,27 @@ The following illustrates a complete python file defining a new pyqi ``Command``
 	#!/usr/bin/env python
 	from __future__ import division
 
-	__author__ = "Greg Caporaso"
-	__copyright__ = "Copyright 2013, Greg Caporaso"
 	__credits__ = ["Greg Caporaso"]
-	__license__ = "BSD"
-	__version__ = "0.0.1"
-	__maintainer__ = "Greg Caporaso"
-	__email__ = "gregcaporaso@gmail.com"
 
-	from pyqi.core.command import Command, Parameter, ParameterCollection
+	from pyqi.core.command import (Command, CommandIn, CommandOut, 
+	    ParameterCollection)
 
 	class SequenceCollectionSummarizer(Command):
 	    BriefDescription = "Generate summary statistics on a collection of sequences."
 	    LongDescription = "Provide the number of sequences, the minimum sequence length, and the maximum sequence length given a collection of sequences. Sequences should be provided as a list (or other iterable object) of tuples of (sequence id, sequence) pairs."
-	    Parameters = ParameterCollection([
-	        Parameter(Name='seqs', DataType=list,
+
+	    CommandIns = ParameterCollection([
+	        CommandIn(Name='seqs', DataType=list,
 	                  Description='sequences to be summarized', Required=True),
-	        Parameter(Name='suppress_length_summary', DataType=bool,
-	                  Description='do not generate summary information on the sequence lengths', 
-	                  Required=False,Default=False)
+	        CommandIn(Name='suppress_length_summary', DataType=bool,
+	                  Description='do not generate summary information on the sequence lengths',
+	                  Required=False, Default=False)
+	    ])
+
+	    CommandOuts = ParameterCollection([
+	        CommandOut(Name='num_seqs', DataType=int, Description='number of sequences'),
+	        CommandOut(Name='min_length', DataType=int, Description='minimum sequence length'),
+	        CommandOut(Name='max_length', DataType=int, Description='maximum sequence length')
 	    ])
 
 	    def run(self, **kwargs):
@@ -149,9 +159,9 @@ The following illustrates a complete python file defining a new pyqi ``Command``
 	            min_length = min(sequence_lengths)
 	            max_length = max(sequence_lengths)
         
-	        return {'num-seqs':num_seqs,
-	                'min-length':min_length,
-	                'max-length':max_length}
+	        return {'num_seqs':num_seqs,
+	                'min_length':min_length,
+	                'max_length':max_length}
 
 	CommandConstructor = SequenceCollectionSummarizer
 
@@ -168,18 +178,18 @@ At this stage you have defined a new command and its API. To access the API in t
 	# You can now see the full output of the command by inspecting the 
 	# result dictionary.
 	>>> r
-	{'max-length': 12, 'min-length': 6, 'num-seqs': 2}
+	{'max_length': 12, 'min_length': 6, 'num_seqs': 2}
 	# Alternatively, you can access each value independently, as with any dictionary.
-	>>> print r['num-seqs']
+	>>> print r['num_seqs']
 	2
-	>>> print r['min-length']
+	>>> print r['min_length']
 	6
-	>>> print r['max-length']
+	>>> print r['max_length']
 	12
 	# You can call this command again with different input.
 	# For example, we can call the command again passing the
 	# suppress_length_summary parameter.
 	>>> r = s(seqs=[('sequence1','ACCGTGGACCAA'),('sequence2','TGTGGA')],suppress_length_summary=True)
 	>>> r
-	{'max-length': None, 'min-length': None, 'num-seqs': 2}
+	{'max_length': None, 'min_length': None, 'num_seqs': 2}
 
