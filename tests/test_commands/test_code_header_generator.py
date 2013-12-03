@@ -39,6 +39,13 @@ class CodeHeaderGeneratorTests(TestCase):
         obs = obs['result']
         self.assertEqual('\n'.join(obs), exp_header2)
 
+        # With no arguments
+        obs = self.cmd()
+        self.assertEqual(obs.keys(), ['result'])
+
+        obs = obs['result']
+        self.assertEqual('\n'.join(obs), exp_header3)
+
 
 exp_header1 = """#!/usr/bin/env python
 from __future__ import division
@@ -64,6 +71,11 @@ __maintainer__ = "bob"
 __email__ = "bob@bob.bob"
 """
 
+exp_header3 = """#!/usr/bin/env python
+from __future__ import division
+
+__credits__ = []
+"""
 
 if __name__ == '__main__':
     main()
