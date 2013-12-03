@@ -11,7 +11,7 @@
 __author__ = "Greg Caporaso"
 __copyright__ = "Copyright 2013, The pyqi project"
 __credits__ = ["Rob Knight", "Greg Caporaso", "Jai Ram Rideout",
-                "Daniel McDonald", "Doug Wendel"]
+               "Daniel McDonald", "Doug Wendel"]
 __license__ = "BSD"
 __version__ = "0.2.0-dev"
 __maintainer__ = "Greg Caporaso"
