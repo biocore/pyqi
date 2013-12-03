@@ -1,13 +1,7 @@
 #!/usr/bin/env python
 from __future__ import division
 
-__author__ = "Daniel McDonald"
-__copyright__ = "123"
 __credits__ = ["Daniel McDonald"]
-__license__ = "asd"
-__version__ = "123"
-__maintainer__ = "Daniel McDonald"
-__email__ = "masdasd"
 
 from pyqi.core.interfaces.optparse import (OptparseUsageExample,
                                            OptparseOption, OptparseResult)
