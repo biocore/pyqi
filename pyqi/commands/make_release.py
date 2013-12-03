@@ -111,7 +111,7 @@ class MakeRelease(Command):
 
     def _set_doc_version(self, version):
         self._info('Setting doc/conf.py version to %s', version)
-        self._set_doc_version('doc/conf.py', version, 'release')
+        self._set_filename_version('doc/conf.py', version, 'release')
 
     def _build_and_upload(self):
         cmd = [sys.executable, 'setup.py', 'sdist', 'upload']
