@@ -48,11 +48,11 @@ class MakeRelease(Command):
     RealRun = False
     _date_clean_re = re.compile(r'(\d+)(st|nd|rd|th)')
 
-    def _parse_changelog(self):
+    def _parse_changelog(self, pkg_name):
         with open('ChangeLog.md') as f:
             lineiter = iter(f)
             for line in lineiter:
-                match = re.search('^pyqi\s+(.*)', line.strip())
+                match = re.search('^%s\s+(.*)' % pkg_name, line.strip())
                 if match is None:
                     continue
                 length = len(match.group(1))
@@ -205,7 +205,7 @@ class MakeRelease(Command):
 
         os.chdir(os.path.join(os.path.dirname(pkg_module.__file__), '..'))
 
-        rv = self._parse_changelog()
+        rv = self._parse_changelog(pkg_name)
         if rv is None:
             self._fail('Could not parse changelog')
 
