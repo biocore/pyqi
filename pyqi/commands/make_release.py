@@ -90,8 +90,8 @@ class MakeRelease(Command):
             changed.append(True)
             return before + version_number + after
         with open(filename) as f:
-            contents = re.sub(r"^(\s*%s\s*=\s*')(.+?)(')(?sm)" % pattern,
-                              inject_version, f.read())
+            contents = re.sub(r"""^(\s*%s\s*=\s*(?:'|"))(.+?)((?:'|"))(?sm)""" % 
+                    pattern, inject_version, f.read())
 
         if not changed:
             self._fail('Could not find %s in %s', pattern, filename)
