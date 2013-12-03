@@ -24,6 +24,7 @@ from pyqi.core.interface import (Interface, InterfaceOutputOption, InterfaceInpu
 from pyqi.core.factory import general_factory
 from pyqi.core.exception import IncompetentDeveloperError
 from pyqi.core.command import Parameter
+from pyqi.util import get_version_string
 
 class HTMLResult(InterfaceOutputOption):
     """Base class for results for an HTML config file"""
@@ -372,9 +373,9 @@ def html_interface_factory(command_constructor, usage_examples, inputs, outputs,
 def get_cmd_obj(cmd_cfg_mod, cmd):
     """Get a ``Command`` object"""
     cmd_cfg,_ = get_command_config(cmd_cfg_mod, cmd)
-    cmd_class = html_interface_factory(cmd_cfg.CommandConstructor, [], 
-                            cmd_cfg.inputs, cmd_cfg.outputs,
-                            cmd_cfg.__version__, cmd)
+    version_str = get_version_string(cmd_cfg_mod)
+    cmd_class = html_interface_factory(cmd_cfg.CommandConstructor, [],
+                            cmd_cfg.inputs, cmd_cfg.outputs, version_str, cmd)
     cmd_obj = cmd_class()
     return cmd_obj
 
