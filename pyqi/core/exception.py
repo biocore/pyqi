@@ -26,3 +26,5 @@ class InvalidReturnTypeError(IncompetentDeveloperError):
 class UnknownParameterError(IncompetentDeveloperError):
     pass
 
+class MissingVersionInfoError(IncompetentDeveloperError):
+    pass

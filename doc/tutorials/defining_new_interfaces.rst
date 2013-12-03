@@ -129,8 +129,6 @@ The resulting file will look something like this::
 
 There are three lists of values that we'll need to populate here to define the optparse interface for our ``SequenceCollectionSummarizer`` command. These are the ``inputs``, the ``outputs``, and the ``usage_examples``. We'll also need to define an input handler and an output handler to tell the ``OptparseInterface`` how to take input from the command line and turn it into something that ``SequenceCollectionSummarizer`` can use, and to take output from ``SequenceCollectionSummarizer`` and turn it into something a command line user will want. ``make-optparse`` will auto-populate the ``inputs`` based on the ``Parameters``, but some changes will usually be required (detailed below). The following sections describe each of these steps.
 
-.. note:: There is a fourth value that is required when defining an optparse interface, which is the version string of the command/interface (e.g., ``0.0.1``). This value has already been filled in for us in the configuration file template (see ``__version__`` at the top of the file). You can specify the version string when creating the configuration file template via ``--config-version``. In the example above, we specified a version string of ``0.0.1``.
-
 Defining usage examples
 -----------------------
 
@@ -403,9 +401,11 @@ To run this, there are a couple of additional things you need to do. First, you 
 	
 	export PYTHONPATH=$HOME/code/:$PYTHONPATH
 
-Next, so you can import from that directory, it'll need to contain an ``__init__.py`` file. That file can be empty, but it does need to exist. You can do this as follows::
+Next, so you can import from that directory, it'll need to contain an ``__init__.py`` file. You can do this as follows::
 	
-	touch $HOME/code/pyqi_experiments/__init__.py
+        echo '__version__ = "0.0.0"' > $HOME/code/pyqi_experiments/__init__.py
+
+.. note:: pyqi requires that the top-level module containing the configuration files has a ``__version__`` attribute defined. ``__version__`` should store a version string, e.g., ``"0.0.0"``. In this example, the top-level module is ``pyqi_experiments``, so we must create an ``__init__.py`` that contains a ``__version__`` attribute.
 
 Now we're ready to run our ``Command`` via its ``OptparseInterface``. You can do this as follows::
 	
