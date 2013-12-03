@@ -4,7 +4,7 @@ pyqi ChangeLog
 pyqi 0.3.0 
 ----------
 
-Feature release, released on December 3nd 2013
+Feature release, released on December 3rd 2013
 
 * new html interface
 * PyPI and pip support
