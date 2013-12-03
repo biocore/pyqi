@@ -75,7 +75,7 @@ class MakeRelease(Command):
         try:
             parts = map(int, version.split('.'))
         except ValueError:
-            fail('Current version is not numeric')
+            self._fail('Current version is not numeric')
         parts[-1] += 1
         return '.'.join(map(str, parts))
 
@@ -94,7 +94,7 @@ class MakeRelease(Command):
                               inject_version, f.read())
 
         if not changed:
-            fail('Could not find %s in %s', pattern, filename)
+            self._fail('Could not find %s in %s', pattern, filename)
 
         if self.RealRun:
             with open(filename, 'w') as f:
