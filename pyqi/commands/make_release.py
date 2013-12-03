@@ -210,7 +210,7 @@ class MakeRelease(Command):
             self._fail('Could not parse changelog')
 
         version, release_date = rv
-        dev_version = self._bump_version(version) + '-dev'
+        dev_version = version + '-dev'
 
         self._info('Releasing %s (release date %s)',
                    version, release_date.strftime('%m/%d/%Y'))
