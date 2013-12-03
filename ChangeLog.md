@@ -1,6 +1,13 @@
 pyqi ChangeLog
 ==============
 
+pyqi 0.3.1
+----------
+
+Test release, released on December 3rd 2013
+
+* validating the make_release.py script
+
 pyqi 0.3.0 
 ----------
 
