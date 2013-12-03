@@ -21,19 +21,8 @@ usage_examples = [
 ]
 
 inputs = [
-    OptparseOption(Parameter=cmd_in_lookup('package_name'),
-                   Type=str,
-                   Action='store', # default is 'store', change if desired
-                   Handler=None, # must be defined if desired
-                   ShortName=None, # must be defined if desired
-                   Name='package-name', # implied by Parameter
-                   ),
-    OptparseOption(Parameter=cmd_in_lookup('real_run'),
-                   Action='store_true', # default is 'store', change if desired
-                   Handler=None, # must be defined if desired
-                   ShortName=None, # must be defined if desired
-                   Name='real-run', # implied by Parameter
-                   ),
+    OptparseOption(Parameter=cmd_in_lookup('package_name')),
+    OptparseOption(Parameter=cmd_in_lookup('real_run'), Action='store_true'),
 ]
 
 outputs = []
