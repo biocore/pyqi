@@ -12,11 +12,13 @@
 
 __credits__ = ["Greg Caporaso", "Jai Ram Rideout"]
 
+import importlib
 from os import remove
 from os.path import split, splitext
 from sys import stdout, stderr
 from subprocess import Popen, PIPE, STDOUT
 from pyqi.core.log import StdErrLogger
+from pyqi.core.exception import MissingVersionInfoError
 
 def pyqi_system_call(cmd, shell=True, dry_run=False):
     """Call cmd and return (stdout, stderr, return_value).
@@ -95,3 +97,28 @@ def old_to_new_command(driver_name, project_title, local_argv):
     stderr.write(result_stderr)
 
     return result_retval
+
+def get_version_string(module_str):
+    """Returns the version string found in the top-level module.
+
+    ``module_str`` should be a valid Python module name. __version__ will be
+    extracted from the top-level module and returned.
+
+    For example, if ``module_str`` is 'foo.bar.baz', ``foo.__version__`` will
+    be returned. If ``__version__`` doesn't exist, a
+    ``MissingVersionInfoError`` is raised.
+    """
+    top_level_name = module_str.split('.')[0]
+
+    try:
+        top_level_module = importlib.import_module(top_level_name)
+    except ImportError:
+        raise ImportError("Unable to import module '%s'" % top_level_name)
+
+    try:
+        version_string = top_level_module.__version__
+    except AttributeError:
+        raise MissingVersionInfoError("Module '%s' does not have the "
+                "__version__ attribute." % top_level_name)
+
+    return version_string
