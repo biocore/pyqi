@@ -115,7 +115,8 @@ class MakeRelease(Command):
 
     def _build_and_upload(self):
         cmd = [sys.executable, 'setup.py', 'sdist', 'upload']
-        stdout, stderr, retval = pyqi_system_call(cmd, dry_run=not self.RealRun)
+        stdout, stderr, retval = pyqi_system_call(cmd, shell=False,
+                                                  dry_run=not self.RealRun)
         if retval is not 0:
             self._fail("build and upload failed,\nSTDOUT:\n%s\n\nSTDERR:\n%s", 
                        stdout, stderr)
@@ -132,7 +133,8 @@ class MakeRelease(Command):
 
     def _get_git_tags(self):
         cmd = ['git', 'tag']
-        stdout, stderr, retval = pyqi_system_call(cmd, dry_run=not self.RealRun)
+        stdout, stderr, retval = pyqi_system_call(cmd, shell=False,
+                                                  dry_run=not self.RealRun)
         if retval is not 0:
             self._fail("Could not git tag, \nSTDOUT:\n%s\n\nSTDERR:\n%s", 
                        stdout, stderr)
@@ -141,13 +143,15 @@ class MakeRelease(Command):
 
     def _git_is_clean(self):
         cmd = ['git','diff','--quiet']
-        stdout, stderr, retval = pyqi_system_call(cmd, dry_run=not self.RealRun)
+        stdout, stderr, retval = pyqi_system_call(cmd, shell=False, 
+                                                  dry_run=not self.RealRun)
         return retval == 0
 
     def _make_git_commit(self, message, *args):
         message = message % args
         cmd = ['git', 'commit', '-am', message]
-        stdout, stderr, retval = pyqi_system_call(cmd, dry_run=not self.RealRun)
+        stdout, stderr, retval = pyqi_system_call(cmd, shell=False,
+                                                  dry_run=not self.RealRun)
         if retval is not 0:
             self._fail("Could not git commit, \nSTDOUT:\n%s\n\nSTDERR:\n%s", 
                        stdout, stderr)
@@ -155,7 +159,8 @@ class MakeRelease(Command):
     def _make_git_tag(self, tag):
         self._info('Tagging "%s"', tag)
         cmd = ['git', 'tag', tag]
-        stdout, stderr, retval = pyqi_system_call(cmd, dry_run=not self.RealRun)
+        stdout, stderr, retval = pyqi_system_call(cmd, shell=False,
+                                                  dry_run=not self.RealRun)
         if retval is not 0:
             self._fail("Could not git tag, \nSTDOUT:\n%s\n\nSTDERR:\n%s", stdout,
                  stderr)
