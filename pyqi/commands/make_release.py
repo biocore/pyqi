@@ -165,6 +165,34 @@ class MakeRelease(Command):
             self._fail("Could not git tag, \nSTDOUT:\n%s\n\nSTDERR:\n%s", stdout,
                  stderr)
 
+    def _get_git_branch(self):
+        cmd = ['git','rev-parse','--abbrev-ref','HEAD']
+        # ignoring self.RealRun, always execute
+        stdout, stderr, retval = pyqi_system_call(cmd, shell=False)
+        if retval is not 0:
+            self._fail("Could not get git branch, \nSTDOUT:\n%s\n\nSTDERR:\n%s",
+                       stdout, stderr)
+        return stdout.strip()
+
+    def _git_push_branch(self):
+        branch = self._get_git_branch()
+        self._info('Pushing branch %s to origin', branch)
+        cmd = ['git','push','upstream', branch]
+        stdout, stderr, retval = pyqi_system_call(cmd, shell=False,
+                                                  dry_run=not self.RealRun)
+        if retval is not 0:
+            self._fail("Could not push branch %s, \nSTDOUT:\n%s\n\nSTDERR:\n%s",
+                       stdout, stderr, branch)
+
+    def _git_push_tag(self, tag):
+        self._info('Pushing tag "%s"', tag)
+        cmd = ['git','push','upstream',tag]
+        stdout, stderr, retval = pyqi_system_call(cmd, shell=False,
+                                                  dry_run=not self.RealRun)
+        if retval is not 0:
+            self._fail("Could not push tag %s, \nSTDOUT:\n%s\n\nSTDERR:\n%s",
+                       stdout, stderr, tag)
+
     def run(self, **kwargs):
         pkg_name = kwargs['package_name']
         self.RealRun = kwargs['real_run']
@@ -207,6 +235,9 @@ class MakeRelease(Command):
         self._set_init_version(pkg_name, dev_version)
         self._set_setup_version(dev_version)
         self._set_doc_version(dev_version)
+        self._make_git_commit('Bump version number to %s', dev_version)
+        self._git_push_branch()
+        self._git_push_tag(version)
 
         return {}
 
