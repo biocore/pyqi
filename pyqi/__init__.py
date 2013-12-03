@@ -10,4 +10,4 @@
 
 __credits__ = ["Rob Knight", "Greg Caporaso", "Daniel McDonald",
                "Jai Ram Rideout", "Doug Wendel"]
-__version__ = "0.3.0"
+__version__ = "0.3.0-dev"
