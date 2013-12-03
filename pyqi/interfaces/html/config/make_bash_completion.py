@@ -20,8 +20,8 @@ cmd_in_lookup = make_command_in_collection_lookup_f(CommandConstructor)
 cmd_out_lookup = make_command_out_collection_lookup_f(CommandConstructor)
 
 inputs = [
-    HTMLInputOption(Parameter=cmd_in_lookup('command_config_module'), Required=True),
-    HTMLInputOption(Parameter=cmd_in_lookup('driver_name'), Required=True),
+    HTMLInputOption(Parameter=cmd_in_lookup('command_config_module')),
+    HTMLInputOption(Parameter=cmd_in_lookup('driver_name')),
     HTMLInputOption(Parameter=None,
                    Name='download-file',
                    Required=True,

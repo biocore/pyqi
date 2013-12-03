@@ -49,5 +49,3 @@ outputs = [ HTMLDownload(Parameter=cmd_out_lookup('result'),
 
 #    [ HTMLPage(Parameter=cmd_out_lookup('result'),
 #              Handler=newline_list_of_strings) ]
-    
-
