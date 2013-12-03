@@ -47,8 +47,6 @@ copyright = u'2013, The BiPy Development Team'
 # |version| and |release|, also used in various other places throughout the
 # built documents.
 #
-# The short X.Y version.
-version = '0.2'
 # The full version, including alpha/beta/rc tags.
 release = '0.2.0-dev'
 

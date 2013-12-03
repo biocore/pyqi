@@ -25,7 +25,7 @@ Manually installing pyqi
 
 If you decided not to install pyqi using pip, you can install it manually with the following steps:
 
-* To use the release version of pyqi, you can download it from `here <ftp://thebeast.colorado.edu/pub/pyqi-releases/pyqi-0.2.0.tar.gz>`_. The latest release is pyqi 0.2.0. After downloading, unzip the file with ``tar -xzf pyqi-0.2.0.tar.gz`` and change to the new ``pyqi-0.2.0`` directory.
+* To use the release version of pyqi, you can download it from `here <https://pypi.python.org/pypi/pyqi/>`_. The latest release is |release|. After downloading, unzip the file with ``tar -xzf pyqi-x.y.z.tar.gz`` and change to the new ``pyqi-x.y.z`` directory, where x.y.z corresponds to the downloaded version.
 
 * To use the latest development version of pyqi you can download it from our `GitHub repository <https://github.com/bipy/pyqi>`_ using ``git clone git@github.com:bipy/pyqi.git``. After downloading, change to the new ``pyqi`` directory.
 
