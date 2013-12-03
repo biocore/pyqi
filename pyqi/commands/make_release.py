@@ -182,7 +182,9 @@ class MakeRelease(Command):
         if version in tags:
             self._fail('Version "%s" is already tagged', version)
         if release_date.date() != date.today():
-            self._fail('Release date is not today (%s != %s)')
+            self._fail('Release date is not today (%s != %s)', 
+                        release_date.strftime('%Y-%m-%d'),
+                        date.today())
 
         if not self._git_is_clean():
             self._fail('You have uncommitted changes in git')
