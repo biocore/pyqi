@@ -10,6 +10,7 @@
 
 __credits__ = ["Rob Knight", "Greg Caporaso", "Jai Ram Rideout",
                "Daniel McDonald", "Doug Wendel"]
+__version__ = "0.2.0-dev"
 
 from distutils.core import setup
 from glob import glob
