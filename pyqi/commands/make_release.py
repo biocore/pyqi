@@ -109,6 +109,10 @@ class MakeRelease(Command):
         self._info('Setting setup.py version to %s', version)
         self._set_filename_version('setup.py', version, '__version__')
 
+    def _set_doc_version(self, version):
+        self._info('Setting doc/conf.py version to %s', version)
+        self._set_doc_version('doc/conf.py', version, 'release')
+
     def _build_and_upload(self):
         cmd = [sys.executable, 'setup.py', 'sdist', 'upload']
         stdout, stderr, retval = pyqi_system_call(cmd, dry_run=not self.RealRun)
@@ -191,11 +195,13 @@ class MakeRelease(Command):
 
         self._set_init_version(pkg_name, version)
         self._set_setup_version(version)
+        self._set_doc_version(version)
         self._make_git_commit('Bump version number to %s', version)
         self._make_git_tag(version)
         self._build_and_upload()
         self._set_init_version(pkg_name, dev_version)
         self._set_setup_version(dev_version)
+        self._set_doc_version(dev_version)
 
         return {}
 
