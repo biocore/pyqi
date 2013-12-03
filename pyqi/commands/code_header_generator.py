@@ -23,16 +23,20 @@ class CodeHeaderGenerator(Command):
 
     CommandIns = ParameterCollection([
         CommandIn(Name='author', DataType=str,
-                  Description='author/maintainer name', Required=False),
+                  Description='author/maintainer name', Required=False,
+                  Default=None),
         CommandIn(Name='email', DataType=str,
-                  Description='maintainer email address', Required=False),
+                  Description='maintainer email address', Required=False,
+                  Default=None),
         CommandIn(Name='license', DataType=str,
-                  Description='license (e.g., BSD)', Required=False),
+                  Description='license (e.g., BSD)', Required=False,
+                  Default=None),
         CommandIn(Name='copyright', DataType=str,
                   Description='copyright (e.g., Copyright 2013, The pyqi '
-                              'project)', Required=False),
+                  'project)', Required=False, Default=None),
         CommandIn(Name='version', DataType=str,
-                  Description='version (e.g., 0.1)', Required=False),
+                  Description='version (e.g., 0.1)', Required=False,
+                  Default=None),
         CommandIn(Name='credits', DataType=list,
                   Description='list of other authors',
                   Required=False, Default=None)
@@ -45,12 +49,11 @@ class CodeHeaderGenerator(Command):
     def run(self, **kwargs):
         # Build a string formatting dictionary for the file header.
         head = {}
-
-        fields = ['author', 'copyright', 'credits', 'license', 'version',
-            'email']
-        
-        for field in fields:
-            head[field] = kwargs.get(field, None)
+        head['author'] = kwargs['author']
+        head['email'] = kwargs['email']
+        head['license'] = kwargs['license']
+        head['copyright'] = kwargs['copyright']
+        head['version'] = kwargs['version']
 
         # Credits always includes author. Note that even if neither author nor
         # credits is passed, credits will be an empty list and will be written
