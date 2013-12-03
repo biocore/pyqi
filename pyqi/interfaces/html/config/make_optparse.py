@@ -8,13 +8,7 @@
 # The full license is in the file COPYING.txt, distributed with this software.
 #-----------------------------------------------------------------------------
 
-__author__ = "Evan Bolyen"
-__copyright__ = "Copyright 2013, The pyqi project"
 __credits__ = ["Evan Bolyen"]
-__license__ = "BSD"
-__version__ = "0.2.0-dev"
-__maintainer__ = "Evan Bolyen"
-__email__ = "ebolyen@gmail.com"
 
 from pyqi.core.interfaces.optparse.input_handler import command_handler
 from pyqi.core.interfaces.html import (HTMLInputOption, HTMLDownload, HTMLPage)
@@ -29,9 +23,8 @@ cmd_out_lookup = make_command_out_collection_lookup_f(CommandConstructor)
 
 inputs = [
     HTMLInputOption(Parameter=cmd_in_lookup('command'), 
-                    Required=True, 
                     Handler=command_handler),
-    HTMLInputOption(Parameter=cmd_in_lookup('command_module'), Required=True),
+    HTMLInputOption(Parameter=cmd_in_lookup('command_module')),
     HTMLInputOption(Parameter=cmd_in_lookup('author')),
     HTMLInputOption(Parameter=cmd_in_lookup('email')),
     HTMLInputOption(Parameter=cmd_in_lookup('license')),

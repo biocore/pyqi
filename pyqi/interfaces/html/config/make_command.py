@@ -8,13 +8,7 @@
 # The full license is in the file COPYING.txt, distributed with this software.
 #-----------------------------------------------------------------------------
 
-__author__ = "Evan Bolyen"
-__copyright__ = "Copyright 2013, The pyqi project"
 __credits__ = ["Evan Bolyen"]
-__license__ = "BSD"
-__version__ = "0.2.0-dev"
-__maintainer__ = "Evan Bolyen"
-__email__ = "ebolyen@gmail.com"
 
 from pyqi.core.interfaces.html import (HTMLInputOption, HTMLDownload, HTMLPage)
 from pyqi.core.interfaces.optparse.input_handler import string_list_handler
@@ -38,7 +32,6 @@ inputs = [
                    Help='comma-separated list of other authors'),
     HTMLInputOption(Parameter=cmd_in_lookup('test_code'),
                    Type=bool,
-                   Default=False,
                    Help='Should a stubbed out python test file be generated instead'),
     HTMLInputOption(Parameter=None,
                    Name='download-file',
@@ -55,5 +48,3 @@ outputs = [ HTMLDownload(Parameter=cmd_out_lookup('result'),
 
 #    [ HTMLPage(Parameter=cmd_out_lookup('result'),
 #              Handler=newline_list_of_strings) ]
-    
-

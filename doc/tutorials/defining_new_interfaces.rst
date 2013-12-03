@@ -16,9 +16,9 @@ pyqi provides a command, ``make-optparse``, that allows developers to easily stu
 
 	pyqi make-optparse -h
 
-To create your interface, you'll need to pass the ``Command`` as a fully specified python module name, the name of the module where that ``Command`` is defined, ownership information (e.g., author name, copyright, license, etc.) and the path where the new configuration file should be written. For example, to create a stub for an ``OptparseInterface`` for our ``SequenceCollectionSummarizer`` command, you could run the following::
+To create your interface, you'll need to pass the ``Command`` as a fully specified python module name, the name of the module where that ``Command`` is defined, and the path where the new configuration file should be written. For example, to create a stub for an ``OptparseInterface`` for our ``SequenceCollectionSummarizer`` command, you could run the following::
 
-	pyqi make-optparse -c sequence_collection_summarizer.SequenceCollectionSummarizer -m sequence_collection_summarizer -a "Greg Caporaso" --copyright "Copyright 2013, Greg Caporaso" -e "gregcaporaso@gmail.com" -l BSD --config-version 0.0.1 -o summarize_sequence_collection.py
+	pyqi make-optparse -c sequence_collection_summarizer.SequenceCollectionSummarizer -m sequence_collection_summarizer --credits "Greg Caporaso" -o summarize_sequence_collection.py
 
 .. warning:: For the above command to work, the directory containing ``sequence_collection_summarizer.py`` will need to be in your ``$PYTHONPATH``. 
 
@@ -27,17 +27,12 @@ The resulting file will look something like this::
 	#!/usr/bin/env python
 	from __future__ import division
 
-	__author__ = "Greg Caporaso"
-	__copyright__ = "Copyright 2013, Greg Caporaso"
 	__credits__ = ["Greg Caporaso"]
-	__license__ = "BSD"
-	__version__ = "0.0.1"
-	__maintainer__ = "Greg Caporaso"
-	__email__ = "gregcaporaso@gmail.com"
 
 	from pyqi.core.interfaces.optparse import (OptparseUsageExample,
 	                                           OptparseOption, OptparseResult)
-	from pyqi.core.command import make_parameter_collection_lookup_f
+	from pyqi.core.command import (make_command_in_collection_lookup_f,
+	                               make_command_out_collection_lookup_f)
 	from sequence_collection_summarizer import CommandConstructor
 
 	# If you need access to input or output handlers provided by pyqi, consider
@@ -48,7 +43,8 @@ The resulting file will look something like this::
 	# pyqi.interfaces.optparse.output_handler
 
 	# Convenience function for looking up parameters by name.
-	param_lookup = make_parameter_collection_lookup_f(CommandConstructor)
+	cmd_in_lookup = make_command_in_collection_lookup_f(CommandConstructor)
+	cmd_out_lookup = make_command_out_collection_lookup_f(CommandConstructor)
 
 	# Examples of how the command can be used from the command line using an
 	# optparse interface.
@@ -62,10 +58,10 @@ The resulting file will look something like this::
 	# to define options here that do not exist as parameters, e.g., an output file.
 	inputs = [
 	    # An example option that has a direct relationship with a Parameter.
-	    # OptparseOption(Parameter=param_lookup('name_of_a_parameter'),
-	    #                InputType='existing_filepath', # the optparse type of input
-	    #                InputAction='store', # the optparse action
-	    #                InputHandler=None, # Apply a function to the input value to convert it into the type expected by Parameter.DataType
+	    # OptparseOption(Parameter=cmd_in_lookup('name_of_a_command_in'),
+	    #                Type='existing_filepath', # the optparse type of input
+	    #                Action='store', # the optparse action
+	    #                Handler=None, # Apply a function to the input value to convert it into the type expected by Parameter.DataType
 	    #                ShortName='n', # a parameter short name, can be None
 	    #                # Name='foo', # implied by Parameter.Name. Can be overwritten here if desired
 	    #                # Required=False, # implied by Parameter.Required. Can be promoted by setting True
@@ -76,67 +72,71 @@ The resulting file will look something like this::
 	    #
 	    # An example option that does not have an associated Parameter.
 	    # OptparseOption(Parameter=None,
-	    #                InputType='new_filepath',
-	    #                InputAction='store',
-	    #                InputHandler=None, # we don't need an InputHandler because this option isn't being converted into a format that a Parameter expects
+	    #                Type='new_filepath',
+	    #                Action='store',
+	    #                Handler=None, # we don't need a Handler because this option isn't being converted into a format that a Parameter expects
 	    #                ShortName='o',
 	    #                Name='output-fp',
 	    #                Required=True,
 	    #                Help='output filepath')
 
-	    OptparseOption(Parameter=param_lookup('seqs'),
-	                   InputType=<type 'list'>,
-	                   InputAction='store', # default is 'store', change if desired
-	                   InputHandler=None, # must be defined if desired
-	                   ShortName=None), # must be defined if desired
+	    OptparseOption(Parameter=cmd_in_lookup('seqs'),
+	                   Type=<type 'list'>,
+	                   Action='store', # default is 'store', change if desired
+	                   Handler=None, # must be defined if desired
+	                   ShortName=None, # must be defined if desired
 	                   # Name='seqs', # implied by Parameter
 	                   # Required=True, # implied by Parameter
 	                   # Help='sequences to be summarized', # implied by Parameter
-                   
-	    OptparseOption(Parameter=param_lookup('suppress_length_summary'),
-	                   InputType=<type 'bool'>,
-	                   InputAction='store', # default is 'store', change if desired
-	                   InputHandler=None, # must be defined if desired
-	                   ShortName=None), # must be defined if desired
+	                   ),
+	    OptparseOption(Parameter=cmd_in_lookup('suppress_length_summary'),
+	                   Type=None,
+	                   Action='store_true', # default is 'store', change if desired
+	                   Handler=None, # must be defined if desired
+	                   ShortName=None, # must be defined if desired
 	                   # Name='suppress_length_summary', # implied by Parameter
 	                   # Required=False, # implied by Parameter
 	                   # Help='do not generate summary information on the sequence lengths', # implied by Parameter
 	                   # Default=False, # implied by Parameter
-	                   # DefaultDescription=None, # implied by Parameter
-
-
+	                   # DefaultDescription=None, # implied by Parameter),
 	]
 
 	# outputs map result keys to output options and handlers. It is not necessary
 	# to supply an associated option, but if you do, it must be an option from the
 	# inputs list (above).
 	outputs = [
-	    # An example option that maps to a result key.
-	    # OptparseResult(ResultKey='some_result',
-	    #                OutputHandler=write_string, # a function applied to the value at ResultKey
-	    #
+	    # An example option that maps to a CommandIn.
+	    # OptparseResult(Parameter=cmd_out_lookup('name_of_a_command_out'),
+	    #                Handler=write_string, # a function applied to the output of the Command
 	    #                # the name of the option (defined in inputs, above), whose
-	    #                # value will be made available to OutputHandler. This name
+	    #                # value will be made available to Handler. This name
 	    #                # can be either an underscored or dashed version of the
 	    #                # option name (e.g., 'output_fp' or 'output-fp')
-	    #                OptionName='output-fp'), 
+	    #                InputName='output-fp'), 
 	    #
-	    # An example option that does not map to a result key.
-	    # OptparseResult(ResultKey='some_other_result',
-	    #                OutputHandler=print_string)
+	    # An example option that does not map to a CommandIn.
+	    # OptparseResult(Parameter=cmd_out_lookup('some_other_result'),
+	    #                Handler=print_string)
+
+	    OptparseResult(Parameter=cmd_out_lookup('max_length'),
+	                    Handler=None, # must be defined
+	                    InputName=None), # define if tying to an OptparseOption
+	    OptparseResult(Parameter=cmd_out_lookup('min_length'),
+	                    Handler=None, # must be defined
+	                    InputName=None), # define if tying to an OptparseOption
+	    OptparseResult(Parameter=cmd_out_lookup('num_seqs'),
+	                    Handler=None, # must be defined
+	                    InputName=None), # define if tying to an OptparseOption
 	]
 
-
-There are three lists of values that we'll need to populate here to define the optparse interface for our ``SequenceCollectionSummarizer`` command. These are the ``inputs``, the ``outputs``, and the ``usage_examples``. We'll also need to define an input handler and an output handler to tell the ``OptparseInterface`` how to take input from the command line and turn it into something that ``SequenceCollectionSummarizer`` can use, and to take output from ``SequenceCollectionSummarizer`` and turn it into something a command line user will want. ``make-optparse`` will auto-populate the ``inputs`` based on the ``Parameters``, but some changes will usually be required (detailed below). The following sections describe each of these steps.
-
-.. note:: There is a fourth value that is required when defining an optparse interface, which is the version string of the command/interface (e.g., ``0.0.1``). This value has already been filled in for us in the configuration file template (see ``__version__`` at the top of the file). You can specify the version string when creating the configuration file template via ``--config-version``. In the example above, we specified a version string of ``0.0.1``.
+There are three lists of values that we'll need to populate here to define the optparse interface for our ``SequenceCollectionSummarizer`` command. These are the ``inputs``, the ``outputs``, and the ``usage_examples``. We'll also need to define an input handler and an output handler to tell the ``OptparseInterface`` how to take input from the command line and turn it into something that ``SequenceCollectionSummarizer`` can use, and to take output from ``SequenceCollectionSummarizer`` and turn it into something a command line user will want. ``make-optparse`` will auto-populate the ``inputs``  and ``outputs`` based on the ``CommandIns`` and ``CommandOuts``, but some changes will usually be required (detailed below). The following sections describe each of these steps.
 
 Defining usage examples
 -----------------------
 
 The first thing to do when defining the ``OptparseInterface`` for our ``SequenceCollectionSummarizer`` command is define a set of usage examples. While in practice this documentation step may seem like something you'd want to do last, it's really helpful to do first to get you thinking about how you'd like to interact with your command from the command line. 
 
-Usage examples are defined as instances of the ``pyqi.interface.optparse.UsageExample`` class, and are instantiated with three parameters: ``ShortDescription``, ``LongDescription``, and ``Ex``. ``Ex`` is the usage example itself, ``ShortDescription`` is a one sentence description of what ``Ex`` will do, and ``LongDescription`` elaborates on what ``Ex`` does. Find the ``usage_examples`` list in your new ``summarize_sequence_collection.py`` file, and replace its definition with::
+Usage examples are defined as instances of the ``pyqi.core.interfaces.optparse.OptparseUsageExample`` class, and are instantiated with three parameters: ``ShortDescription``, ``LongDescription``, and ``Ex``. ``Ex`` is the usage example itself, ``ShortDescription`` is a one sentence description of what ``Ex`` will do, and ``LongDescription`` elaborates on what ``Ex`` does. Find the ``usage_examples`` list in your new ``summarize_sequence_collection.py`` file, and replace its definition with::
 
 	usage_examples = [
 	    OptparseUsageExample(ShortDesc="Summarize the input sequence collection and write the result to file.",
@@ -149,47 +149,47 @@ Usage examples are defined as instances of the ``pyqi.interface.optparse.UsageEx
 
 Here we define two usage examples, each of which gives us an idea about how we want our script to behave: we want it to take an ``i`` parameter (where the user passes their input file name), an ``o`` parameter (where the user passes their output file name), and an optional parameter called ``suppress-length-summary`` which controls some of the script behavior. 
 
- .. warning:: You shouldn't ever include the name of the script when defining ``UsageExample.Ex``, but instead include the text ``%prog``. This will be automatically replaced with the script name, so if you ever change the name of the script in the future, the change will take effect in all of your usage examples without you having to remember to update them.
+ .. warning:: You shouldn't ever include the name of the script when defining ``OptparseUsageExample.Ex``, but instead include the text ``%prog``. This will be automatically replaced with the script name, so if you ever change the name of the script in the future, the change will take effect in all of your usage examples without you having to remember to update them.
 
 Defining inputs
 ---------------
 
-Next we'll define the list of ``inputs`` that should be associated with our ``OptparseInterface``. Each of these inputs will be an instance of a ``pyqi.core.interface.optparse.OptparseOption`` object. These will roughly map on to the ``Parameters`` that we defined for ``SequenceCollectionSummarizer``, but there are usually additional interface options relative to command parameters, as we'll see here. 
+Next we'll define the list of ``inputs`` that should be associated with our ``OptparseInterface``. Each of these inputs will be an instance of a ``pyqi.core.interface.optparse.OptparseOption`` object. These will roughly map on to the ``CommandIns`` that we defined for ``SequenceCollectionSummarizer``, but there are usually additional interface options relative to command parameters, as we'll see here.
 
-For the ``OptparseOptions`` that map onto ``Parameters`` directly, you can look up the corresponding ``Parameter`` in the ``param_lookup`` dictionary (which is created for you by ``make-optparse``), and most of the information in the ``OptparseOption`` will be auto-populated for you. ``make-optparse`` will actually fill in as much information as possible for each ``OptparseOption`` that corresponds to an existing ``Parameter``. 
+For the ``OptparseOptions`` that map onto ``CommandIns`` directly, you can look up the corresponding ``CommandIn`` in the ``cmd_in_lookup`` dictionary (which is created for you by ``make-optparse``), and most of the information in the ``OptparseOption`` will be auto-populated for you. ``make-optparse`` will actually fill in as much information as possible for each ``OptparseOption`` that corresponds to an existing ``CommandIn``.
 
-In our example, you'll notice that there are two ``OptparseOptions`` that are already defined. There are a few values that may need to be changed here. In almost all cases, you'll need to change the ``InputType``, which is set to the ``Parameter``' ``DataType`` value by default, but should be updated to the ``optparse`` type. You can find discussion of these types in the :ref:`optparse type definitions <optparse-types>` section. Note that the ``InputType`` should be ``None`` for command line flags, as the type describes the value that is passed via that option, and command line flags don't take a value. The other value that often will need to be changed is ``InputHandler``, which tells ``OptparseInterface`` how to transform the ``OptparseOption`` into the corresponding ``Parameter``. In our case, for our ``seqs`` ``OptparseOption``, that involves converting a filepath into a list of tuples of (sequence id, sequence) pairs. First let's define the ``OptparseOptions``, and then we'll define a new ``InputHandler``.
+In our example, you'll notice that there are two ``OptparseOptions`` that are already defined. There are a few values that may need to be changed here. In almost all cases, you'll need to change the ``Type``, which is set to the ``CommandIn``'s ``DataType`` value by default, but should be updated to the ``optparse`` type. You can find discussion of these types in the :ref:`optparse type definitions <optparse-types>` section. Note that the ``Type`` should be ``None`` for command line flags, as the type describes the value that is passed via that option, and command line flags don't take a value. The other value that often will need to be changed is ``Handler``, which tells ``OptparseInterface`` how to transform the ``OptparseOption`` into the corresponding ``CommandIn``. In our case, for our ``seqs`` ``OptparseOption``, that involves converting a filepath into a list of tuples of (sequence id, sequence) pairs. First let's define the ``OptparseOptions``, and then we'll define a new ``Handler``.
 
-The ``OptparseOptions`` corresponding to the existing ``Parameters`` should look like this::
+The ``OptparseOptions`` corresponding to the existing ``CommandIns`` should look like this::
 
 	inputs = [
 
-	    OptparseOption(Parameter=param_lookup('seqs'),
-	                   InputType='existing_filepath',
-	                   InputAction='store',
-	                   InputHandler=parse_fasta,
+	    OptparseOption(Parameter=cmd_in_lookup('seqs'),
+	                   Type='existing_filepath',
+	                   Action='store',
+	                   Handler=parse_fasta,
 	                   ShortName='i'),
                    
-	    OptparseOption(Parameter=param_lookup('suppress_length_summary'),
-	                   InputType=None,
-	                   InputAction='store_true',
-	                   InputHandler=None,
+	    OptparseOption(Parameter=cmd_in_lookup('suppress_length_summary'),
+	                   Type=None,
+	                   Action='store_true',
+	                   Handler=None,
 	                   ShortName=None),
 	]
 
-These definitions are exactly as generated by ``make-optparse``, except that many of the comments have been removed, and we've modified the ``InputTypes`` and the ``InputHandler`` for our ``seqs`` option. In the :ref:`next section <defining-input-handlers>` we'll define this new ``parse_fasta`` input handler, but first we'll add one more OptparseOption which is specific to our command line interface.
+These definitions are exactly as generated by ``make-optparse``, except that many of the comments have been removed, and we've modified the ``Types`` and the ``Handler`` for our ``seqs`` option. In the :ref:`next section <defining-input-handlers>` we'll define this new ``parse_fasta`` input handler, but first we'll add one more ``OptparseOption`` which is specific to our command line interface.
 
-The output from our ``SequenceCollectionSummarizer`` is a dictionary, where some of the values are integers and some of the values may be ``None``. Generally a command line user will want to have information printed to stdout or to file. We'll define our interface so that the output is written to file with some basic formatting put in place. To do this, we need to define a new OptparseOption to allow the user to specify the path where output should be written. This ``OptparseOption`` does not map onto one of our existing ``Parameters``, and should be defined as follows::
+The output from our ``SequenceCollectionSummarizer`` is a dictionary, where some of the values are integers and some of the values may be ``None``. Generally a command line user will want to have information printed to stdout or to file. We'll define our interface so that the output is written to file with some basic formatting put in place. To do this, we need to define a new ``OptparseOption`` to allow the user to specify the path where output should be written. This ``OptparseOption`` does not map onto one of our existing ``CommandIns``, and should be defined as follows::
 
 	OptparseOption(Parameter=None,
-	               InputType='new_filepath',
-	               InputAction='store',
+	               Type='new_filepath',
+	               Action='store',
 	               ShortName='o',
 	               Name='output-fp',
 	               Required=True,
 	               Help='path where output should be written')
 
-Notice the ``Parameter=None`` parameter here: this indicates that this ``OptparseOption`` does not correspond to one of the ``SequenceCollectionSummarizer`` parameters. 
+Notice the ``Parameter=None`` parameter here: this indicates that this ``OptparseOption`` does not correspond to one of the ``SequenceCollectionSummarizer`` ``CommandIns``.
 
 You should include this ``OptparseOption`` definition in the ``inputs`` list to define the three options for our command line interface.
 
@@ -236,24 +236,24 @@ Defining outputs
 The last thing we need to do is define which of the outputs generated by ``SequenceCollectionSummarizer`` are things we care about with this interface, and tell our ``OptparseInterface`` how to handle those. We do this by defining the ``outputs`` list of ``pyqi.core.interfaces.optparse.OptparseResult`` objects. In our case, we'll want to write all of the values that are not ``None`` to the filepath specified by the user with ``output-fp``. To do that, we need to handle three possible outputs, so we'll define those outputs and write an output handler. You should start with the stubbed ``outputs`` list to define how you want to handle each of the parameters. We'll do this as follows::
 
 	outputs = [
-	    OptparseResult(ResultKey='num-seqs',
-	                   OutputHandler=append_datum_to_file,
-	                   OptionName='output-fp'), 
-	    OptparseResult(ResultKey='min-length',
-	                   OutputHandler=append_datum_to_file,
-	                   OptionName='output-fp'), 
-	    OptparseResult(ResultKey='max-length',
-	                   OutputHandler=append_datum_to_file,
-	                   OptionName='output-fp'), 
+	    OptparseResult(Parameter=cmd_out_lookup('num_seqs'),
+	                   Handler=append_datum_to_file,
+	                   InputName='output-fp'), 
+	    OptparseResult(Parameter=cmd_out_lookup('min_length'),
+	                   Handler=append_datum_to_file,
+	                   InputName='output-fp'), 
+	    OptparseResult(Parameter=cmd_out_lookup('max_length'),
+	                   Handler=append_datum_to_file,
+	                   InputName='output-fp'), 
 
 	]
 
-In this case, each of our ``OptparseResults`` are associated with a single ``OptionName``: ``output-fp``. We do this because each of these should be written to the same file, but in practice each of these could be associated with different ``OptionNames`` (e.g., if each should be written to a different file), or ``OptionName=None``, if (for example) a particular result should be written to stdout or stderr. We'll next define the new output handler, ``append_datum_to_file``, used by each of these ``OptparseResult`` objects.
+In this case, each of our ``OptparseResults`` are associated with a single ``InputName``: ``output-fp``. We do this because each of these should be written to the same file, but in practice each of these could be associated with different ``InputNames`` (e.g., if each should be written to a different file), or ``InputName=None``, if (for example) a particular result should be written to stdout or stderr. We'll next define the new output handler, ``append_datum_to_file``, used by each of these ``OptparseResult`` objects.
 
 Defining output handlers
 ------------------------
 
-Each of these ``OptparseResult`` objects uses the same ``OutputHandler``, which we need to define now. This will take the result and write it to the file specified by the user as ``output-fp``. This should look like the following::
+Each of these ``OptparseResult`` objects use the same ``Handler``, which we need to define now. This will take the result and write it to the file specified by the user as ``output-fp``. This should look like the following::
 
 	def append_datum_to_file(result_key, data, option_value=None):
 	    """Append summary information to a file.
@@ -284,31 +284,25 @@ At this stage we've fully configured our interface. The final interface configur
 	#!/usr/bin/env python
 	from __future__ import division
 
-	__author__ = "Greg Caporaso"
-	__copyright__ = "Copyright 2013, Greg Caporaso"
 	__credits__ = ["Greg Caporaso"]
-	__license__ = "BSD"
-	__version__ = "0.0.1"
-	__maintainer__ = "Greg Caporaso"
-	__email__ = "gregcaporaso@gmail.com"
 
 	from pyqi.core.interfaces.optparse import (OptparseUsageExample,
 	                                           OptparseOption, OptparseResult)
-	from pyqi.core.command import make_parameter_collection_lookup_f
+	from pyqi.core.command import (make_command_in_collection_lookup_f,
+	                               make_command_out_collection_lookup_f)
 	from sequence_collection_summarizer import CommandConstructor
-	from pyqi.core.exception import IncompetentDeveloperError
-	import os
 
-	param_lookup = make_parameter_collection_lookup_f(CommandConstructor)
+	cmd_in_lookup = make_command_in_collection_lookup_f(CommandConstructor)
+	cmd_out_lookup = make_command_out_collection_lookup_f(CommandConstructor)
 
 	def parse_fasta(fp):
 	    """
 	       fp: path to a fasta-formatted file
-       
+   
 	       This function is a fasta record generator, yielding 
 	        (sequence id, sequence) pairs when provided with a 
 	        valid fasta file.
-       
+   
 	       NO ERROR CHECKING IS PERFORMED!
 	    """
 	    # Always open files for reading in python using mode 'U'
@@ -327,6 +321,7 @@ At this stage we've fully configured our interface. The final interface configur
 	        else:
 	            seq.append(line)
 	    yield seq_id, ''.join(seq)
+	    f.close()
 
 	def append_datum_to_file(result_key, data, option_value=None):
 	    """Append summary information to a file.
@@ -359,22 +354,19 @@ At this stage we've fully configured our interface. The final interface configur
 	]
 
 	inputs = [
-
-	    OptparseOption(Parameter=param_lookup('seqs'),
-	                   InputType='existing_filepath',
-	                   InputAction='store',
-	                   InputHandler=parse_fasta,
+	    OptparseOption(Parameter=cmd_in_lookup('seqs'),
+	                   Type='existing_filepath',
+	                   Action='store',
+	                   Handler=parse_fasta,
 	                   ShortName='i'),
-                   
-	    OptparseOption(Parameter=param_lookup('suppress_length_summary'),
-	                   InputType=None,
-	                   InputAction='store_true',
-	                   InputHandler=None,
+	    OptparseOption(Parameter=cmd_in_lookup('suppress_length_summary'),
+	                   Type=None,
+	                   Action='store_true',
+	                   Handler=None,
 	                   ShortName=None),
-
 	    OptparseOption(Parameter=None,
-	                   InputType='new_filepath',
-	                   InputAction='store',
+	                   Type='new_filepath',
+	                   Action='store',
 	                   ShortName='o',
 	                   Name='output-fp',
 	                   Required=True,
@@ -382,16 +374,15 @@ At this stage we've fully configured our interface. The final interface configur
 	]
 
 	outputs = [
-	    OptparseResult(ResultKey='num-seqs',
-	                   OutputHandler=append_datum_to_file,
-	                   OptionName='output-fp'), 
-	    OptparseResult(ResultKey='min-length',
-	                   OutputHandler=append_datum_to_file,
-	                   OptionName='output-fp'), 
-	    OptparseResult(ResultKey='max-length',
-	                   OutputHandler=append_datum_to_file,
-	                   OptionName='output-fp'), 
-
+	    OptparseResult(Parameter=cmd_out_lookup('num_seqs'),
+	                   Handler=append_datum_to_file,
+	                   InputName='output-fp'),
+	    OptparseResult(Parameter=cmd_out_lookup('min_length'),
+	                   Handler=append_datum_to_file,
+	                   InputName='output-fp'),
+	    OptparseResult(Parameter=cmd_out_lookup('max_length'),
+	                   Handler=append_datum_to_file,
+	                   InputName='output-fp')
 	]
 
 .. _running-our-command:
@@ -403,9 +394,11 @@ To run this, there are a couple of additional things you need to do. First, you 
 	
 	export PYTHONPATH=$HOME/code/:$PYTHONPATH
 
-Next, so you can import from that directory, it'll need to contain an ``__init__.py`` file. That file can be empty, but it does need to exist. You can do this as follows::
+Next, so you can import from that directory, it'll need to contain an ``__init__.py`` file. You can do this as follows::
 	
-	touch $HOME/code/pyqi_experiments/__init__.py
+        echo '__version__ = "0.0.0"' > $HOME/code/pyqi_experiments/__init__.py
+
+.. note:: pyqi requires that the top-level module containing the configuration files has a ``__version__`` attribute defined. ``__version__`` should store a version string, e.g., ``"0.0.0"``. In this example, the top-level module is ``pyqi_experiments``, so we must create an ``__init__.py`` that contains a ``__version__`` attribute.
 
 Now we're ready to run our ``Command`` via its ``OptparseInterface``. You can do this as follows::
 	
@@ -482,5 +475,3 @@ Thoughts and guidelines on designing command line interfaces
 ------------------------------------------------------------
 
 Based on our experiences developing command line interfaces for `QIIME <http://www.qiime.org>`_, we've compiled some thoughts on best practices, which you can find in :ref:`optparse-guidelines`. 
-
-

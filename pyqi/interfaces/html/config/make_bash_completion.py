@@ -8,13 +8,7 @@
 # The full license is in the file COPYING.txt, distributed with this software.
 #-----------------------------------------------------------------------------
 
-__author__ = "Evan Bolyen"
-__copyright__ = "Copyright 2013, The pyqi project"
 __credits__ = ["Evan Bolyen"]
-__license__ = "BSD"
-__version__ = "0.2.0-dev"
-__maintainer__ = "Evan Bolyen"
-__email__ = "ebolyen@gmail.com"
 
 from pyqi.core.interfaces.html import (HTMLInputOption, HTMLDownload, HTMLPage)
 from pyqi.core.interfaces.html.output_handler import newline_list_of_strings
@@ -26,8 +20,8 @@ cmd_in_lookup = make_command_in_collection_lookup_f(CommandConstructor)
 cmd_out_lookup = make_command_out_collection_lookup_f(CommandConstructor)
 
 inputs = [
-    HTMLInputOption(Parameter=cmd_in_lookup('command_config_module'), Required=True),
-    HTMLInputOption(Parameter=cmd_in_lookup('driver_name'), Required=True),
+    HTMLInputOption(Parameter=cmd_in_lookup('command_config_module')),
+    HTMLInputOption(Parameter=cmd_in_lookup('driver_name')),
     HTMLInputOption(Parameter=None,
                    Name='download-file',
                    Required=True,

@@ -8,13 +8,8 @@
 # The full license is in the file COPYING.txt, distributed with this software.
 #-----------------------------------------------------------------------------
 
-__author__ = "Evan Bolyen"
-__copyright__ = "Copyright 2013, The pyqi project"
-__credits__ = ["Evan Bolyen", "Jai Ram Rideout", "Daniel McDonald", "Greg Caporaso"]
-__license__ = "BSD"
-__version__ = "0.2.0-dev"
-__maintainer__ = "Evan Bolyen"
-__email__ = "ebolyen@gmail.com"
+__credits__ = ["Evan Bolyen", "Jai Ram Rideout", "Daniel McDonald",
+    "Greg Caporaso"]
 
 import os
 import types
@@ -29,6 +24,7 @@ from pyqi.core.interface import (Interface, InterfaceOutputOption, InterfaceInpu
 from pyqi.core.factory import general_factory
 from pyqi.core.exception import IncompetentDeveloperError
 from pyqi.core.command import Parameter
+from pyqi.util import get_version_string
 
 class HTMLResult(InterfaceOutputOption):
     """Base class for results for an HTML config file"""
@@ -377,9 +373,9 @@ def html_interface_factory(command_constructor, usage_examples, inputs, outputs,
 def get_cmd_obj(cmd_cfg_mod, cmd):
     """Get a ``Command`` object"""
     cmd_cfg,_ = get_command_config(cmd_cfg_mod, cmd)
-    cmd_class = html_interface_factory(cmd_cfg.CommandConstructor, [], 
-                            cmd_cfg.inputs, cmd_cfg.outputs,
-                            cmd_cfg.__version__, cmd)
+    version_str = get_version_string(cmd_cfg_mod)
+    cmd_class = html_interface_factory(cmd_cfg.CommandConstructor, [],
+                            cmd_cfg.inputs, cmd_cfg.outputs, version_str, cmd)
     cmd_obj = cmd_class()
     return cmd_obj
 
@@ -512,7 +508,7 @@ def get_http_handler(module):
 def start_server(port, module):
     """Start a server for the HTMLInterface on the specified port"""
     interface_server = HTTPServer(("", port), get_http_handler(module))
-    print "-- Starting server at 'http://localhost:%d' --" % port
+    print "-- Starting server at http://localhost:%d --" % port
     print "To close the server, type 'ctrl-c' into this window."
     try:
         interface_server.serve_forever()
