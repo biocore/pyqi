@@ -15,7 +15,7 @@ __credits__ = ["Greg Caporaso", "Jai Ram Rideout"]
 import importlib
 from os import remove
 from os.path import split, splitext
-from sys import stdout, stderr
+import sys 
 from subprocess import Popen, PIPE, STDOUT
 from pyqi.core.log import StdErrLogger
 from pyqi.core.exception import MissingVersionInfoError
@@ -36,7 +36,11 @@ def pyqi_system_call(cmd, shell=True, dry_run=False):
     pyqi's BSD license).
     """
     if dry_run:
-        print cmd
+        if isinstance(cmd, list):
+            sys.stderr.write(' '.join(cmd))
+        else:
+            sys.stderr.write(cmd)
+        sys.stderr.write('\n')
         return "", "", 0
     else:
         proc = Popen(cmd,
@@ -93,8 +97,8 @@ def old_to_new_command(driver_name, project_title, local_argv):
 
     result_stdout, result_stderr, result_retval = pyqi_system_call(command)
 
-    stdout.write(result_stdout)
-    stderr.write(result_stderr)
+    sys.stdout.write(result_stdout)
+    sys.stderr.write(result_stderr)
 
     return result_retval
 
