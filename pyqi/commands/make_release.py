@@ -143,8 +143,9 @@ class MakeRelease(Command):
 
     def _git_is_clean(self):
         cmd = ['git','diff','--quiet']
-        stdout, stderr, retval = pyqi_system_call(cmd, shell=False, 
-                                                  dry_run=not self.RealRun)
+
+        # always execute, even in dry run
+        stdout, stderr, retval = pyqi_system_call(cmd, shell=False)
         return retval == 0
 
     def _make_git_commit(self, message, *args):
@@ -167,6 +168,7 @@ class MakeRelease(Command):
 
     def _get_git_branch(self):
         cmd = ['git','rev-parse','--abbrev-ref','HEAD']
+
         # ignoring self.RealRun, always execute
         stdout, stderr, retval = pyqi_system_call(cmd, shell=False)
         if retval is not 0:
