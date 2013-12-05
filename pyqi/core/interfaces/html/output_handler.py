@@ -14,3 +14,7 @@ __credits__ = ["Evan Bolyen"]
 def newline_list_of_strings(result_key, data, option_value=None):
     """Return a string from a list of strings while appending newline"""
     return "\n".join(data)
+
+def html_list_of_strings(result_key, data, option_value=None):
+    """Return a string from a list of strings while appending an html break"""
+	return "<br />".join(data)
