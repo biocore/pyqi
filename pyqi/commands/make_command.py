@@ -58,7 +58,9 @@ if __name__ == '__main__':
 
 class MakeCommand(CodeHeaderGenerator):
     BriefDescription = "Construct a stubbed out Command object"
-    LongDescription = """This command is intended to construct the basics of a Command object so that a developer can dive straight into the implementation of the command"""
+    LongDescription = ("This command is intended to construct the basics of a "
+        "Command object so that a developer can dive straight into the "
+        "implementation of the command")
 
     CommandIns = ParameterCollection(
           CodeHeaderGenerator.CommandIns.Parameters + [

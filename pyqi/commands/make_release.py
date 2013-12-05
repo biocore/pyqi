@@ -64,7 +64,8 @@ class MakeRelease(Command):
                     if change_info:
                         break
 
-                match = re.search(r'released on (\w+\s+\d+\w+\s+\d+)', change_info)
+                match = re.search(r'released on (\w+\s+\d+\w+\s+\d+)',
+                    change_info)
                 if match is None:
                     continue
 
@@ -163,7 +164,7 @@ class MakeRelease(Command):
         stdout, stderr, retval = pyqi_system_call(cmd, shell=False,
                                                   dry_run=not self.RealRun)
         if retval is not 0:
-            self._fail("Could not git tag, \nSTDOUT:\n%s\n\nSTDERR:\n%s", stdout,
+            self._fail("Could not git tag, \nSTDOUT:\n%s\n\nSTDERR:\n%s",stdout,
                  stderr)
 
     def _get_git_branch(self):

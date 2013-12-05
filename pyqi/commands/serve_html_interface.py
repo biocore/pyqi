@@ -17,19 +17,22 @@ from pyqi.core.interfaces.html import start_server
 
 class ServeHTMLInterface(Command):
     BriefDescription = "Start the HTMLInterface server"
-    LongDescription = "Start the HTMLInterface server and load the provided interface_module and port"
+    LongDescription = ("Start the HTMLInterface server and load the provided "
+        "interface_module and port")
     CommandIns = ParameterCollection([
         CommandIn(Name='port', DataType=int,
                   Description='The port to run the server on', Required=False,
                   Default=8080),
 
         CommandIn(Name='interface_module', DataType=str,
-                  Description='The module to serve the interface for', Required=True)
+                  Description='The module to serve the interface for',
+                  Required=True)
     ])
 
     CommandOuts = ParameterCollection([
           CommandOut(Name='result',DataType=str, 
-                    Description='Signals the termination of the HTMLInterface server')
+                    Description='Signals the termination of the HTMLInterface '
+                                'server')
           ])
 
     def run(self, **kwargs):
