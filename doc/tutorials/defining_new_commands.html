@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -17,7 +15,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.1.0-dev',
+        VERSION:     '0.3.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -54,31 +52,31 @@
 <div class="highlight-python"><pre>pyqi make-command -h</pre>
 </div>
 <p>To create our sequence collection summarizer, we can start by stubbing a <tt class="docutils literal"><span class="pre">SequenceCollectionSummarizer</span></tt> class:</p>
-<div class="highlight-python"><pre>pyqi make-command -n SequenceCollectionSummarizer -a "Greg Caporaso" -c "Copyright 2013, Greg Caporaso" -e "gregcaporaso@gmail.com" -l BSD --command-version 0.0.1 -o sequence_collection_summarizer.py</pre>
+<div class="highlight-python"><pre>pyqi make-command -n SequenceCollectionSummarizer --credits "Greg Caporaso" -o sequence_collection_summarizer.py</pre>
 </div>
-<p>If you run this command locally, substituting your own name and email address where applicable, you&#8217;ll have a new file called <tt class="docutils literal"><span class="pre">sequence_collection_summarizer.py</span></tt>, which will look roughly like the following:</p>
+<p>If you run this command locally, substituting your own name where applicable, you&#8217;ll have a new file called <tt class="docutils literal"><span class="pre">sequence_collection_summarizer.py</span></tt>, which will look roughly like the following:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="c">#!/usr/bin/env python</span>
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span>
 
-<span class="n">__author__</span> <span class="o">=</span> <span class="s">&quot;Greg Caporaso&quot;</span>
-<span class="n">__copyright__</span> <span class="o">=</span> <span class="s">&quot;Copyright 2013, Greg Caporaso&quot;</span>
 <span class="n">__credits__</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;Greg Caporaso&quot;</span><span class="p">]</span>
-<span class="n">__license__</span> <span class="o">=</span> <span class="s">&quot;BSD&quot;</span>
-<span class="n">__version__</span> <span class="o">=</span> <span class="s">&quot;0.0.1&quot;</span>
-<span class="n">__maintainer__</span> <span class="o">=</span> <span class="s">&quot;Greg Caporaso&quot;</span>
-<span class="n">__email__</span> <span class="o">=</span> <span class="s">&quot;gregcaporaso@gmail.com&quot;</span>
 
-<span class="kn">from</span> <span class="nn">pyqi.core.command</span> <span class="kn">import</span> <span class="n">Command</span><span class="p">,</span> <span class="n">Parameter</span><span class="p">,</span> <span class="n">ParameterCollection</span>
+<span class="kn">from</span> <span class="nn">pyqi.core.command</span> <span class="kn">import</span> <span class="p">(</span><span class="n">Command</span><span class="p">,</span> <span class="n">CommandIn</span><span class="p">,</span> <span class="n">CommandOut</span><span class="p">,</span>
+    <span class="n">ParameterCollection</span><span class="p">)</span>
 
 <span class="k">class</span> <span class="nc">SequenceCollectionSummarizer</span><span class="p">(</span><span class="n">Command</span><span class="p">):</span>
     <span class="n">BriefDescription</span> <span class="o">=</span> <span class="s">&quot;FILL IN A 1 SENTENCE DESCRIPTION&quot;</span>
     <span class="n">LongDescription</span> <span class="o">=</span> <span class="s">&quot;GO INTO MORE DETAIL&quot;</span>
-    <span class="n">Parameters</span> <span class="o">=</span> <span class="n">ParameterCollection</span><span class="p">([</span>
-        <span class="n">Parameter</span><span class="p">(</span><span class="n">Name</span><span class="o">=</span><span class="s">&#39;foo&#39;</span><span class="p">,</span> <span class="n">DataType</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+    <span class="n">CommandIns</span> <span class="o">=</span> <span class="n">ParameterCollection</span><span class="p">([</span>
+        <span class="n">CommandIn</span><span class="p">(</span><span class="n">Name</span><span class="o">=</span><span class="s">&#39;foo&#39;</span><span class="p">,</span> <span class="n">DataType</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
                   <span class="n">Description</span><span class="o">=</span><span class="s">&#39;some required parameter&#39;</span><span class="p">,</span> <span class="n">Required</span><span class="o">=</span><span class="bp">True</span><span class="p">),</span>
-        <span class="n">Parameter</span><span class="p">(</span><span class="n">Name</span><span class="o">=</span><span class="s">&#39;bar&#39;</span><span class="p">,</span> <span class="n">DataType</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span>
+        <span class="n">CommandIn</span><span class="p">(</span><span class="n">Name</span><span class="o">=</span><span class="s">&#39;bar&#39;</span><span class="p">,</span> <span class="n">DataType</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span>
                   <span class="n">Description</span><span class="o">=</span><span class="s">&#39;some optional parameter&#39;</span><span class="p">,</span> <span class="n">Required</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
                   <span class="n">Default</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="p">])</span>
+
+    <span class="n">CommandOuts</span> <span class="o">=</span> <span class="n">ParameterCollection</span><span class="p">([</span>
+        <span class="n">CommandOut</span><span class="p">(</span><span class="n">Name</span><span class="o">=</span><span class="s">&quot;result_1&quot;</span><span class="p">,</span> <span class="n">DataType</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">Description</span><span class="o">=</span><span class="s">&quot;xyz&quot;</span><span class="p">),</span>
+        <span class="n">CommandOut</span><span class="p">(</span><span class="n">Name</span><span class="o">=</span><span class="s">&quot;result_2&quot;</span><span class="p">,</span> <span class="n">DataType</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">Description</span><span class="o">=</span><span class="s">&quot;123&quot;</span><span class="p">),</span>
     <span class="p">])</span>
 
     <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -94,27 +92,34 @@
 <div class="section" id="defining-a-command">
 <h2>Defining a command<a class="headerlink" href="#defining-a-command" title="Permalink to this headline">¶</a></h2>
 <p>There are several values that you&#8217;ll need to fill in to define your command based on the stub that is created by <tt class="docutils literal"><span class="pre">make-command</span></tt>. The first, which are the easiest, are <tt class="docutils literal"><span class="pre">BriefDescription</span></tt> and <tt class="docutils literal"><span class="pre">LongDescription</span></tt>. <tt class="docutils literal"><span class="pre">BriefDescription</span></tt> should be a one sentence description of your command, and <tt class="docutils literal"><span class="pre">LongDescription</span></tt> should be a more detailed explanation (usually 2-3 sentences). These are used in auto-generated documentation.</p>
-<p>Next, you&#8217;ll need to define the parameters that your new command can take. Each of these parameters will be an instance of the <tt class="docutils literal"><span class="pre">pyqi.core.command.Parameter</span></tt> class.</p>
+<p>Next, you&#8217;ll need to define the parameters that your new command can take as input. Each of these parameters will be an instance of the <tt class="docutils literal"><span class="pre">pyqi.core.command.CommandIn</span></tt> class.</p>
 <p>Our <tt class="docutils literal"><span class="pre">SequenceCollectionSummarizer</span></tt> command will take one required parameter and one optional parameter. The required parameter will be called <tt class="docutils literal"><span class="pre">seqs</span></tt>, and will be a list (or some other iterable type) of tuples of (sequence identifier, sequence) pairs. For example:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="p">[(</span><span class="s">&#39;sequence1&#39;</span><span class="p">,</span><span class="s">&#39;ACCGTGGACCAA&#39;</span><span class="p">),(</span><span class="s">&#39;sequence2&#39;</span><span class="p">,</span><span class="s">&#39;TGTGGA&#39;</span><span class="p">),</span> <span class="o">...</span><span class="p">]</span>
 </pre></div>
 </div>
-<p>We&#8217;ll also need to provide a description of this parameter (used in documentation), its type, and indicate that it is required. The final Parameter definition should look like this:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">Parameter</span><span class="p">(</span><span class="n">Name</span><span class="o">=</span><span class="s">&#39;seqs&#39;</span><span class="p">,</span> <span class="n">DataType</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span>
-         <span class="n">Description</span><span class="o">=</span><span class="s">&#39;sequences to be summarized&#39;</span><span class="p">,</span> <span class="n">Required</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<p>We&#8217;ll also need to provide a description of this parameter (used in documentation), its type, and indicate that it is required. The final <tt class="docutils literal"><span class="pre">CommandIn</span></tt> definition should look like this:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">CommandIn</span><span class="p">(</span><span class="n">Name</span><span class="o">=</span><span class="s">&#39;seqs&#39;</span><span class="p">,</span> <span class="n">DataType</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span>
+          <span class="n">Description</span><span class="o">=</span><span class="s">&#39;sequences to be summarized&#39;</span><span class="p">,</span> <span class="n">Required</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>The optional parameter will be called <tt class="docutils literal"><span class="pre">suppress_length_summary</span></tt>, and if passed will indicate that we don&#8217;t want information on sequence lengths included in our output summary. The <tt class="docutils literal"><span class="pre">Parameter</span></tt> definition in this case should look like this:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">Parameter</span><span class="p">(</span><span class="n">Name</span><span class="o">=</span><span class="s">&#39;suppress_length_summary&#39;</span><span class="p">,</span> <span class="n">DataType</span><span class="o">=</span><span class="nb">bool</span><span class="p">,</span>
-         <span class="n">Description</span><span class="o">=</span><span class="s">&#39;do not generate summary information on the sequence lengths&#39;</span><span class="p">,</span>
-         <span class="n">Required</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">Default</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">CommandIn</span><span class="p">(</span><span class="n">Name</span><span class="o">=</span><span class="s">&#39;suppress_length_summary&#39;</span><span class="p">,</span> <span class="n">DataType</span><span class="o">=</span><span class="nb">bool</span><span class="p">,</span>
+          <span class="n">Description</span><span class="o">=</span><span class="s">&#39;do not generate summary information on the sequence lengths&#39;</span><span class="p">,</span>
+          <span class="n">Required</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">Default</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>The only additional <tt class="docutils literal"><span class="pre">Parameter</span></tt> that is passed here, relative to our <tt class="docutils literal"><span class="pre">seqs</span></tt> parameter, is <tt class="docutils literal"><span class="pre">Default</span></tt>. Because this parameter isn&#8217;t required, it&#8217;s necessary to give it a default value here. All of the <tt class="docutils literal"><span class="pre">Parameters</span></tt> should be included in a <tt class="docutils literal"><span class="pre">pyqi.core.command.ParameterCollection</span></tt> object (as in the stubbed file).</p>
+<p>The only additional parameter that is passed here, relative to our <tt class="docutils literal"><span class="pre">seqs</span></tt> parameter, is <tt class="docutils literal"><span class="pre">Default</span></tt>. Because this parameter isn&#8217;t required, it&#8217;s necessary to give it a default value here. All of the <tt class="docutils literal"><span class="pre">CommandIns</span></tt> should be included in a <tt class="docutils literal"><span class="pre">pyqi.core.command.ParameterCollection</span></tt> object (as in the stubbed file).</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">There are a few restrictions on what <tt class="docutils literal"><span class="pre">Name</span></tt> can be set to for a <tt class="docutils literal"><span class="pre">Parameter</span></tt>. It must be a <a class="reference external" href="http://docs.python.org/2/reference/lexical_analysis.html#identifiers">valid python identifier</a> (e.g., it cannot contain <tt class="docutils literal"><span class="pre">-</span></tt> characters or begin with a number) so the <tt class="docutils literal"><span class="pre">Command</span></tt> can be called with named options instead of passing a dict. <tt class="docutils literal"><span class="pre">Parameter</span></tt> names also must be unique for a <tt class="docutils literal"><span class="pre">Command</span></tt>.</p>
+<p class="last">There are a few restrictions on what <tt class="docutils literal"><span class="pre">Name</span></tt> can be set to for a <tt class="docutils literal"><span class="pre">Parameter</span></tt> (e.g., a <tt class="docutils literal"><span class="pre">CommandIn</span></tt> or a <tt class="docutils literal"><span class="pre">CommandOut</span></tt>). It must be a <a class="reference external" href="http://docs.python.org/2/reference/lexical_analysis.html#identifiers">valid python identifier</a> (e.g., it cannot contain <tt class="docutils literal"><span class="pre">-</span></tt> characters or begin with a number) so the <tt class="docutils literal"><span class="pre">Command</span></tt> can be called with named options instead of passing a dict. <tt class="docutils literal"><span class="pre">Parameter</span></tt> names also must be unique for a <tt class="docutils literal"><span class="pre">Command</span></tt>.</p>
 </div>
+<p>Next, you&#8217;ll need to define the results that the <tt class="docutils literal"><span class="pre">Command</span></tt> generates as output. In this example, our <tt class="docutils literal"><span class="pre">Command</span></tt> will generate three results: the number of sequences, the minimum sequence length, and the maximum sequence length. Each of these results will be an instance of the <tt class="docutils literal"><span class="pre">pyqi.core.command.CommandOut</span></tt> class. We define the name of the result, its type, and a description. The final <tt class="docutils literal"><span class="pre">CommandOuts</span></tt> should look like this:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">CommandOut</span><span class="p">(</span><span class="n">Name</span><span class="o">=</span><span class="s">&#39;num_seqs&#39;</span><span class="p">,</span> <span class="n">DataType</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">Description</span><span class="o">=</span><span class="s">&#39;number of sequences&#39;</span><span class="p">),</span>
+<span class="n">CommandOut</span><span class="p">(</span><span class="n">Name</span><span class="o">=</span><span class="s">&#39;min_length&#39;</span><span class="p">,</span> <span class="n">DataType</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">Description</span><span class="o">=</span><span class="s">&#39;minimum sequence length&#39;</span><span class="p">),</span>
+<span class="n">CommandOut</span><span class="p">(</span><span class="n">Name</span><span class="o">=</span><span class="s">&#39;max_length&#39;</span><span class="p">,</span> <span class="n">DataType</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">Description</span><span class="o">=</span><span class="s">&#39;maximum sequence length&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>All of the <tt class="docutils literal"><span class="pre">CommandOuts</span></tt> should be included in a <tt class="docutils literal"><span class="pre">pyqi.core.command.ParameterCollection</span></tt> object (as in the stubbed file).</p>
 <p>Next, we&#8217;ll need to define what our <tt class="docutils literal"><span class="pre">Command</span></tt> will actually do. This is done in the <tt class="docutils literal"><span class="pre">run</span></tt> method, and all results are returned in a dictionary. The run method for our <tt class="docutils literal"><span class="pre">SequenceCollectionSummarizer</span></tt> object would look like the following:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -132,9 +137,9 @@
         <span class="n">min_length</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">sequence_lengths</span><span class="p">)</span>
         <span class="n">max_length</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">sequence_lengths</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="p">{</span><span class="s">&#39;num-seqs&#39;</span><span class="p">:</span><span class="n">num_seqs</span><span class="p">,</span>
-            <span class="s">&#39;min-length&#39;</span><span class="p">:</span><span class="n">min_length</span><span class="p">,</span>
-            <span class="s">&#39;max-length&#39;</span><span class="p">:</span><span class="n">max_length</span><span class="p">}</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s">&#39;num_seqs&#39;</span><span class="p">:</span><span class="n">num_seqs</span><span class="p">,</span>
+            <span class="s">&#39;min_length&#39;</span><span class="p">:</span><span class="n">min_length</span><span class="p">,</span>
+            <span class="s">&#39;max_length&#39;</span><span class="p">:</span><span class="n">max_length</span><span class="p">}</span>
 </pre></div>
 </div>
 <p>In practice, if your <tt class="docutils literal"><span class="pre">Command</span></tt> is more complex than our <tt class="docutils literal"><span class="pre">SequenceCollectionSummarizer</span></tt> (which it probably is), you can define other methods that are called by <tt class="docutils literal"><span class="pre">run</span></tt>. These should likely be private methods.</p>
@@ -149,25 +154,27 @@
 <div class="highlight-python"><div class="highlight"><pre><span class="c">#!/usr/bin/env python</span>
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span>
 
-<span class="n">__author__</span> <span class="o">=</span> <span class="s">&quot;Greg Caporaso&quot;</span>
-<span class="n">__copyright__</span> <span class="o">=</span> <span class="s">&quot;Copyright 2013, Greg Caporaso&quot;</span>
 <span class="n">__credits__</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;Greg Caporaso&quot;</span><span class="p">]</span>
-<span class="n">__license__</span> <span class="o">=</span> <span class="s">&quot;BSD&quot;</span>
-<span class="n">__version__</span> <span class="o">=</span> <span class="s">&quot;0.0.1&quot;</span>
-<span class="n">__maintainer__</span> <span class="o">=</span> <span class="s">&quot;Greg Caporaso&quot;</span>
-<span class="n">__email__</span> <span class="o">=</span> <span class="s">&quot;gregcaporaso@gmail.com&quot;</span>
 
-<span class="kn">from</span> <span class="nn">pyqi.core.command</span> <span class="kn">import</span> <span class="n">Command</span><span class="p">,</span> <span class="n">Parameter</span><span class="p">,</span> <span class="n">ParameterCollection</span>
+<span class="kn">from</span> <span class="nn">pyqi.core.command</span> <span class="kn">import</span> <span class="p">(</span><span class="n">Command</span><span class="p">,</span> <span class="n">CommandIn</span><span class="p">,</span> <span class="n">CommandOut</span><span class="p">,</span>
+    <span class="n">ParameterCollection</span><span class="p">)</span>
 
 <span class="k">class</span> <span class="nc">SequenceCollectionSummarizer</span><span class="p">(</span><span class="n">Command</span><span class="p">):</span>
     <span class="n">BriefDescription</span> <span class="o">=</span> <span class="s">&quot;Generate summary statistics on a collection of sequences.&quot;</span>
     <span class="n">LongDescription</span> <span class="o">=</span> <span class="s">&quot;Provide the number of sequences, the minimum sequence length, and the maximum sequence length given a collection of sequences. Sequences should be provided as a list (or other iterable object) of tuples of (sequence id, sequence) pairs.&quot;</span>
-    <span class="n">Parameters</span> <span class="o">=</span> <span class="n">ParameterCollection</span><span class="p">([</span>
-        <span class="n">Parameter</span><span class="p">(</span><span class="n">Name</span><span class="o">=</span><span class="s">&#39;seqs&#39;</span><span class="p">,</span> <span class="n">DataType</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span>
+
+    <span class="n">CommandIns</span> <span class="o">=</span> <span class="n">ParameterCollection</span><span class="p">([</span>
+        <span class="n">CommandIn</span><span class="p">(</span><span class="n">Name</span><span class="o">=</span><span class="s">&#39;seqs&#39;</span><span class="p">,</span> <span class="n">DataType</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span>
                   <span class="n">Description</span><span class="o">=</span><span class="s">&#39;sequences to be summarized&#39;</span><span class="p">,</span> <span class="n">Required</span><span class="o">=</span><span class="bp">True</span><span class="p">),</span>
-        <span class="n">Parameter</span><span class="p">(</span><span class="n">Name</span><span class="o">=</span><span class="s">&#39;suppress_length_summary&#39;</span><span class="p">,</span> <span class="n">DataType</span><span class="o">=</span><span class="nb">bool</span><span class="p">,</span>
+        <span class="n">CommandIn</span><span class="p">(</span><span class="n">Name</span><span class="o">=</span><span class="s">&#39;suppress_length_summary&#39;</span><span class="p">,</span> <span class="n">DataType</span><span class="o">=</span><span class="nb">bool</span><span class="p">,</span>
                   <span class="n">Description</span><span class="o">=</span><span class="s">&#39;do not generate summary information on the sequence lengths&#39;</span><span class="p">,</span>
-                  <span class="n">Required</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span><span class="n">Default</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+                  <span class="n">Required</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">Default</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+    <span class="p">])</span>
+
+    <span class="n">CommandOuts</span> <span class="o">=</span> <span class="n">ParameterCollection</span><span class="p">([</span>
+        <span class="n">CommandOut</span><span class="p">(</span><span class="n">Name</span><span class="o">=</span><span class="s">&#39;num_seqs&#39;</span><span class="p">,</span> <span class="n">DataType</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">Description</span><span class="o">=</span><span class="s">&#39;number of sequences&#39;</span><span class="p">),</span>
+        <span class="n">CommandOut</span><span class="p">(</span><span class="n">Name</span><span class="o">=</span><span class="s">&#39;min_length&#39;</span><span class="p">,</span> <span class="n">DataType</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">Description</span><span class="o">=</span><span class="s">&#39;minimum sequence length&#39;</span><span class="p">),</span>
+        <span class="n">CommandOut</span><span class="p">(</span><span class="n">Name</span><span class="o">=</span><span class="s">&#39;max_length&#39;</span><span class="p">,</span> <span class="n">DataType</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">Description</span><span class="o">=</span><span class="s">&#39;maximum sequence length&#39;</span><span class="p">)</span>
     <span class="p">])</span>
 
     <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -186,9 +193,9 @@
             <span class="n">min_length</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">sequence_lengths</span><span class="p">)</span>
             <span class="n">max_length</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">sequence_lengths</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="p">{</span><span class="s">&#39;num-seqs&#39;</span><span class="p">:</span><span class="n">num_seqs</span><span class="p">,</span>
-                <span class="s">&#39;min-length&#39;</span><span class="p">:</span><span class="n">min_length</span><span class="p">,</span>
-                <span class="s">&#39;max-length&#39;</span><span class="p">:</span><span class="n">max_length</span><span class="p">}</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s">&#39;num_seqs&#39;</span><span class="p">:</span><span class="n">num_seqs</span><span class="p">,</span>
+                <span class="s">&#39;min_length&#39;</span><span class="p">:</span><span class="n">min_length</span><span class="p">,</span>
+                <span class="s">&#39;max_length&#39;</span><span class="p">:</span><span class="n">max_length</span><span class="p">}</span>
 
 <span class="n">CommandConstructor</span> <span class="o">=</span> <span class="n">SequenceCollectionSummarizer</span>
 </pre></div>
@@ -205,20 +212,20 @@
 # You can now see the full output of the command by inspecting the
 # result dictionary.
 &gt;&gt;&gt; r
-{'max-length': 12, 'min-length': 6, 'num-seqs': 2}
+{'max_length': 12, 'min_length': 6, 'num_seqs': 2}
 # Alternatively, you can access each value independently, as with any dictionary.
-&gt;&gt;&gt; print r['num-seqs']
+&gt;&gt;&gt; print r['num_seqs']
 2
-&gt;&gt;&gt; print r['min-length']
+&gt;&gt;&gt; print r['min_length']
 6
-&gt;&gt;&gt; print r['max-length']
+&gt;&gt;&gt; print r['max_length']
 12
 # You can call this command again with different input.
 # For example, we can call the command again passing the
 # suppress_length_summary parameter.
 &gt;&gt;&gt; r = s(seqs=[('sequence1','ACCGTGGACCAA'),('sequence2','TGTGGA')],suppress_length_summary=True)
 &gt;&gt;&gt; r
-{'max-length': None, 'min-length': None, 'num-seqs': 2}</pre>
+{'max_length': None, 'min_length': None, 'num_seqs': 2}</pre>
 </div>
 </div>
 </div>
@@ -235,8 +242,8 @@
 
     <div class="footer">
         &copy; Copyright 2013, The BiPy Development Team.
-      Last updated on Aug 26, 2013.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+      Last updated on Dec 04, 2013.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
     </div>
   </body>
 </html>

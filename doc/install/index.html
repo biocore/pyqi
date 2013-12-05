@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -17,7 +15,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.1.0-dev',
+        VERSION:     '0.3.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -47,19 +45,23 @@
   <div class="section" id="installing-pyqi">
 <span id="install-index"></span><h1>Installing pyqi<a class="headerlink" href="#installing-pyqi" title="Permalink to this headline">¶</a></h1>
 <p>pyqi has no dependencies outside of Python, so installing is easy.</p>
-<div class="section" id="installation-of-pyqi">
-<h2>Installation of pyqi<a class="headerlink" href="#installation-of-pyqi" title="Permalink to this headline">¶</a></h2>
-<p>There are two steps to installing pyqi:</p>
+<p>First, decide if you want to work with the release or development version of pyqi. If you work with the release version, you&#8217;ll have the most recent stable version of pyqi, but may not have access to the latest and greatest features. If you&#8217;re most interested in having access to the latest features and can tolerate some instability, you should work with the development version of pyqi. If you&#8217;re unsure about what you want here, you should likely work with the release version.</p>
+<div class="section" id="installing-pyqi-via-pip">
+<h2>Installing pyqi via pip<a class="headerlink" href="#installing-pyqi-via-pip" title="Permalink to this headline">¶</a></h2>
+<p>The easiest way to install the latest pyqi release is via pip:</p>
+<div class="highlight-python"><pre>pip install pyqi</pre>
+</div>
+<p>Instead, if you&#8217;d like to install the development version of pyqi:</p>
+<div class="highlight-python"><pre>pip install git+git://github.com/bipy/pyqi.git</pre>
+</div>
+<p>That&#8217;s it!</p>
+</div>
+<div class="section" id="manually-installing-pyqi">
+<h2>Manually installing pyqi<a class="headerlink" href="#manually-installing-pyqi" title="Permalink to this headline">¶</a></h2>
+<p>If you decided not to install pyqi using pip, you can install it manually with the following steps:</p>
 <ul class="simple">
-<li>First, decide if you want to work with the release or development version of pyqi. If you work with the release version, you&#8217;ll have the most recent stable version of pyqi, but may not have access to the latest and greatest features. If you&#8217;re most interested in having access to the latest features and can tolerate some instability, you should work with the development version of pyqi. If you&#8217;re unsure about what you want here, you should likely work with the release version.</li>
-</ul>
-<blockquote>
-<div><ul class="simple">
-<li>To use the release version of pyqi, you can download it from <a class="reference external" href="ftp://thebeast.colorado.edu/pub/pyqi-releases/pyqi-0.2.0.tar.gz">here</a>. The latest release is pyqi 0.2.0. After downloading, unzip the file with <tt class="docutils literal"><span class="pre">tar</span> <span class="pre">-xzf</span> <span class="pre">pyqi-0.2.0.tar.gz</span></tt> and change to the new <tt class="docutils literal"><span class="pre">pyqi-0.2.0</span></tt> directory.</li>
+<li>To use the release version of pyqi, you can download it from <a class="reference external" href="https://pypi.python.org/pypi/pyqi/">here</a>. The latest release is 0.3.1. After downloading, unzip the file with <tt class="docutils literal"><span class="pre">tar</span> <span class="pre">-xzf</span> <span class="pre">pyqi-x.y.z.tar.gz</span></tt> and change to the new <tt class="docutils literal"><span class="pre">pyqi-x.y.z</span></tt> directory, where x.y.z corresponds to the downloaded version.</li>
 <li>To use the latest development version of pyqi you can download it from our <a class="reference external" href="https://github.com/bipy/pyqi">GitHub repository</a> using <tt class="docutils literal"><span class="pre">git</span> <span class="pre">clone</span> <span class="pre">git&#64;github.com:bipy/pyqi.git</span></tt>. After downloading, change to the new <tt class="docutils literal"><span class="pre">pyqi</span></tt> directory.</li>
-</ul>
-</div></blockquote>
-<ul class="simple">
 <li>Next, run <tt class="docutils literal"><span class="pre">python</span> <span class="pre">setup.py</span> <span class="pre">install</span></tt>. That&#8217;s it!</li>
 </ul>
 </div>
@@ -93,8 +95,8 @@ done</pre>
 
     <div class="footer">
         &copy; Copyright 2013, The BiPy Development Team.
-      Last updated on Aug 26, 2013.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+      Last updated on Dec 04, 2013.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
     </div>
   </body>
 </html>

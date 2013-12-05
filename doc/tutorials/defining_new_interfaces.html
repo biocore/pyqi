@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -17,7 +15,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.1.0-dev',
+        VERSION:     '0.3.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -54,8 +52,8 @@
 <p>pyqi provides a command, <tt class="docutils literal"><span class="pre">make-optparse</span></tt>, that allows developers to easily stub (i.e., create templates for) their optparse interface configuration files. After installing pyqi, you can get usage information by calling:</p>
 <div class="highlight-python"><pre>pyqi make-optparse -h</pre>
 </div>
-<p>To create your interface, you&#8217;ll need to pass the <tt class="docutils literal"><span class="pre">Command</span></tt> as a fully specified python module name, the name of the module where that <tt class="docutils literal"><span class="pre">Command</span></tt> is defined, ownership information (e.g., author name, copyright, license, etc.) and the path where the new configuration file should be written. For example, to create a stub for an <tt class="docutils literal"><span class="pre">OptparseInterface</span></tt> for our <tt class="docutils literal"><span class="pre">SequenceCollectionSummarizer</span></tt> command, you could run the following:</p>
-<div class="highlight-python"><pre>pyqi make-optparse -c sequence_collection_summarizer.SequenceCollectionSummarizer -m sequence_collection_summarizer -a "Greg Caporaso" --copyright "Copyright 2013, Greg Caporaso" -e "gregcaporaso@gmail.com" -l BSD --config-version 0.0.1 -o summarize_sequence_collection.py</pre>
+<p>To create your interface, you&#8217;ll need to pass the <tt class="docutils literal"><span class="pre">Command</span></tt> as a fully specified python module name, the name of the module where that <tt class="docutils literal"><span class="pre">Command</span></tt> is defined, and the path where the new configuration file should be written. For example, to create a stub for an <tt class="docutils literal"><span class="pre">OptparseInterface</span></tt> for our <tt class="docutils literal"><span class="pre">SequenceCollectionSummarizer</span></tt> command, you could run the following:</p>
+<div class="highlight-python"><pre>pyqi make-optparse -c sequence_collection_summarizer.SequenceCollectionSummarizer -m sequence_collection_summarizer --credits "Greg Caporaso" -o summarize_sequence_collection.py</pre>
 </div>
 <div class="admonition warning">
 <p class="first admonition-title">Warning</p>
@@ -65,17 +63,12 @@
 <div class="highlight-python"><pre>#!/usr/bin/env python
 from __future__ import division
 
-__author__ = "Greg Caporaso"
-__copyright__ = "Copyright 2013, Greg Caporaso"
 __credits__ = ["Greg Caporaso"]
-__license__ = "BSD"
-__version__ = "0.0.1"
-__maintainer__ = "Greg Caporaso"
-__email__ = "gregcaporaso@gmail.com"
 
 from pyqi.core.interfaces.optparse import (OptparseUsageExample,
                                            OptparseOption, OptparseResult)
-from pyqi.core.command import make_parameter_collection_lookup_f
+from pyqi.core.command import (make_command_in_collection_lookup_f,
+                               make_command_out_collection_lookup_f)
 from sequence_collection_summarizer import CommandConstructor
 
 # If you need access to input or output handlers provided by pyqi, consider
@@ -86,7 +79,8 @@ from sequence_collection_summarizer import CommandConstructor
 # pyqi.interfaces.optparse.output_handler
 
 # Convenience function for looking up parameters by name.
-param_lookup = make_parameter_collection_lookup_f(CommandConstructor)
+cmd_in_lookup = make_command_in_collection_lookup_f(CommandConstructor)
+cmd_out_lookup = make_command_out_collection_lookup_f(CommandConstructor)
 
 # Examples of how the command can be used from the command line using an
 # optparse interface.
@@ -100,10 +94,10 @@ usage_examples = [
 # to define options here that do not exist as parameters, e.g., an output file.
 inputs = [
     # An example option that has a direct relationship with a Parameter.
-    # OptparseOption(Parameter=param_lookup('name_of_a_parameter'),
-    #                InputType='existing_filepath', # the optparse type of input
-    #                InputAction='store', # the optparse action
-    #                InputHandler=None, # Apply a function to the input value to convert it into the type expected by Parameter.DataType
+    # OptparseOption(Parameter=cmd_in_lookup('name_of_a_command_in'),
+    #                Type='existing_filepath', # the optparse type of input
+    #                Action='store', # the optparse action
+    #                Handler=None, # Apply a function to the input value to convert it into the type expected by Parameter.DataType
     #                ShortName='n', # a parameter short name, can be None
     #                # Name='foo', # implied by Parameter.Name. Can be overwritten here if desired
     #                # Required=False, # implied by Parameter.Required. Can be promoted by setting True
@@ -114,66 +108,69 @@ inputs = [
     #
     # An example option that does not have an associated Parameter.
     # OptparseOption(Parameter=None,
-    #                InputType='new_filepath',
-    #                InputAction='store',
-    #                InputHandler=None, # we don't need an InputHandler because this option isn't being converted into a format that a Parameter expects
+    #                Type='new_filepath',
+    #                Action='store',
+    #                Handler=None, # we don't need a Handler because this option isn't being converted into a format that a Parameter expects
     #                ShortName='o',
     #                Name='output-fp',
     #                Required=True,
     #                Help='output filepath')
 
-    OptparseOption(Parameter=param_lookup('seqs'),
-                   InputType=&lt;type 'list'&gt;,
-                   InputAction='store', # default is 'store', change if desired
-                   InputHandler=None, # must be defined if desired
-                   ShortName=None), # must be defined if desired
+    OptparseOption(Parameter=cmd_in_lookup('seqs'),
+                   Type=&lt;type 'list'&gt;,
+                   Action='store', # default is 'store', change if desired
+                   Handler=None, # must be defined if desired
+                   ShortName=None, # must be defined if desired
                    # Name='seqs', # implied by Parameter
                    # Required=True, # implied by Parameter
                    # Help='sequences to be summarized', # implied by Parameter
-
-    OptparseOption(Parameter=param_lookup('suppress_length_summary'),
-                   InputType=&lt;type 'bool'&gt;,
-                   InputAction='store', # default is 'store', change if desired
-                   InputHandler=None, # must be defined if desired
-                   ShortName=None), # must be defined if desired
+                   ),
+    OptparseOption(Parameter=cmd_in_lookup('suppress_length_summary'),
+                   Type=None,
+                   Action='store_true', # default is 'store', change if desired
+                   Handler=None, # must be defined if desired
+                   ShortName=None, # must be defined if desired
                    # Name='suppress_length_summary', # implied by Parameter
                    # Required=False, # implied by Parameter
                    # Help='do not generate summary information on the sequence lengths', # implied by Parameter
                    # Default=False, # implied by Parameter
-                   # DefaultDescription=None, # implied by Parameter
-
-
+                   # DefaultDescription=None, # implied by Parameter),
 ]
 
 # outputs map result keys to output options and handlers. It is not necessary
 # to supply an associated option, but if you do, it must be an option from the
 # inputs list (above).
 outputs = [
-    # An example option that maps to a result key.
-    # OptparseResult(ResultKey='some_result',
-    #                OutputHandler=write_string, # a function applied to the value at ResultKey
-    #
+    # An example option that maps to a CommandIn.
+    # OptparseResult(Parameter=cmd_out_lookup('name_of_a_command_out'),
+    #                Handler=write_string, # a function applied to the output of the Command
     #                # the name of the option (defined in inputs, above), whose
-    #                # value will be made available to OutputHandler. This name
+    #                # value will be made available to Handler. This name
     #                # can be either an underscored or dashed version of the
     #                # option name (e.g., 'output_fp' or 'output-fp')
-    #                OptionName='output-fp'),
+    #                InputName='output-fp'),
     #
-    # An example option that does not map to a result key.
-    # OptparseResult(ResultKey='some_other_result',
-    #                OutputHandler=print_string)
+    # An example option that does not map to a CommandIn.
+    # OptparseResult(Parameter=cmd_out_lookup('some_other_result'),
+    #                Handler=print_string)
+
+    OptparseResult(Parameter=cmd_out_lookup('max_length'),
+                    Handler=None, # must be defined
+                    InputName=None), # define if tying to an OptparseOption
+    OptparseResult(Parameter=cmd_out_lookup('min_length'),
+                    Handler=None, # must be defined
+                    InputName=None), # define if tying to an OptparseOption
+    OptparseResult(Parameter=cmd_out_lookup('num_seqs'),
+                    Handler=None, # must be defined
+                    InputName=None), # define if tying to an OptparseOption
 ]</pre>
 </div>
-<p>There are three lists of values that we&#8217;ll need to populate here to define the optparse interface for our <tt class="docutils literal"><span class="pre">SequenceCollectionSummarizer</span></tt> command. These are the <tt class="docutils literal"><span class="pre">inputs</span></tt>, the <tt class="docutils literal"><span class="pre">outputs</span></tt>, and the <tt class="docutils literal"><span class="pre">usage_examples</span></tt>. We&#8217;ll also need to define an input handler and an output handler to tell the <tt class="docutils literal"><span class="pre">OptparseInterface</span></tt> how to take input from the command line and turn it into something that <tt class="docutils literal"><span class="pre">SequenceCollectionSummarizer</span></tt> can use, and to take output from <tt class="docutils literal"><span class="pre">SequenceCollectionSummarizer</span></tt> and turn it into something a command line user will want. <tt class="docutils literal"><span class="pre">make-optparse</span></tt> will auto-populate the <tt class="docutils literal"><span class="pre">inputs</span></tt> based on the <tt class="docutils literal"><span class="pre">Parameters</span></tt>, but some changes will usually be required (detailed below). The following sections describe each of these steps.</p>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">There is a fourth value that is required when defining an optparse interface, which is the version string of the command/interface (e.g., <tt class="docutils literal"><span class="pre">0.0.1</span></tt>). This value has already been filled in for us in the configuration file template (see <tt class="docutils literal"><span class="pre">__version__</span></tt> at the top of the file). You can specify the version string when creating the configuration file template via <tt class="docutils literal"><span class="pre">--config-version</span></tt>. In the example above, we specified a version string of <tt class="docutils literal"><span class="pre">0.0.1</span></tt>.</p>
-</div>
+<p>There are three lists of values that we&#8217;ll need to populate here to define the optparse interface for our <tt class="docutils literal"><span class="pre">SequenceCollectionSummarizer</span></tt> command. These are the <tt class="docutils literal"><span class="pre">inputs</span></tt>, the <tt class="docutils literal"><span class="pre">outputs</span></tt>, and the <tt class="docutils literal"><span class="pre">usage_examples</span></tt>. We&#8217;ll also need to define an input handler and an output handler to tell the <tt class="docutils literal"><span class="pre">OptparseInterface</span></tt> how to take input from the command line and turn it into something that <tt class="docutils literal"><span class="pre">SequenceCollectionSummarizer</span></tt> can use, and to take output from <tt class="docutils literal"><span class="pre">SequenceCollectionSummarizer</span></tt> and turn it into something a command line user will want. <tt class="docutils literal"><span class="pre">make-optparse</span></tt> will auto-populate the <tt class="docutils literal"><span class="pre">inputs</span></tt>  and <tt class="docutils literal"><span class="pre">outputs</span></tt> based on the <tt class="docutils literal"><span class="pre">CommandIns</span></tt> and <tt class="docutils literal"><span class="pre">CommandOuts</span></tt>, but some changes will usually be required (detailed below). The following sections describe each of these steps.</p>
 </div>
 <div class="section" id="defining-usage-examples">
 <h2>Defining usage examples<a class="headerlink" href="#defining-usage-examples" title="Permalink to this headline">¶</a></h2>
 <p>The first thing to do when defining the <tt class="docutils literal"><span class="pre">OptparseInterface</span></tt> for our <tt class="docutils literal"><span class="pre">SequenceCollectionSummarizer</span></tt> command is define a set of usage examples. While in practice this documentation step may seem like something you&#8217;d want to do last, it&#8217;s really helpful to do first to get you thinking about how you&#8217;d like to interact with your command from the command line.</p>
-<p>Usage examples are defined as instances of the <tt class="docutils literal"><span class="pre">pyqi.interface.optparse.UsageExample</span></tt> class, and are instantiated with three parameters: <tt class="docutils literal"><span class="pre">ShortDescription</span></tt>, <tt class="docutils literal"><span class="pre">LongDescription</span></tt>, and <tt class="docutils literal"><span class="pre">Ex</span></tt>. <tt class="docutils literal"><span class="pre">Ex</span></tt> is the usage example itself, <tt class="docutils literal"><span class="pre">ShortDescription</span></tt> is a one sentence description of what <tt class="docutils literal"><span class="pre">Ex</span></tt> will do, and <tt class="docutils literal"><span class="pre">LongDescription</span></tt> elaborates on what <tt class="docutils literal"><span class="pre">Ex</span></tt> does. Find the <tt class="docutils literal"><span class="pre">usage_examples</span></tt> list in your new <tt class="docutils literal"><span class="pre">summarize_sequence_collection.py</span></tt> file, and replace its definition with:</p>
+<p>Usage examples are defined as instances of the <tt class="docutils literal"><span class="pre">pyqi.core.interfaces.optparse.OptparseUsageExample</span></tt> class, and are instantiated with three parameters: <tt class="docutils literal"><span class="pre">ShortDescription</span></tt>, <tt class="docutils literal"><span class="pre">LongDescription</span></tt>, and <tt class="docutils literal"><span class="pre">Ex</span></tt>. <tt class="docutils literal"><span class="pre">Ex</span></tt> is the usage example itself, <tt class="docutils literal"><span class="pre">ShortDescription</span></tt> is a one sentence description of what <tt class="docutils literal"><span class="pre">Ex</span></tt> will do, and <tt class="docutils literal"><span class="pre">LongDescription</span></tt> elaborates on what <tt class="docutils literal"><span class="pre">Ex</span></tt> does. Find the <tt class="docutils literal"><span class="pre">usage_examples</span></tt> list in your new <tt class="docutils literal"><span class="pre">summarize_sequence_collection.py</span></tt> file, and replace its definition with:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">usage_examples</span> <span class="o">=</span> <span class="p">[</span>
     <span class="n">OptparseUsageExample</span><span class="p">(</span><span class="n">ShortDesc</span><span class="o">=</span><span class="s">&quot;Summarize the input sequence collection and write the result to file.&quot;</span><span class="p">,</span>
                          <span class="n">LongDesc</span><span class="o">=</span><span class="s">&quot;Read the file specified by -i, and compute the number of sequences in the file, and the minimum and maximum sequence lengths. Write all of that information to path specified by -o.&quot;</span><span class="p">,</span>
@@ -188,44 +185,44 @@ outputs = [
 <blockquote>
 <div><div class="admonition warning">
 <p class="first admonition-title">Warning</p>
-<p class="last">You shouldn&#8217;t ever include the name of the script when defining <tt class="docutils literal"><span class="pre">UsageExample.Ex</span></tt>, but instead include the text <tt class="docutils literal"><span class="pre">%prog</span></tt>. This will be automatically replaced with the script name, so if you ever change the name of the script in the future, the change will take effect in all of your usage examples without you having to remember to update them.</p>
+<p class="last">You shouldn&#8217;t ever include the name of the script when defining <tt class="docutils literal"><span class="pre">OptparseUsageExample.Ex</span></tt>, but instead include the text <tt class="docutils literal"><span class="pre">%prog</span></tt>. This will be automatically replaced with the script name, so if you ever change the name of the script in the future, the change will take effect in all of your usage examples without you having to remember to update them.</p>
 </div>
 </div></blockquote>
 </div>
 <div class="section" id="defining-inputs">
 <h2>Defining inputs<a class="headerlink" href="#defining-inputs" title="Permalink to this headline">¶</a></h2>
-<p>Next we&#8217;ll define the list of <tt class="docutils literal"><span class="pre">inputs</span></tt> that should be associated with our <tt class="docutils literal"><span class="pre">OptparseInterface</span></tt>. Each of these inputs will be an instance of a <tt class="docutils literal"><span class="pre">pyqi.core.interface.optparse.OptparseOption</span></tt> object. These will roughly map on to the <tt class="docutils literal"><span class="pre">Parameters</span></tt> that we defined for <tt class="docutils literal"><span class="pre">SequenceCollectionSummarizer</span></tt>, but there are usually additional interface options relative to command parameters, as we&#8217;ll see here.</p>
-<p>For the <tt class="docutils literal"><span class="pre">OptparseOptions</span></tt> that map onto <tt class="docutils literal"><span class="pre">Parameters</span></tt> directly, you can look up the corresponding <tt class="docutils literal"><span class="pre">Parameter</span></tt> in the <tt class="docutils literal"><span class="pre">param_lookup</span></tt> dictionary (which is created for you by <tt class="docutils literal"><span class="pre">make-optparse</span></tt>), and most of the information in the <tt class="docutils literal"><span class="pre">OptparseOption</span></tt> will be auto-populated for you. <tt class="docutils literal"><span class="pre">make-optparse</span></tt> will actually fill in as much information as possible for each <tt class="docutils literal"><span class="pre">OptparseOption</span></tt> that corresponds to an existing <tt class="docutils literal"><span class="pre">Parameter</span></tt>.</p>
-<p>In our example, you&#8217;ll notice that there are two <tt class="docutils literal"><span class="pre">OptparseOptions</span></tt> that are already defined. There are a few values that may need to be changed here. In almost all cases, you&#8217;ll need to change the <tt class="docutils literal"><span class="pre">InputType</span></tt>, which is set to the <tt class="docutils literal"><span class="pre">Parameter</span></tt>&#8216; <tt class="docutils literal"><span class="pre">DataType</span></tt> value by default, but should be updated to the <tt class="docutils literal"><span class="pre">optparse</span></tt> type. You can find discussion of these types in the <a class="reference internal" href="#optparse-types"><em>optparse type definitions</em></a> section. Note that the <tt class="docutils literal"><span class="pre">InputType</span></tt> should be <tt class="docutils literal"><span class="pre">None</span></tt> for command line flags, as the type describes the value that is passed via that option, and command line flags don&#8217;t take a value. The other value that often will need to be changed is <tt class="docutils literal"><span class="pre">InputHandler</span></tt>, which tells <tt class="docutils literal"><span class="pre">OptparseInterface</span></tt> how to transform the <tt class="docutils literal"><span class="pre">OptparseOption</span></tt> into the corresponding <tt class="docutils literal"><span class="pre">Parameter</span></tt>. In our case, for our <tt class="docutils literal"><span class="pre">seqs</span></tt> <tt class="docutils literal"><span class="pre">OptparseOption</span></tt>, that involves converting a filepath into a list of tuples of (sequence id, sequence) pairs. First let&#8217;s define the <tt class="docutils literal"><span class="pre">OptparseOptions</span></tt>, and then we&#8217;ll define a new <tt class="docutils literal"><span class="pre">InputHandler</span></tt>.</p>
-<p>The <tt class="docutils literal"><span class="pre">OptparseOptions</span></tt> corresponding to the existing <tt class="docutils literal"><span class="pre">Parameters</span></tt> should look like this:</p>
+<p>Next we&#8217;ll define the list of <tt class="docutils literal"><span class="pre">inputs</span></tt> that should be associated with our <tt class="docutils literal"><span class="pre">OptparseInterface</span></tt>. Each of these inputs will be an instance of a <tt class="docutils literal"><span class="pre">pyqi.core.interface.optparse.OptparseOption</span></tt> object. These will roughly map on to the <tt class="docutils literal"><span class="pre">CommandIns</span></tt> that we defined for <tt class="docutils literal"><span class="pre">SequenceCollectionSummarizer</span></tt>, but there are usually additional interface options relative to command parameters, as we&#8217;ll see here.</p>
+<p>For the <tt class="docutils literal"><span class="pre">OptparseOptions</span></tt> that map onto <tt class="docutils literal"><span class="pre">CommandIns</span></tt> directly, you can look up the corresponding <tt class="docutils literal"><span class="pre">CommandIn</span></tt> in the <tt class="docutils literal"><span class="pre">cmd_in_lookup</span></tt> dictionary (which is created for you by <tt class="docutils literal"><span class="pre">make-optparse</span></tt>), and most of the information in the <tt class="docutils literal"><span class="pre">OptparseOption</span></tt> will be auto-populated for you. <tt class="docutils literal"><span class="pre">make-optparse</span></tt> will actually fill in as much information as possible for each <tt class="docutils literal"><span class="pre">OptparseOption</span></tt> that corresponds to an existing <tt class="docutils literal"><span class="pre">CommandIn</span></tt>.</p>
+<p>In our example, you&#8217;ll notice that there are two <tt class="docutils literal"><span class="pre">OptparseOptions</span></tt> that are already defined. There are a few values that may need to be changed here. In almost all cases, you&#8217;ll need to change the <tt class="docutils literal"><span class="pre">Type</span></tt>, which is set to the <tt class="docutils literal"><span class="pre">CommandIn</span></tt>&#8216;s <tt class="docutils literal"><span class="pre">DataType</span></tt> value by default, but should be updated to the <tt class="docutils literal"><span class="pre">optparse</span></tt> type. You can find discussion of these types in the <a class="reference internal" href="#optparse-types"><em>optparse type definitions</em></a> section. Note that the <tt class="docutils literal"><span class="pre">Type</span></tt> should be <tt class="docutils literal"><span class="pre">None</span></tt> for command line flags, as the type describes the value that is passed via that option, and command line flags don&#8217;t take a value. The other value that often will need to be changed is <tt class="docutils literal"><span class="pre">Handler</span></tt>, which tells <tt class="docutils literal"><span class="pre">OptparseInterface</span></tt> how to transform the <tt class="docutils literal"><span class="pre">OptparseOption</span></tt> into the corresponding <tt class="docutils literal"><span class="pre">CommandIn</span></tt>. In our case, for our <tt class="docutils literal"><span class="pre">seqs</span></tt> <tt class="docutils literal"><span class="pre">OptparseOption</span></tt>, that involves converting a filepath into a list of tuples of (sequence id, sequence) pairs. First let&#8217;s define the <tt class="docutils literal"><span class="pre">OptparseOptions</span></tt>, and then we&#8217;ll define a new <tt class="docutils literal"><span class="pre">Handler</span></tt>.</p>
+<p>The <tt class="docutils literal"><span class="pre">OptparseOptions</span></tt> corresponding to the existing <tt class="docutils literal"><span class="pre">CommandIns</span></tt> should look like this:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">inputs</span> <span class="o">=</span> <span class="p">[</span>
 
-    <span class="n">OptparseOption</span><span class="p">(</span><span class="n">Parameter</span><span class="o">=</span><span class="n">param_lookup</span><span class="p">(</span><span class="s">&#39;seqs&#39;</span><span class="p">),</span>
-                   <span class="n">InputType</span><span class="o">=</span><span class="s">&#39;existing_filepath&#39;</span><span class="p">,</span>
-                   <span class="n">InputAction</span><span class="o">=</span><span class="s">&#39;store&#39;</span><span class="p">,</span>
-                   <span class="n">InputHandler</span><span class="o">=</span><span class="n">parse_fasta</span><span class="p">,</span>
+    <span class="n">OptparseOption</span><span class="p">(</span><span class="n">Parameter</span><span class="o">=</span><span class="n">cmd_in_lookup</span><span class="p">(</span><span class="s">&#39;seqs&#39;</span><span class="p">),</span>
+                   <span class="n">Type</span><span class="o">=</span><span class="s">&#39;existing_filepath&#39;</span><span class="p">,</span>
+                   <span class="n">Action</span><span class="o">=</span><span class="s">&#39;store&#39;</span><span class="p">,</span>
+                   <span class="n">Handler</span><span class="o">=</span><span class="n">parse_fasta</span><span class="p">,</span>
                    <span class="n">ShortName</span><span class="o">=</span><span class="s">&#39;i&#39;</span><span class="p">),</span>
 
-    <span class="n">OptparseOption</span><span class="p">(</span><span class="n">Parameter</span><span class="o">=</span><span class="n">param_lookup</span><span class="p">(</span><span class="s">&#39;suppress_length_summary&#39;</span><span class="p">),</span>
-                   <span class="n">InputType</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-                   <span class="n">InputAction</span><span class="o">=</span><span class="s">&#39;store_true&#39;</span><span class="p">,</span>
-                   <span class="n">InputHandler</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+    <span class="n">OptparseOption</span><span class="p">(</span><span class="n">Parameter</span><span class="o">=</span><span class="n">cmd_in_lookup</span><span class="p">(</span><span class="s">&#39;suppress_length_summary&#39;</span><span class="p">),</span>
+                   <span class="n">Type</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                   <span class="n">Action</span><span class="o">=</span><span class="s">&#39;store_true&#39;</span><span class="p">,</span>
+                   <span class="n">Handler</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                    <span class="n">ShortName</span><span class="o">=</span><span class="bp">None</span><span class="p">),</span>
 <span class="p">]</span>
 </pre></div>
 </div>
-<p>These definitions are exactly as generated by <tt class="docutils literal"><span class="pre">make-optparse</span></tt>, except that many of the comments have been removed, and we&#8217;ve modified the <tt class="docutils literal"><span class="pre">InputTypes</span></tt> and the <tt class="docutils literal"><span class="pre">InputHandler</span></tt> for our <tt class="docutils literal"><span class="pre">seqs</span></tt> option. In the <a class="reference internal" href="#defining-input-handlers"><em>next section</em></a> we&#8217;ll define this new <tt class="docutils literal"><span class="pre">parse_fasta</span></tt> input handler, but first we&#8217;ll add one more OptparseOption which is specific to our command line interface.</p>
-<p>The output from our <tt class="docutils literal"><span class="pre">SequenceCollectionSummarizer</span></tt> is a dictionary, where some of the values are integers and some of the values may be <tt class="docutils literal"><span class="pre">None</span></tt>. Generally a command line user will want to have information printed to stdout or to file. We&#8217;ll define our interface so that the output is written to file with some basic formatting put in place. To do this, we need to define a new OptparseOption to allow the user to specify the path where output should be written. This <tt class="docutils literal"><span class="pre">OptparseOption</span></tt> does not map onto one of our existing <tt class="docutils literal"><span class="pre">Parameters</span></tt>, and should be defined as follows:</p>
+<p>These definitions are exactly as generated by <tt class="docutils literal"><span class="pre">make-optparse</span></tt>, except that many of the comments have been removed, and we&#8217;ve modified the <tt class="docutils literal"><span class="pre">Types</span></tt> and the <tt class="docutils literal"><span class="pre">Handler</span></tt> for our <tt class="docutils literal"><span class="pre">seqs</span></tt> option. In the <a class="reference internal" href="#defining-input-handlers"><em>next section</em></a> we&#8217;ll define this new <tt class="docutils literal"><span class="pre">parse_fasta</span></tt> input handler, but first we&#8217;ll add one more <tt class="docutils literal"><span class="pre">OptparseOption</span></tt> which is specific to our command line interface.</p>
+<p>The output from our <tt class="docutils literal"><span class="pre">SequenceCollectionSummarizer</span></tt> is a dictionary, where some of the values are integers and some of the values may be <tt class="docutils literal"><span class="pre">None</span></tt>. Generally a command line user will want to have information printed to stdout or to file. We&#8217;ll define our interface so that the output is written to file with some basic formatting put in place. To do this, we need to define a new <tt class="docutils literal"><span class="pre">OptparseOption</span></tt> to allow the user to specify the path where output should be written. This <tt class="docutils literal"><span class="pre">OptparseOption</span></tt> does not map onto one of our existing <tt class="docutils literal"><span class="pre">CommandIns</span></tt>, and should be defined as follows:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">OptparseOption</span><span class="p">(</span><span class="n">Parameter</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-               <span class="n">InputType</span><span class="o">=</span><span class="s">&#39;new_filepath&#39;</span><span class="p">,</span>
-               <span class="n">InputAction</span><span class="o">=</span><span class="s">&#39;store&#39;</span><span class="p">,</span>
+               <span class="n">Type</span><span class="o">=</span><span class="s">&#39;new_filepath&#39;</span><span class="p">,</span>
+               <span class="n">Action</span><span class="o">=</span><span class="s">&#39;store&#39;</span><span class="p">,</span>
                <span class="n">ShortName</span><span class="o">=</span><span class="s">&#39;o&#39;</span><span class="p">,</span>
                <span class="n">Name</span><span class="o">=</span><span class="s">&#39;output-fp&#39;</span><span class="p">,</span>
                <span class="n">Required</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
                <span class="n">Help</span><span class="o">=</span><span class="s">&#39;path where output should be written&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Notice the <tt class="docutils literal"><span class="pre">Parameter=None</span></tt> parameter here: this indicates that this <tt class="docutils literal"><span class="pre">OptparseOption</span></tt> does not correspond to one of the <tt class="docutils literal"><span class="pre">SequenceCollectionSummarizer</span></tt> parameters.</p>
+<p>Notice the <tt class="docutils literal"><span class="pre">Parameter=None</span></tt> parameter here: this indicates that this <tt class="docutils literal"><span class="pre">OptparseOption</span></tt> does not correspond to one of the <tt class="docutils literal"><span class="pre">SequenceCollectionSummarizer</span></tt> <tt class="docutils literal"><span class="pre">CommandIns</span></tt>.</p>
 <p>You should include this <tt class="docutils literal"><span class="pre">OptparseOption</span></tt> definition in the <tt class="docutils literal"><span class="pre">inputs</span></tt> list to define the three options for our command line interface.</p>
 </div>
 <div class="section" id="defining-input-handlers">
@@ -266,24 +263,24 @@ outputs = [
 <h2>Defining outputs<a class="headerlink" href="#defining-outputs" title="Permalink to this headline">¶</a></h2>
 <p>The last thing we need to do is define which of the outputs generated by <tt class="docutils literal"><span class="pre">SequenceCollectionSummarizer</span></tt> are things we care about with this interface, and tell our <tt class="docutils literal"><span class="pre">OptparseInterface</span></tt> how to handle those. We do this by defining the <tt class="docutils literal"><span class="pre">outputs</span></tt> list of <tt class="docutils literal"><span class="pre">pyqi.core.interfaces.optparse.OptparseResult</span></tt> objects. In our case, we&#8217;ll want to write all of the values that are not <tt class="docutils literal"><span class="pre">None</span></tt> to the filepath specified by the user with <tt class="docutils literal"><span class="pre">output-fp</span></tt>. To do that, we need to handle three possible outputs, so we&#8217;ll define those outputs and write an output handler. You should start with the stubbed <tt class="docutils literal"><span class="pre">outputs</span></tt> list to define how you want to handle each of the parameters. We&#8217;ll do this as follows:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">outputs</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="n">OptparseResult</span><span class="p">(</span><span class="n">ResultKey</span><span class="o">=</span><span class="s">&#39;num-seqs&#39;</span><span class="p">,</span>
-                   <span class="n">OutputHandler</span><span class="o">=</span><span class="n">append_datum_to_file</span><span class="p">,</span>
-                   <span class="n">OptionName</span><span class="o">=</span><span class="s">&#39;output-fp&#39;</span><span class="p">),</span>
-    <span class="n">OptparseResult</span><span class="p">(</span><span class="n">ResultKey</span><span class="o">=</span><span class="s">&#39;min-length&#39;</span><span class="p">,</span>
-                   <span class="n">OutputHandler</span><span class="o">=</span><span class="n">append_datum_to_file</span><span class="p">,</span>
-                   <span class="n">OptionName</span><span class="o">=</span><span class="s">&#39;output-fp&#39;</span><span class="p">),</span>
-    <span class="n">OptparseResult</span><span class="p">(</span><span class="n">ResultKey</span><span class="o">=</span><span class="s">&#39;max-length&#39;</span><span class="p">,</span>
-                   <span class="n">OutputHandler</span><span class="o">=</span><span class="n">append_datum_to_file</span><span class="p">,</span>
-                   <span class="n">OptionName</span><span class="o">=</span><span class="s">&#39;output-fp&#39;</span><span class="p">),</span>
+    <span class="n">OptparseResult</span><span class="p">(</span><span class="n">Parameter</span><span class="o">=</span><span class="n">cmd_out_lookup</span><span class="p">(</span><span class="s">&#39;num_seqs&#39;</span><span class="p">),</span>
+                   <span class="n">Handler</span><span class="o">=</span><span class="n">append_datum_to_file</span><span class="p">,</span>
+                   <span class="n">InputName</span><span class="o">=</span><span class="s">&#39;output-fp&#39;</span><span class="p">),</span>
+    <span class="n">OptparseResult</span><span class="p">(</span><span class="n">Parameter</span><span class="o">=</span><span class="n">cmd_out_lookup</span><span class="p">(</span><span class="s">&#39;min_length&#39;</span><span class="p">),</span>
+                   <span class="n">Handler</span><span class="o">=</span><span class="n">append_datum_to_file</span><span class="p">,</span>
+                   <span class="n">InputName</span><span class="o">=</span><span class="s">&#39;output-fp&#39;</span><span class="p">),</span>
+    <span class="n">OptparseResult</span><span class="p">(</span><span class="n">Parameter</span><span class="o">=</span><span class="n">cmd_out_lookup</span><span class="p">(</span><span class="s">&#39;max_length&#39;</span><span class="p">),</span>
+                   <span class="n">Handler</span><span class="o">=</span><span class="n">append_datum_to_file</span><span class="p">,</span>
+                   <span class="n">InputName</span><span class="o">=</span><span class="s">&#39;output-fp&#39;</span><span class="p">),</span>
 
 <span class="p">]</span>
 </pre></div>
 </div>
-<p>In this case, each of our <tt class="docutils literal"><span class="pre">OptparseResults</span></tt> are associated with a single <tt class="docutils literal"><span class="pre">OptionName</span></tt>: <tt class="docutils literal"><span class="pre">output-fp</span></tt>. We do this because each of these should be written to the same file, but in practice each of these could be associated with different <tt class="docutils literal"><span class="pre">OptionNames</span></tt> (e.g., if each should be written to a different file), or <tt class="docutils literal"><span class="pre">OptionName=None</span></tt>, if (for example) a particular result should be written to stdout or stderr. We&#8217;ll next define the new output handler, <tt class="docutils literal"><span class="pre">append_datum_to_file</span></tt>, used by each of these <tt class="docutils literal"><span class="pre">OptparseResult</span></tt> objects.</p>
+<p>In this case, each of our <tt class="docutils literal"><span class="pre">OptparseResults</span></tt> are associated with a single <tt class="docutils literal"><span class="pre">InputName</span></tt>: <tt class="docutils literal"><span class="pre">output-fp</span></tt>. We do this because each of these should be written to the same file, but in practice each of these could be associated with different <tt class="docutils literal"><span class="pre">InputNames</span></tt> (e.g., if each should be written to a different file), or <tt class="docutils literal"><span class="pre">InputName=None</span></tt>, if (for example) a particular result should be written to stdout or stderr. We&#8217;ll next define the new output handler, <tt class="docutils literal"><span class="pre">append_datum_to_file</span></tt>, used by each of these <tt class="docutils literal"><span class="pre">OptparseResult</span></tt> objects.</p>
 </div>
 <div class="section" id="defining-output-handlers">
 <h2>Defining output handlers<a class="headerlink" href="#defining-output-handlers" title="Permalink to this headline">¶</a></h2>
-<p>Each of these <tt class="docutils literal"><span class="pre">OptparseResult</span></tt> objects uses the same <tt class="docutils literal"><span class="pre">OutputHandler</span></tt>, which we need to define now. This will take the result and write it to the file specified by the user as <tt class="docutils literal"><span class="pre">output-fp</span></tt>. This should look like the following:</p>
+<p>Each of these <tt class="docutils literal"><span class="pre">OptparseResult</span></tt> objects use the same <tt class="docutils literal"><span class="pre">Handler</span></tt>, which we need to define now. This will take the result and write it to the file specified by the user as <tt class="docutils literal"><span class="pre">output-fp</span></tt>. This should look like the following:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">append_datum_to_file</span><span class="p">(</span><span class="n">result_key</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">option_value</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Append summary information to a file.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -313,22 +310,16 @@ outputs = [
 <div class="highlight-python"><div class="highlight"><pre><span class="c">#!/usr/bin/env python</span>
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span>
 
-<span class="n">__author__</span> <span class="o">=</span> <span class="s">&quot;Greg Caporaso&quot;</span>
-<span class="n">__copyright__</span> <span class="o">=</span> <span class="s">&quot;Copyright 2013, Greg Caporaso&quot;</span>
 <span class="n">__credits__</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;Greg Caporaso&quot;</span><span class="p">]</span>
-<span class="n">__license__</span> <span class="o">=</span> <span class="s">&quot;BSD&quot;</span>
-<span class="n">__version__</span> <span class="o">=</span> <span class="s">&quot;0.0.1&quot;</span>
-<span class="n">__maintainer__</span> <span class="o">=</span> <span class="s">&quot;Greg Caporaso&quot;</span>
-<span class="n">__email__</span> <span class="o">=</span> <span class="s">&quot;gregcaporaso@gmail.com&quot;</span>
 
 <span class="kn">from</span> <span class="nn">pyqi.core.interfaces.optparse</span> <span class="kn">import</span> <span class="p">(</span><span class="n">OptparseUsageExample</span><span class="p">,</span>
                                            <span class="n">OptparseOption</span><span class="p">,</span> <span class="n">OptparseResult</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">pyqi.core.command</span> <span class="kn">import</span> <span class="n">make_parameter_collection_lookup_f</span>
+<span class="kn">from</span> <span class="nn">pyqi.core.command</span> <span class="kn">import</span> <span class="p">(</span><span class="n">make_command_in_collection_lookup_f</span><span class="p">,</span>
+                               <span class="n">make_command_out_collection_lookup_f</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">sequence_collection_summarizer</span> <span class="kn">import</span> <span class="n">CommandConstructor</span>
-<span class="kn">from</span> <span class="nn">pyqi.core.exception</span> <span class="kn">import</span> <span class="n">IncompetentDeveloperError</span>
-<span class="kn">import</span> <span class="nn">os</span>
 
-<span class="n">param_lookup</span> <span class="o">=</span> <span class="n">make_parameter_collection_lookup_f</span><span class="p">(</span><span class="n">CommandConstructor</span><span class="p">)</span>
+<span class="n">cmd_in_lookup</span> <span class="o">=</span> <span class="n">make_command_in_collection_lookup_f</span><span class="p">(</span><span class="n">CommandConstructor</span><span class="p">)</span>
+<span class="n">cmd_out_lookup</span> <span class="o">=</span> <span class="n">make_command_out_collection_lookup_f</span><span class="p">(</span><span class="n">CommandConstructor</span><span class="p">)</span>
 
 <span class="k">def</span> <span class="nf">parse_fasta</span><span class="p">(</span><span class="n">fp</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -356,6 +347,7 @@ outputs = [
         <span class="k">else</span><span class="p">:</span>
             <span class="n">seq</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
     <span class="k">yield</span> <span class="n">seq_id</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">seq</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
 <span class="k">def</span> <span class="nf">append_datum_to_file</span><span class="p">(</span><span class="n">result_key</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">option_value</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Append summary information to a file.</span>
@@ -388,22 +380,19 @@ outputs = [
 <span class="p">]</span>
 
 <span class="n">inputs</span> <span class="o">=</span> <span class="p">[</span>
-
-    <span class="n">OptparseOption</span><span class="p">(</span><span class="n">Parameter</span><span class="o">=</span><span class="n">param_lookup</span><span class="p">(</span><span class="s">&#39;seqs&#39;</span><span class="p">),</span>
-                   <span class="n">InputType</span><span class="o">=</span><span class="s">&#39;existing_filepath&#39;</span><span class="p">,</span>
-                   <span class="n">InputAction</span><span class="o">=</span><span class="s">&#39;store&#39;</span><span class="p">,</span>
-                   <span class="n">InputHandler</span><span class="o">=</span><span class="n">parse_fasta</span><span class="p">,</span>
+    <span class="n">OptparseOption</span><span class="p">(</span><span class="n">Parameter</span><span class="o">=</span><span class="n">cmd_in_lookup</span><span class="p">(</span><span class="s">&#39;seqs&#39;</span><span class="p">),</span>
+                   <span class="n">Type</span><span class="o">=</span><span class="s">&#39;existing_filepath&#39;</span><span class="p">,</span>
+                   <span class="n">Action</span><span class="o">=</span><span class="s">&#39;store&#39;</span><span class="p">,</span>
+                   <span class="n">Handler</span><span class="o">=</span><span class="n">parse_fasta</span><span class="p">,</span>
                    <span class="n">ShortName</span><span class="o">=</span><span class="s">&#39;i&#39;</span><span class="p">),</span>
-
-    <span class="n">OptparseOption</span><span class="p">(</span><span class="n">Parameter</span><span class="o">=</span><span class="n">param_lookup</span><span class="p">(</span><span class="s">&#39;suppress_length_summary&#39;</span><span class="p">),</span>
-                   <span class="n">InputType</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-                   <span class="n">InputAction</span><span class="o">=</span><span class="s">&#39;store_true&#39;</span><span class="p">,</span>
-                   <span class="n">InputHandler</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+    <span class="n">OptparseOption</span><span class="p">(</span><span class="n">Parameter</span><span class="o">=</span><span class="n">cmd_in_lookup</span><span class="p">(</span><span class="s">&#39;suppress_length_summary&#39;</span><span class="p">),</span>
+                   <span class="n">Type</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                   <span class="n">Action</span><span class="o">=</span><span class="s">&#39;store_true&#39;</span><span class="p">,</span>
+                   <span class="n">Handler</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                    <span class="n">ShortName</span><span class="o">=</span><span class="bp">None</span><span class="p">),</span>
-
     <span class="n">OptparseOption</span><span class="p">(</span><span class="n">Parameter</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-                   <span class="n">InputType</span><span class="o">=</span><span class="s">&#39;new_filepath&#39;</span><span class="p">,</span>
-                   <span class="n">InputAction</span><span class="o">=</span><span class="s">&#39;store&#39;</span><span class="p">,</span>
+                   <span class="n">Type</span><span class="o">=</span><span class="s">&#39;new_filepath&#39;</span><span class="p">,</span>
+                   <span class="n">Action</span><span class="o">=</span><span class="s">&#39;store&#39;</span><span class="p">,</span>
                    <span class="n">ShortName</span><span class="o">=</span><span class="s">&#39;o&#39;</span><span class="p">,</span>
                    <span class="n">Name</span><span class="o">=</span><span class="s">&#39;output-fp&#39;</span><span class="p">,</span>
                    <span class="n">Required</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
@@ -411,16 +400,15 @@ outputs = [
 <span class="p">]</span>
 
 <span class="n">outputs</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="n">OptparseResult</span><span class="p">(</span><span class="n">ResultKey</span><span class="o">=</span><span class="s">&#39;num-seqs&#39;</span><span class="p">,</span>
-                   <span class="n">OutputHandler</span><span class="o">=</span><span class="n">append_datum_to_file</span><span class="p">,</span>
-                   <span class="n">OptionName</span><span class="o">=</span><span class="s">&#39;output-fp&#39;</span><span class="p">),</span>
-    <span class="n">OptparseResult</span><span class="p">(</span><span class="n">ResultKey</span><span class="o">=</span><span class="s">&#39;min-length&#39;</span><span class="p">,</span>
-                   <span class="n">OutputHandler</span><span class="o">=</span><span class="n">append_datum_to_file</span><span class="p">,</span>
-                   <span class="n">OptionName</span><span class="o">=</span><span class="s">&#39;output-fp&#39;</span><span class="p">),</span>
-    <span class="n">OptparseResult</span><span class="p">(</span><span class="n">ResultKey</span><span class="o">=</span><span class="s">&#39;max-length&#39;</span><span class="p">,</span>
-                   <span class="n">OutputHandler</span><span class="o">=</span><span class="n">append_datum_to_file</span><span class="p">,</span>
-                   <span class="n">OptionName</span><span class="o">=</span><span class="s">&#39;output-fp&#39;</span><span class="p">),</span>
-
+    <span class="n">OptparseResult</span><span class="p">(</span><span class="n">Parameter</span><span class="o">=</span><span class="n">cmd_out_lookup</span><span class="p">(</span><span class="s">&#39;num_seqs&#39;</span><span class="p">),</span>
+                   <span class="n">Handler</span><span class="o">=</span><span class="n">append_datum_to_file</span><span class="p">,</span>
+                   <span class="n">InputName</span><span class="o">=</span><span class="s">&#39;output-fp&#39;</span><span class="p">),</span>
+    <span class="n">OptparseResult</span><span class="p">(</span><span class="n">Parameter</span><span class="o">=</span><span class="n">cmd_out_lookup</span><span class="p">(</span><span class="s">&#39;min_length&#39;</span><span class="p">),</span>
+                   <span class="n">Handler</span><span class="o">=</span><span class="n">append_datum_to_file</span><span class="p">,</span>
+                   <span class="n">InputName</span><span class="o">=</span><span class="s">&#39;output-fp&#39;</span><span class="p">),</span>
+    <span class="n">OptparseResult</span><span class="p">(</span><span class="n">Parameter</span><span class="o">=</span><span class="n">cmd_out_lookup</span><span class="p">(</span><span class="s">&#39;max_length&#39;</span><span class="p">),</span>
+                   <span class="n">Handler</span><span class="o">=</span><span class="n">append_datum_to_file</span><span class="p">,</span>
+                   <span class="n">InputName</span><span class="o">=</span><span class="s">&#39;output-fp&#39;</span><span class="p">)</span>
 <span class="p">]</span>
 </pre></div>
 </div>
@@ -430,8 +418,12 @@ outputs = [
 <p>To run this, there are a couple of additional things you need to do. First, you need to confirm that the directory where you&#8217;ve written these files is accessible via your <tt class="docutils literal"><span class="pre">PYTHONPATH</span></tt>. For example, if you&#8217;ve been working in <tt class="docutils literal"><span class="pre">$HOME/code/pyqi_experiments/</span></tt>, you should have <tt class="docutils literal"><span class="pre">$HOME/code/</span></tt> in your <tt class="docutils literal"><span class="pre">PYTHONPATH</span></tt>. You can add that as follows:</p>
 <div class="highlight-python"><pre>export PYTHONPATH=$HOME/code/:$PYTHONPATH</pre>
 </div>
-<p>Next, so you can import from that directory, it&#8217;ll need to contain an <tt class="docutils literal"><span class="pre">__init__.py</span></tt> file. That file can be empty, but it does need to exist. You can do this as follows:</p>
-<div class="highlight-python"><pre>touch $HOME/code/pyqi_experiments/__init__.py</pre>
+<p>Next, so you can import from that directory, it&#8217;ll need to contain an <tt class="docutils literal"><span class="pre">__init__.py</span></tt> file. You can do this as follows:</p>
+<div class="highlight-python"><pre>echo '__version__ = "0.0.0"' &gt; $HOME/code/pyqi_experiments/__init__.py</pre>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">pyqi requires that the top-level module containing the configuration files has a <tt class="docutils literal"><span class="pre">__version__</span></tt> attribute defined. <tt class="docutils literal"><span class="pre">__version__</span></tt> should store a version string, e.g., <tt class="docutils literal"><span class="pre">&quot;0.0.0&quot;</span></tt>. In this example, the top-level module is <tt class="docutils literal"><span class="pre">pyqi_experiments</span></tt>, so we must create an <tt class="docutils literal"><span class="pre">__init__.py</span></tt> that contains a <tt class="docutils literal"><span class="pre">__version__</span></tt> attribute.</p>
 </div>
 <p>Now we&#8217;re ready to run our <tt class="docutils literal"><span class="pre">Command</span></tt> via its <tt class="docutils literal"><span class="pre">OptparseInterface</span></tt>. You can do this as follows:</p>
 <div class="highlight-python"><pre>pyqi --command-config-module pyqi_experiments -- summarize-sequence-collection -h</pre>
@@ -509,13 +501,16 @@ max-length      27</pre>
 <tr class="row-odd"><td>existing_dirpath</td>
 <td>path to an existing directory</td>
 </tr>
-<tr class="row-even"><td>new_dirpath</td>
+<tr class="row-even"><td>existing_dirpaths</td>
+<td>path to one or more existing directories</td>
+</tr>
+<tr class="row-odd"><td>new_dirpath</td>
 <td>path to a new directory</td>
 </tr>
-<tr class="row-odd"><td>multiple_choice</td>
+<tr class="row-even"><td>multiple_choice</td>
 <td>one or more values from a list of choices</td>
 </tr>
-<tr class="row-even"><td>blast_db</td>
+<tr class="row-odd"><td>blast_db</td>
 <td>a blast database</td>
 </tr>
 </tbody>
@@ -539,8 +534,8 @@ max-length      27</pre>
 
     <div class="footer">
         &copy; Copyright 2013, The BiPy Development Team.
-      Last updated on Aug 26, 2013.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+      Last updated on Dec 04, 2013.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
     </div>
   </body>
 </html>
