@@ -58,7 +58,7 @@ class HTMLInputOption(InterfaceInputOption):
         float: lambda x: float(x.value),
         long: lambda x: long(x.value),
         complex: lambda x: complex(x.value),
-        "upload_file": lambda x: x.file.read(),
+        "upload_file": lambda x: x.file,
         "multiple_choice": lambda x: x.value
     }
 
@@ -120,7 +120,7 @@ class HTMLInputOption(InterfaceInputOption):
             if self.Choices is None:
                 raise IncompetentDeveloperError(
                     "must supply a list of Choices for type '%s'" % self.type, self)
-            elif type(self.Choices) not in (_type_handlers.TupleType, types.ListType):
+            elif type(self.Choices) not in (types.TupleType, types.ListType):
                 raise IncompetentDeveloperError(
                     "choices must be a list of strings ('%s' supplied)"
                     % str(type(self.Choices)).split("'")[1], self)
