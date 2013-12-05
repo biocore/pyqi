@@ -1,7 +1,7 @@
 pyqi: expose your interface
 ===========================
 
-[![Build Status](http://ci.qiime.org/job/pyqi/badge/icon)](http://ci.qiime.org/job/pyqi/)
+[![Build Status](https://travis-ci.org/bipy/pyqi.png?branch=master)](https://travis-ci.org/bipy/pyqi)
 
 pyqi (canonically pronounced *pie chee*) is designed to support wrapping general commands in multiple types of interfaces, including at the command line, HTML, and API levels. We're currently in the early stages of development, and there is a lot to be done. We're very interested in having beta users, and we fully embrace collaborative development, so if you're interested in using or developing pyqi, you should get in touch. For now, you can direct questions to gregcaporaso@gmail.com.
 
