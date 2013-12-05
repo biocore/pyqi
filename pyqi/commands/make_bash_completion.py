@@ -58,7 +58,8 @@ command_fmt = """       "%(command)s")
 
 class BashCompletion(Command):
     BriefDescription = "Construct a bash completion script"
-    LongDescription = """Construct a bash tab completion script that will search through available commands and options"""
+    LongDescription = ("Construct a bash tab completion script that will search"
+        " through available commands and options")
     
     CommandIns = ParameterCollection([
         CommandIn(Name='command_config_module', DataType=str,
