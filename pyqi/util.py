@@ -69,7 +69,8 @@ def remove_files(list_of_filepaths, error_on_missing=True):
             missing.append(fp)
 
     if error_on_missing and missing:
-        raise OSError, "Some filepaths were not accessible: %s" % '\t'.join(missing)
+        raise OSError, "Some filepaths were not accessible: %s" % '\t'.join(
+            missing)
 
 def old_to_new_command(driver_name, project_title, local_argv):
     """Deprecate an old-style script.
