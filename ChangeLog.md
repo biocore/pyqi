@@ -1,6 +1,12 @@
 pyqi ChangeLog
 ==============
 
+pyqi 0.3.1-dev
+--------------
+
+* painless profiling: just set the environment variable PYQI_PROFILE_COMMAND
+* HDF5 automatically extending datasets
+
 pyqi 0.3.1
 ----------
 
