@@ -1,6 +1,11 @@
 pyqi ChangeLog
 ==============
 
+pyqi 0.3.1-dev
+--------------
+
+* painless profiling: just set the environment variable PYQI_PROFILE_COMMAND
+
 pyqi 0.3.1
 ----------
 
