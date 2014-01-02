@@ -4,6 +4,7 @@ pyqi ChangeLog
 pyqi 0.3.1-dev
 --------------
 
+* native python 3 support
 * painless profiling: just set the environment variable PYQI_PROFILE_COMMAND
 
 pyqi 0.3.1

@@ -21,14 +21,6 @@ from setuptools import setup
 from glob import glob
 import sys
 
-# from https://wiki.python.org/moin/PortingPythonToPy3k
-try:
-    # python 3.x
-    from distutils.command.build_py import build_py_2to3 as build_py
-except ImportError:
-    # python 2.x
-    from distutils.command.build_py import build_py
-
 # classes/classifiers code adapted from Celery:
 # https://github.com/celery/celery/blob/master/setup.py
 #
@@ -57,7 +49,6 @@ if ver not in ['2.7']:
 long_description = """pyqi (canonically pronounced pie chee) is a Python framework designed to support wrapping general commands in multiple types of interfaces, including at the command line, HTML, and API levels."""
 
 setup(name='pyqi',
-      cmdclass={'build_py':build_py},
       version=__version__,
       license=__license__,
       description='pyqi: expose your interface',
