@@ -19,11 +19,15 @@ __email__ = "mcdonadt@colorado.edu"
 
 import importlib
 import textwrap
+import cProfile
+import pstats
 from sys import argv, exit, stderr
 from pyqi.core.interface import get_command_names, get_command_config
 from pyqi.core.interfaces.optparse import optparse_main, optparse_factory
+from pyqi.util import get_version_string
 from os.path import basename
 from string import ljust 
+from os import environ
 
 ### we actually have some flexibility here to make the driver interface agnostic as well
 
@@ -75,9 +79,11 @@ def usage(cmd_cfg_mod, command_names):
 def get_cmd_obj(cmd_cfg_mod, cmd):
     """Get a ``Command`` object"""
     cmd_cfg, _ = get_command_config(cmd_cfg_mod, cmd)
+    version_str = get_version_string(cmd_cfg_mod)
+
     return optparse_factory(cmd_cfg.CommandConstructor, cmd_cfg.usage_examples, 
                             cmd_cfg.inputs, cmd_cfg.outputs,
-                            cmd_cfg.__version__)
+                            version_str)
 
 def help_(cmd_cfg_mod, cmd):
     """Dump the help for a ``Command``"""
@@ -165,10 +171,16 @@ if __name__ == '__main__':
             help_(cmd_cfg_mod, help_cmd)
         else:
             assert_command_exists(cmd_name, command_names, driver_name)
-
+            
             # see the note about crying about tears.
             argv[0] = ' '.join([driver_name, cmd_name])
             cmd_obj = get_cmd_obj(cmd_cfg_mod, cmd_name)
 
             # execute FTW
-            optparse_main(cmd_obj, argv[1:])
+            if 'PYQI_PROFILE_COMMAND' in environ:
+                stats_f = "%s.stats" % cmd_name
+                cProfile.run("optparse_main(cmd_obj, argv[1:])", stats_f)
+                stats = pstats.Stats(stats_f)
+                stats.strip_dirs().sort_stats('cumul').print_stats(25)
+            else:
+                optparse_main(cmd_obj, argv[1:])

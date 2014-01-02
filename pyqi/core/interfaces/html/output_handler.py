@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+
 #-----------------------------------------------------------------------------
 # Copyright (c) 2013, The BiPy Development Team.
 #
@@ -7,7 +8,13 @@
 #
 # The full license is in the file COPYING.txt, distributed with this software.
 #-----------------------------------------------------------------------------
-from __future__ import division
 
-__credits__ = ["Greg Caporaso", "Daniel McDonald", "Doug Wendel",
-               "Jai Ram Rideout"]
+__credits__ = ["Evan Bolyen"]
+
+def newline_list_of_strings(result_key, data, option_value=None):
+    """Return a string from a list of strings while appending newline"""
+    return "\n".join(data)
+
+def html_list_of_strings(result_key, data, option_value=None):
+    """Return a string from a list of strings while appending an html break"""
+	return "<br />".join(data)

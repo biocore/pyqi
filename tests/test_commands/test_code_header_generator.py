@@ -9,13 +9,7 @@ from __future__ import division
 # The full license is in the file COPYING.txt, distributed with this software.
 #-----------------------------------------------------------------------------
 
-__author__ = "Jai Ram Rideout"
-__copyright__ = "Copyright 2013, The pyqi project"
 __credits__ = ["Jai Ram Rideout"]
-__license__ = "BSD"
-__version__ = "0.2.0-dev"
-__maintainer__ = "Jai Ram Rideout"
-__email__ = "jai.rideout@gmail.com"
 
 from unittest import TestCase, main
 from pyqi.commands.code_header_generator import CodeHeaderGenerator
@@ -45,6 +39,13 @@ class CodeHeaderGeneratorTests(TestCase):
         obs = obs['result']
         self.assertEqual('\n'.join(obs), exp_header2)
 
+        # With no arguments
+        obs = self.cmd()
+        self.assertEqual(obs.keys(), ['result'])
+
+        obs = obs['result']
+        self.assertEqual('\n'.join(obs), exp_header3)
+
 
 exp_header1 = """#!/usr/bin/env python
 from __future__ import division
@@ -70,6 +71,11 @@ __maintainer__ = "bob"
 __email__ = "bob@bob.bob"
 """
 
+exp_header3 = """#!/usr/bin/env python
+from __future__ import division
+
+__credits__ = []
+"""
 
 if __name__ == '__main__':
     main()

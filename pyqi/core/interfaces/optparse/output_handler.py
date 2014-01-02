@@ -20,14 +20,8 @@ option_value - if the handler is tied to an output option, the value of that
 # The full license is in the file COPYING.txt, distributed with this software.
 #-----------------------------------------------------------------------------
 
-__author__ = "Daniel McDonald"
-__copyright__ = "Copyright 2013, The pyqi project"
 __credits__ = ["Daniel McDonald", "Greg Caporaso", "Doug Wendel",
-               "Jai Ram Rideout"]
-__license__ = "BSD"
-__version__ = "0.1-dev"
-__maintainer__ = "Daniel McDonald"
-__email__ = "mcdonadt@colorado.edu"
+               "Jai Ram Rideout", "Evan Bolyen", "Adam Robbins-Pianka"]
 
 from pyqi.core.exception import IncompetentDeveloperError
 import os
@@ -72,3 +66,33 @@ def print_list_of_strings(result_key, data, option_value=None):
     """
     for line in data:
         print(line)
+
+def print_string(result_key, data, option_value=None):
+    """Print the string
+
+    A newline will be printed before the data"""
+    print("")
+    print(data)
+
+def write_or_print_string(result_key, data, option_value=None):
+    """Write a string to a file.
+
+    A newline will be added to the end of the file. If no file is supplied,
+    then the output will be printed to stdout instead.
+    """
+    if option_value is None:
+        print_string(result_key, data, option_value)
+    else:
+        write_string(result_key, data, option_value)
+
+def write_or_print_list_of_strings(result_key, data, option_value=None):
+    """Write a list of strings to a file, one per line.
+
+    A newline will be added to the end of the file. If no file is supplied,
+    then the output will be printed to stdout instead.
+    """
+    if option_value is None:
+        print_list_of_strings(result_key, data, option_value)
+    else:
+        write_list_of_strings(result_key, data, option_value)
+

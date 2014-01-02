@@ -8,13 +8,8 @@
 # The full license is in the file COPYING.txt, distributed with this software.
 #-----------------------------------------------------------------------------
 
-__author__ = "Daniel McDonald"
-__copyright__ = "Copyright 2013, The pyqi project"
-__credits__ = ["Daniel McDonald", "Jai Ram Rideout", "Doug Wendel", "Greg Caporaso"]
-__license__ = "BSD"
-__version__ = "0.2.0-dev"
-__maintainer__ = "Daniel McDonald"
-__email__ = "mcdonadt@colorado.edu"
+__credits__ = ["Daniel McDonald", "Jai Ram Rideout", "Doug Wendel",
+    "Greg Caporaso"]
 
 from pyqi.core.interfaces.optparse import (OptparseOption,
                                            OptparseUsageExample,

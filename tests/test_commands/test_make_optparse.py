@@ -13,13 +13,8 @@ from pyqi.commands.make_optparse import MakeOptparse
 from pyqi.core.command import CommandIn, ParameterCollection
 from unittest import TestCase, main
 
-__author__ = "Daniel McDonald"
-__copyright__ = "Copyright 2013, The pyqi project"
-__credits__ = ["Daniel McDonald", "Jai Ram Rideout", "Doug Wendel", "Greg Caporaso"]
-__license__ = "BSD"
-__version__ = "0.2.0-dev"
-__maintainer__ = "Daniel McDonald"
-__email__ = "mcdonadt@colorado.edu"
+__credits__ = ["Daniel McDonald", "Jai Ram Rideout", "Doug Wendel",
+    "Greg Caporaso"]
 
 class MakeOptparseTests(TestCase):
     def setUp(self):
@@ -127,28 +122,25 @@ inputs = [
                    # Required=False, # implied by Parameter
                    # Help='zero or one', # implied by Parameter
                    # Default=None, # implied by Parameter
-                   # DefaultDescription=None, # implied by Parameter
-),
-
+                   # DefaultDescription=None, # implied by Parameter),
 ]
 
 # outputs map result keys to output options and handlers. It is not necessary
 # to supply an associated option, but if you do, it must be an option from the
 # inputs list (above).
 outputs = [
-    # An example option that maps to a result key.
+    # An example option that maps to a CommandIn.
     # OptparseResult(Parameter=cmd_out_lookup('name_of_a_command_out'),
-    #                Handler=write_string, # a function applied to the value
+    #                Handler=write_string, # a function applied to the output of the Command
     #                # the name of the option (defined in inputs, above), whose
-    #                # value will be made available to OutputHandler. This name
+    #                # value will be made available to Handler. This name
     #                # can be either an underscored or dashed version of the
     #                # option name (e.g., 'output_fp' or 'output-fp')
     #                InputName='output-fp'), 
     #
-    # An example option that does not map to a result key.
+    # An example option that does not map to a CommandIn.
     # OptparseResult(Parameter=cmd_out_lookup('some_other_result'),
     #                Handler=print_string)
-
 
 ]
 """

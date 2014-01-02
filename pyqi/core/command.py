@@ -9,15 +9,10 @@
 #-----------------------------------------------------------------------------
 from __future__ import division
 
-__author__ = "Greg Caporaso"
-__copyright__ = "Copyright 2013, The pyqi project"
 __credits__ = ["Greg Caporaso", "Daniel McDonald", "Doug Wendel",
                "Jai Ram Rideout"]
-__license__ = "BSD"
-__version__ = "0.2.0-dev"
-__maintainer__ = "Greg Caporaso"
-__email__ = "gregcaporaso@gmail.com"
 
+import sys, traceback
 import re
 from pyqi.core.log import NullLogger
 from pyqi.core.exception import (IncompetentDeveloperError,
@@ -29,7 +24,7 @@ class Parameter(object):
     """The ``Command`` variable type baseclass
 
     A ``Parameter`` is interface agnostic, and is used to describe an input
-    or outputs of a ``Command``.
+    or output of a ``Command``.
     """
 
     def __init__(self, Name, DataType, Description, ValidateValue=None):
@@ -79,8 +74,8 @@ class CommandIn(Parameter):
         self.DefaultDescription = DefaultDescription
         
         if Required and Default is not None:
-            raise IncompetentDeveloperError("Found required parameter '%s' "
-                    "with default value '%r'. Required parameters cannot have "
+            raise IncompetentDeveloperError("Found required CommandIn '%s' "
+                    "with default value '%r'. Required CommandIns cannot have "
                     "default values." % (Name, Default))
         
         super(CommandIn, self).__init__(Name, DataType, Description, **kwargs)
@@ -169,14 +164,14 @@ class Command(object):
         # check required parameters
         for p in self.CommandIns.values():
             if p.Required and p.Name not in kwargs:
-                err_msg = 'Missing required parameter %s in %s' % (p.Name, 
+                err_msg = 'Missing required CommandIn %s in %s' % (p.Name, 
                                                                    self_str)
                 self._logger.fatal(err_msg)
                 raise MissingParameterError(err_msg)
 
             if p.Name in kwargs and p.ValidateValue:
                 if not p.ValidateValue(kwargs[p.Name]):
-                    err_msg = "Parameter %s cannot take value %s in %s" % \
+                    err_msg = "CommandIn %s cannot take value %s in %s" % \
                                 (p.Name, kwargs[p.Name], self_str)
                     self._logger.fatal(err_msg)
                     raise ValueError(err_msg)
@@ -184,7 +179,7 @@ class Command(object):
         # make sure we only have things we expect
         for opt in kwargs:
             if opt not in self.CommandIns:
-                err_msg = 'Unknown parameter %s in %s' % (opt, self_str)
+                err_msg = 'Unknown CommandIn %s in %s' % (opt, self_str)
                 self._logger.fatal(err_msg)
                 raise UnknownParameterError(err_msg)
     
@@ -194,7 +189,7 @@ class Command(object):
 
         for p in self.CommandOuts.values():
             if p.Name not in result:
-                err_msg = "CommandOut %s not in %s" % (p, self_str)
+                err_msg = "CommandOut %s not in %s" % (p.Name, self_str)
                 self._logger.fatal(err_msg)
                 raise UnknownParameterError(err_msg)
         for k in result:

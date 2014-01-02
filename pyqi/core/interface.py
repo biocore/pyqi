@@ -8,23 +8,14 @@
 # The full license is in the file COPYING.txt, distributed with this software.
 #-----------------------------------------------------------------------------
 
-__author__ = "Greg Caporaso"
-__copyright__ = "Copyright 2013, The pyqi project"
 __credits__ = ["Greg Caporaso", "Daniel McDonald", "Doug Wendel",
-               "Jai Ram Rideout"]
-__license__ = "BSD"
-__version__ = "0.2.0-dev"
-__maintainer__ = "Greg Caporaso"
-__email__ = "gregcaporaso@gmail.com"
+               "Jai Ram Rideout", "Evan Bolyen"]
 
 import importlib
 from sys import exit, stderr
 from glob import glob
 from os.path import basename, dirname, expanduser, join
 from pyqi.core.exception import IncompetentDeveloperError
-
-### for an isintance check. not very excited about this
-from pyqi.core.command import CommandIn, Parameter as CommandParameter
 
 class Interface(object):
     CommandConstructor = None
@@ -40,9 +31,8 @@ class Interface(object):
         self.CmdInstance = self.CommandConstructor(**kwargs)
 
         self._validate_usage_examples(self._get_usage_examples())
-        self._validate_inputs(self._get_inputs())
-        self._validate_outputs(self._get_outputs())
-
+        self._validate_inputs_outputs(self._get_inputs(), self._get_outputs())
+    
     def __call__(self, in_, *args, **kwargs):
         self._the_in_validator(in_)
         cmd_input = self._input_handler(in_, *args, **kwargs)
@@ -61,13 +51,19 @@ class Interface(object):
         """
         pass
 
-    def _validate_inputs(self, inputs):
-        """Perform validation on a list of ``InterfaceOption`` objects.
+    def _validate_inputs_outputs(self, inputs, outputs):
+        """Perform validation on interface IO objects.
 
         ``inputs`` will be the output of ``self._get_inputs()``. Subclasses can
         override to perform validation that requires a list of all input
         options. Validation that should be performed on a per-option basis
         should instead go into ``InterfaceOption._validate_option``.
+
+        ``outputs`` will be the output of ``self._get_outputs()``. Subclasses
+        can override to perform validation that requires a list of all
+        interface results. Validation that should be performed on a
+        per-interface result basis should instead go into
+        ``InterfaceOutputOption._validate_result``.
         """
         param_names = [input_.getParameterName()
                        for input_ in inputs
@@ -78,16 +74,14 @@ class Interface(object):
                                             "InterfaceOption mapping to the "
                                             "same Parameter.")
 
-    def _validate_outputs(self, outputs):
-        """Perform validation on a list of ``InterfaceOutput`` objects.
-
-        ``outputs`` will be the output of ``self._get_outputs()``. Subclasses
-        can override to perform validation that requires a list of all
-        interface results. Validation that should be performed on a
-        per-interface result basis should instead go into
-        ``InterfaceOutput._validate_result``.
-        """
-        pass
+        input_names = set([i.Name for i in inputs])
+        for ifout in outputs:
+            if ifout.InputName is None:
+                continue
+            
+            if ifout.InputName not in input_names:
+                raise IncompetentDeveloperError(\
+                        "Could not link %s to an input!" % ifout.InputName)
 
     def _the_in_validator(self, in_):
         """The job securator"""
@@ -124,7 +118,7 @@ class Interface(object):
         raise NotImplementedError("Must define _get_inputs")
 
     def _get_outputs(self):
-        """Return a list of ``InterfaceOutput`` objects
+        """Return a list of ``InterfaceOutputOption`` objects
         
         These are typically set in a command+interface specific configuration
         file and passed to ``pyqi.core.general_factory``
@@ -142,21 +136,24 @@ class Interface(object):
 class InterfaceOption(object):
     """Describes an option and what to do with it
     
-    ``Parameter`` is a pyqi.core.command.Parameter instance
+    ``Parameter`` is a pyqi.core.command.Parameter instance, typically an 
+        instance of a ``CommandIn`` or a ``CommandOut``.
     ``Type`` refers to the interface type, not the actually datatype of the
         ``Parameter``. For instance, a file path may be specified on a command
         line interface for a BIOM table. The ``Parameter.Datatype`` is a BIOM 
         type, while the ``InterfaceOption.Type`` is a string or possibly a 
         ``FilePath`` object.
-    ``Handler`` is a function that can take the value associated with the
-        option and transform it into the ``Parameter.DataType``.
+    ``Handler`` is a function that either transforms the value associated with 
+        the option into the ``Parameter.DataType`` (e.g., if ``Parameter`` is a
+        ``CommandIn``), or the result of a ``Command`` into something consumable
+        by the interface (e.g., if ``Parameter`` is a ``CommandOut``).
     ``Name`` is the name of the ``InterfaceOption``, e.g,, 'input-fp'
     ``Help`` is a description of the ``InterfaceOption``
     """
     def __init__(self, Parameter=None, Type=None, Handler=None, Name=None,
                  Help=None):
         self.Parameter = Parameter
-
+        
         if self.Parameter is None:
             if Name is None:
                 raise IncompetentDeveloperError("Must specify a Name for the "
@@ -189,6 +186,22 @@ class InterfaceOption(object):
             return self.Parameter.Name
 
 class InterfaceInputOption(InterfaceOption):
+    _primitive_mapping = {
+        "None": None,
+        "bool": bool,
+        "str": str,
+        "int": int,
+        "float": float,
+        "long": long,
+        "complex": complex,
+        "tuple": tuple,
+        "dict": dict,
+        "list": list,
+        "set": set,
+        "unicode": unicode,
+        "frozenset": frozenset
+    }
+
     def __init__(self, Action=None, Required=False, Default=None, 
                  ShortName=None, DefaultDescription=None, 
                  convert_to_dashed_name=True, **kwargs):
@@ -208,19 +221,26 @@ class InterfaceInputOption(InterfaceOption):
                     "with default value '%s'. Required options cannot have "
                     "default values." % (self.Name, self.Default))
     
-        if self.Default is None:
-            if hasattr(self.Parameter, "Default"):
-                self.Default = self.Parameter.Default
-                self.DefaultDescription = self.Parameter.DefaultDescription 
+        if self.Default is None and self.Parameter is not None:
+            self.Default = self.Parameter.Default
+            self.DefaultDescription = self.Parameter.DefaultDescription 
 
         # If a parameter is required, the option is always required, but
         # if a parameter is not required, but the option does require it,
         # then we make the option required.
-        if hasattr(self.Parameter, "Required"):
+        if self.Parameter is not None: 
+            self.Required = self.Parameter.Required
+
             if not self.Parameter.Required and Required:
                 self.Required = True
-
+        
+        self._convert_primitive_strings()
         self._validate_option()
+
+    def _convert_primitive_strings(self):
+        """Convert our Type to a python type object if it is a primitive string.
+           Otherwise, leave unchanged"""
+        self.Type = self._primitive_mapping.get(self.Type, self.Type)
 
 class InterfaceOutputOption(InterfaceOption):
     def __init__(self, InputName=None, **kwargs):

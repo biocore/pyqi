@@ -10,13 +10,8 @@
 
 from __future__ import division
 
-__author__ = "Daniel McDonald"
-__copyright__ = "Copyright 2013, The pyqi project"
-__credits__ = ["Daniel McDonald", "Jai Ram Rideout", "Doug Wendel", "Greg Caporaso"]
-__license__ = "BSD"
-__version__ = "0.2.0-dev"
-__maintainer__ = "Daniel McDonald"
-__email__ = "mcdonadt@colorado.edu"
+__credits__ = ["Daniel McDonald", "Jai Ram Rideout", "Doug Wendel",
+    "Greg Caporaso"]
 
 import importlib
 from pyqi.core.command import (Command, CommandIn, CommandOut, 
@@ -63,9 +58,10 @@ command_fmt = """       "%(command)s")
 
 class BashCompletion(Command):
     BriefDescription = "Construct a bash completion script"
-    LongDescription = """Construct a bash tab completion script that will search through available commands and options"""
+    LongDescription = ("Construct a bash tab completion script that will search"
+        " through available commands and options")
     
-    CommandIns= ParameterCollection([
+    CommandIns = ParameterCollection([
         CommandIn(Name='command_config_module', DataType=str,
                   Description="CLI command configuration module",
                   Required=True),
