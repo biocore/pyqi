@@ -42,8 +42,8 @@ classifiers = [s.strip() for s in classes.split('\n') if s]
 
 # Verify Python version
 ver = '.'.join(map(str, [sys.version_info.major, sys.version_info.minor]))
-if ver not in ['2.7']:
-    sys.stderr.write("Only Python >=2.7 and <3.0 is supported.")
+if ver not in ['2.7', '3.3']:
+    sys.stderr.write("Only Python 2.7 and 3.3 are supported.")
     sys.exit(1)
 
 long_description = """pyqi (canonically pronounced pie chee) is a Python framework designed to support wrapping general commands in multiple types of interfaces, including at the command line, HTML, and API levels."""
