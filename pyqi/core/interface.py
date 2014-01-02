@@ -192,13 +192,13 @@ class InterfaceInputOption(InterfaceOption):
         "str": str,
         "int": int,
         "float": float,
-        "long": long,
+        "long": int, # for python 3 compatibility as long is dropped
         "complex": complex,
         "tuple": tuple,
         "dict": dict,
         "list": list,
         "set": set,
-        "unicode": unicode,
+        "unicode": str, # for python 3 compatibility as all strings are unicode
         "frozenset": frozenset
     }
 

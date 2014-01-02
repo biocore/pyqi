@@ -41,7 +41,7 @@ class CodeHeaderGeneratorTests(TestCase):
 
         # With no arguments
         obs = self.cmd()
-        self.assertEqual(obs.keys(), ['result'])
+        self.assertEqual(list(obs.keys()), ['result'])
 
         obs = obs['result']
         self.assertEqual('\n'.join(obs), exp_header3)

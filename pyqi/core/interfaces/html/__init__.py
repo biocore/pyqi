@@ -14,7 +14,13 @@ __credits__ = ["Evan Bolyen", "Jai Ram Rideout", "Daniel McDonald",
 import os
 import types
 import os.path
-from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
+import sys
+
+if sys.version_info.major == 2:
+    from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
+else:
+    from http.server import BaseHTTPRequestHandler, HTTPServer
+
 from cgi import parse_header, parse_multipart, parse_qs, FieldStorage
 from copy import copy
 from glob import glob
@@ -56,7 +62,6 @@ class HTMLInputOption(InterfaceInputOption):
         bool: lambda x: x.value == "True",
         int: lambda x: int(x.value),
         float: lambda x: float(x.value),
-        long: lambda x: long(x.value),
         complex: lambda x: complex(x.value),
         "upload_file": lambda x: x.file,
         "multiple_choice": lambda x: x.value
@@ -96,7 +101,6 @@ class HTMLInputOption(InterfaceInputOption):
             bool: mchoice_input,
             int: number_input,
             float: number_input,
-            long: number_input,
             complex: string_input,
             "multiple_choice": mchoice_input,
             "upload_file": upload_input
@@ -508,8 +512,8 @@ def get_http_handler(module):
 def start_server(port, module):
     """Start a server for the HTMLInterface on the specified port"""
     interface_server = HTTPServer(("", port), get_http_handler(module))
-    print "-- Starting server at http://localhost:%d --" % port
-    print "To close the server, type 'ctrl-c' into this window."
+    print("-- Starting server at http://localhost:%d --" % port)
+    print("To close the server, type 'ctrl-c' into this window.")
     try:
         interface_server.serve_forever()
 
