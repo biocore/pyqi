@@ -25,7 +25,7 @@ def load_file_lines(option_value):
 
 def load_file_contents(option_value):
     """Return the contents of a file as a single string."""
-    try:
-        return option_value.read()
-    except AttributeError:
+    if not hasattr(option_value, 'read'):
         raise IncompetentDeveloperError("Input type must be a file object.")
+    
+    return option_value.read()
