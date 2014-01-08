@@ -10,11 +10,7 @@
 
 __credits__ = ["Evan Bolyen"]
 
-import os
-import sys
 from StringIO import StringIO
-from shutil import rmtree
-from tempfile import mkdtemp
 from unittest import TestCase, main
 from pyqi.core.interfaces.html.output_handler import (newline_list_of_strings,
         html_list_of_strings)
