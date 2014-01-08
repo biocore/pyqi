@@ -10,7 +10,6 @@
 
 __credits__ = ["Evan Bolyen"]
 
-from StringIO import StringIO
 from unittest import TestCase, main
 from pyqi.core.interfaces.html.output_handler import (newline_list_of_strings,
         html_list_of_strings)
