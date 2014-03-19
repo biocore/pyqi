@@ -16,6 +16,7 @@ import sys
 
 from unittest import TestCase, main
 from pyqi.core.interface import get_command_names, get_command_config
+from pyqi.util import is_py2
 import pyqi.interfaces.optparse.config.make_bash_completion
 
 class TopLevelTests(TestCase):
@@ -45,7 +46,7 @@ class TopLevelTests(TestCase):
 
         py2_err = 'No module named hopefully.nonexistent.python.module.umm'
         py3_err = "No module named 'hopefully'"
-        if sys.version_info.major == 2:
+        if is_py2():
             self.assertEqual(error_msg, py2_err)
         else:
             self.assertEqual(error_msg, py3_err)
