@@ -17,6 +17,7 @@ from unittest import TestCase, main
 from pyqi.util import get_version_string
 from pyqi.core.exception import MissingVersionInfoError
 
+
 class UtilTests(TestCase):
     def test_get_version_string(self):
         """Test extracting a version string given a module string."""

@@ -10,8 +10,14 @@
 
 __credits__ = ["Evan Bolyen"]
 
-from StringIO import StringIO
+import sys
 from unittest import TestCase, main
+
+if sys.version_info.major == 2:
+    from StringIO import StringIO
+else:
+    from io import StringIO
+
 from pyqi.core.exception import IncompetentDeveloperError
 from pyqi.core.interfaces.html.input_handler import (load_file_lines,
         load_file_contents)
@@ -34,8 +40,8 @@ class HTMLInputHandlerTests(TestCase):
         # can't load a string, etc...
         self.assertRaises(IncompetentDeveloperError, load_file_lines, 'This is not a file')
         result = load_file_lines(self.file_like_object)
-        self.assertEqual(result, 
-                         ["This is line 1", 
+        self.assertEqual(result,
+                         ["This is line 1",
                           "This is line 2",
                           "This is line 3"])
 

@@ -14,7 +14,14 @@ __credits__ = ["Evan Bolyen", "Jai Ram Rideout", "Daniel McDonald",
 import os
 import types
 import os.path
-from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
+import sys
+
+from pyqi.util import is_py2
+if is_py2():
+    from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
+else:
+    from http.server import BaseHTTPRequestHandler, HTTPServer
+
 from cgi import parse_header, parse_multipart, parse_qs, FieldStorage
 from copy import copy
 from glob import glob
@@ -36,7 +43,7 @@ class HTMLResult(InterfaceOutputOption):
 
 class HTMLDownload(HTMLResult):
     """Result class for downloading a file from the server"""
-    def __init__(self, FileExtension=None, FilenameLookup=None, DefaultFilename=None, 
+    def __init__(self, FileExtension=None, FilenameLookup=None, DefaultFilename=None,
             MIMEType='application/octet-stream', **kwargs):
         super(HTMLDownload, self).__init__(MIMEType=MIMEType, **kwargs)
         self.FileExtension = FileExtension
@@ -56,7 +63,6 @@ class HTMLInputOption(InterfaceInputOption):
         bool: lambda x: x.value == "True",
         int: lambda x: int(x.value),
         float: lambda x: float(x.value),
-        long: lambda x: long(x.value),
         complex: lambda x: complex(x.value),
         "upload_file": lambda x: x.file,
         "multiple_choice": lambda x: x.value
@@ -76,17 +82,17 @@ class HTMLInputOption(InterfaceInputOption):
         """Return the HTML needed for user input given a default value"""
         if (not value) and (self.Default is not None):
             value = self.Default
-            
+
         input_name = prefix + self.Name
         string_input = lambda: '<input type="text" name="%s" value="%s"/>' % (input_name, value)
         number_input = lambda: '<input type="number" name="%s" value="%s"/>' % (input_name, value)
 
-        #html input files cannot have default values. 
+        #html input files cannot have default values.
         #If the html interface worked as a data service, this would be possible as submit would be ajax.
         upload_input = lambda: '<input type="file" name="%s" />' % input_name
         mchoice_input = lambda: ''.join(
-            [ ('(%s<input type="radio" name="%s" value="%s" %s/>)' 
-                    % (choice, input_name, choice, 'checked="true"' if value == choice else '')) 
+            [ ('(%s<input type="radio" name="%s" value="%s" %s/>)'
+                    % (choice, input_name, choice, 'checked="true"' if value == choice else ''))
                 for choice in self.Choices ]
         )
 
@@ -96,7 +102,6 @@ class HTMLInputOption(InterfaceInputOption):
             bool: mchoice_input,
             int: number_input,
             float: number_input,
-            long: number_input,
             complex: string_input,
             "multiple_choice": mchoice_input,
             "upload_file": upload_input
@@ -110,7 +115,7 @@ class HTMLInputOption(InterfaceInputOption):
                         self.Help,
                        '</td></tr><tr><td>&nbsp;</td></tr>'
                        ])
-   
+
     def _validate_option(self):
         if self.Type not in self._type_handlers:
             raise IncompetentDeveloperError("Unsupported Type in HTMLInputOption: %s" % self.Type)
@@ -130,7 +135,7 @@ class HTMLInputOption(InterfaceInputOption):
 class HTMLInterface(Interface):
     """An HTML interface"""
     #Relative mapping wasn't working on a collegue's MacBook when pyqi was run outside of it's directory
-    #Until I understand why that was the case and how to fix it, I am putting the style css here. 
+    #Until I understand why that was the case and how to fix it, I am putting the style css here.
     #This is not a permanent solution.
     css_style = '\n'.join([
         'html, body {',
@@ -189,7 +194,7 @@ class HTMLInterface(Interface):
         self._html_input_prefix = input_prefix
         self._html_interface_input = {}
         super(HTMLInterface, self).__init__(**kwargs)
-    
+
     #Override
     def __call__(self, in_, *args, **kwargs):
         self._the_in_validator(in_)
@@ -199,14 +204,14 @@ class HTMLInterface(Interface):
                     'type': 'error',
                     'errors': errors
                 }
-        else:        
+        else:
             cmd_result = self.CmdInstance(**cmd_input)
-            self._the_out_validator(cmd_result)       
+            self._the_out_validator(cmd_result)
             return self._output_handler(cmd_result)
 
     def _validate_inputs_outputs(self, inputs, outputs):
-        super(HTMLInterface, self)._validate_inputs_outputs(inputs, outputs)  
-        
+        super(HTMLInterface, self)._validate_inputs_outputs(inputs, outputs)
+
         if len(outputs) > 1:
             raise IncompetentDeveloperError("There can be only one... output")
 
@@ -241,7 +246,7 @@ class HTMLInterface(Interface):
         formatted_input = {}
 
         for key in in_:
-            mod_key = key[ len(self._html_input_prefix): ] 
+            mod_key = key[ len(self._html_input_prefix): ]
             formatted_input[mod_key] = in_[key]
             if not formatted_input[mod_key].value:
                 formatted_input[mod_key] = None
@@ -319,11 +324,11 @@ class HTMLInterface(Interface):
             if output.InputName is None:
                 handled_results = output.Handler(rk, results[rk])
             else:
-                handled_results = output.Handler(rk, results[rk], 
+                handled_results = output.Handler(rk, results[rk],
                     self._html_interface_input[output.InputName])
         else:
             handled_results = results[rk]
-    
+
         if isinstance(output, HTMLDownload):
             return self._output_download_handler(output, handled_results)
 
@@ -413,7 +418,7 @@ def get_http_handler(module):
                 self.send_header('Content-type', 'text/html')
                 self.end_headers()
                 output_writer(self.wfile.write)
-                
+
                 self.wfile.close()
                 self._unrouted = False;
 
@@ -426,7 +431,7 @@ def get_http_handler(module):
                 self.send_header('Content-type', 'text/html')
                 self.end_headers()
                 cmd_obj.command_page_writer(self.wfile.write, [], {})
-                
+
                 self.wfile.close()
                 self._unrouted = False
 
@@ -441,14 +446,14 @@ def get_http_handler(module):
                         'type':'error',
                         'errors':[e]
                     }
-                
+
                 if result['type'] == 'error':
                     self.send_response(400)
                     self.send_header('Content-type', 'text/html')
                     self.end_headers()
                     cmd_obj.command_page_writer(self.wfile.write, result['errors'], postvars)
 
-                elif result['type'] == 'page':       
+                elif result['type'] == 'page':
                     self.send_response(200)
                     self.send_header('Content-type', result['mime_type'])
                     self.end_headers()
@@ -460,7 +465,7 @@ def get_http_handler(module):
                     self.send_header('Content-disposition', 'attachment; filename='+result['filename'])
                     self.end_headers()
                     self.wfile.write(result['contents'])
-                    
+
                 self.wfile.close()
                 self._unrouted = False
 
@@ -508,8 +513,8 @@ def get_http_handler(module):
 def start_server(port, module):
     """Start a server for the HTMLInterface on the specified port"""
     interface_server = HTTPServer(("", port), get_http_handler(module))
-    print "-- Starting server at http://localhost:%d --" % port
-    print "To close the server, type 'ctrl-c' into this window."
+    print("-- Starting server at http://localhost:%d --" % port)
+    print("To close the server, type 'ctrl-c' into this window.")
     try:
         interface_server.serve_forever()
 

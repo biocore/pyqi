@@ -13,7 +13,6 @@ __credits__ = ["Greg Caporaso", "Daniel McDonald", "Doug Wendel",
 
 import importlib
 from sys import exit, stderr
-from ConfigParser import SafeConfigParser
 from glob import glob
 from os.path import basename, dirname, expanduser, join
 from pyqi.core.exception import IncompetentDeveloperError
@@ -193,13 +192,13 @@ class InterfaceInputOption(InterfaceOption):
         "str": str,
         "int": int,
         "float": float,
-        "long": long,
+        "long": int, # for python 3 compatibility as long is dropped
         "complex": complex,
         "tuple": tuple,
         "dict": dict,
         "list": list,
         "set": set,
-        "unicode": unicode,
+        "unicode": str, # for python 3 compatibility as all strings are unicode
         "frozenset": frozenset
     }
 
@@ -298,9 +297,9 @@ def get_command_config(command_config_module, cmd, exit_on_failure=True):
     try:
         cmd_cfg = importlib.import_module('.'.join([command_config_module,
                                                     python_cmd_name]))
-    except ImportError, e:
+    except ImportError as e:
         error_msg = str(e)
-
+        
         if exit_on_failure:
             stderr.write("Unable to import the command configuration for "
                          "%s:\n" % cmd)

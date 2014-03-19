@@ -13,7 +13,6 @@ __credits__ = ["Greg Caporaso", "Daniel McDonald", "Gavin Huttley",
                "Jose Antonio Navas Molina"]
 
 import os
-import types
 from copy import copy
 from glob import glob
 from os.path import abspath, exists, isdir, isfile, split
@@ -436,7 +435,7 @@ class PyqiOption(Option):
             if self.mchoices is None:
                 raise OptionError(
                     "must supply a list of mchoices for type '%s'" % self.type, self)
-            elif type(self.mchoices) not in (types.TupleType, types.ListType):
+            elif type(self.mchoices) not in (tuple, list):
                 raise OptionError(
                     "choices must be a list of strings ('%s' supplied)"
                     % str(type(self.mchoices)).split("'")[1], self)

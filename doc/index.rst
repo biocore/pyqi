@@ -6,7 +6,7 @@ What is pyqi?
 
 pyqi (canonically pronounced *pie chee*) is a Python framework designed to support wrapping general *commands* in multiple types of *interfaces*, including at the command line, HTML, and API levels. 
 
-pyqi's only requirement is a working Python 2.7 installation.
+pyqi's only requirement is a working Python 2.7 or 3.3 installation.
 
 Why should I care?
 ------------------

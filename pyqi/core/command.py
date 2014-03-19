@@ -135,9 +135,9 @@ class Command(object):
 
         try:
             result = self.run(**kwargs)
-        except Exception:
+        except Exception as e:
             self._logger.fatal('Error executing command: %s' % self_str)
-            raise
+            raise e
         else:
             self._logger.info('Completed command: %s' % self_str)
 

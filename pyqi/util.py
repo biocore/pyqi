@@ -15,21 +15,29 @@ __credits__ = ["Greg Caporaso", "Jai Ram Rideout"]
 import importlib
 from os import remove
 from os.path import split, splitext
-import sys 
-from subprocess import Popen, PIPE, STDOUT
+import sys
+from subprocess import Popen, PIPE
+
 from pyqi.core.log import StdErrLogger
 from pyqi.core.exception import MissingVersionInfoError
+
+def is_py2():
+    """Check if we're using Python 2"""
+    if sys.version_info.major == 2:
+        return True
+    else:
+        return False
 
 def pyqi_system_call(cmd, shell=True, dry_run=False):
     """Call cmd and return (stdout, stderr, return_value).
 
-    cmd: can be either a string containing the command to be run, or a 
+    cmd: can be either a string containing the command to be run, or a
      sequence of strings that are the tokens of the command.
-    shell: value passed directly to Popen (default: True). See Python's 
+    shell: value passed directly to Popen (default: True). See Python's
      subprocess.Popen for a description of the shell parameter and how cmd
      is interpreted differently based on its value.
     dry_run: if True, print cmd and return ("", "", 0) (default: False)
-    
+
     This function is ported from QIIME (http://www.qiime.org), previously
     named qiime_system_call. QIIME is a GPL project, but we obtained permission
     from the authors of this function to port it to pyqi (and keep it under
@@ -48,7 +56,7 @@ def pyqi_system_call(cmd, shell=True, dry_run=False):
                      universal_newlines=True,
                      stdout=PIPE,
                      stderr=PIPE)
-        # communicate pulls all stdout/stderr from the PIPEs to 
+        # communicate pulls all stdout/stderr from the PIPEs to
         # avoid blocking -- don't remove this line!
         stdout, stderr = proc.communicate()
         return_value = proc.returncode
@@ -69,8 +77,8 @@ def remove_files(list_of_filepaths, error_on_missing=True):
             missing.append(fp)
 
     if error_on_missing and missing:
-        raise OSError, "Some filepaths were not accessible: %s" % '\t'.join(
-            missing)
+        raise OSError("Some filepaths were not accessible: %s" % '\t'.join(
+            missing))
 
 def old_to_new_command(driver_name, project_title, local_argv):
     """Deprecate an old-style script.

@@ -65,14 +65,14 @@ def print_list_of_strings(result_key, data, option_value=None):
     ``result_key`` and ``option_value`` are ignored.
     """
     for line in data:
-        print line
+        print(line)
 
 def print_string(result_key, data, option_value=None):
     """Print the string
 
     A newline will be printed before the data"""
-    print ""
-    print data
+    print("")
+    print(data)
 
 def write_or_print_string(result_key, data, option_value=None):
     """Write a string to a file.

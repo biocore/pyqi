@@ -100,7 +100,7 @@ class OptparseInterfaceTests(TestCase):
 
     def test_input_handler(self):
         obs = self.interface._input_handler(['--c','foo'])
-        self.assertEqual(obs.items(), [('c', 'foo')])
+        self.assertEqual(list(obs.items()), [('c', 'foo')])
 
     def test_build_usage_lines(self):
         obs = self.interface._build_usage_lines([])
@@ -177,8 +177,10 @@ class TypeCheckTests(TestCase):
         self._dirs_to_clean_up = []
 
     def tearDown(self):
-        map(remove, self._paths_to_clean_up)
-        map(rmdir, self._dirs_to_clean_up)
+        for p in self._paths_to_clean_up:
+            remove(p)
+        for d in self._dirs_to_clean_up:
+            rmdir(d)
 
     def test_check_existing_filepath(self):
         # Check that returns the correct value when the file exists
@@ -199,8 +201,8 @@ class TypeCheckTests(TestCase):
     def test_check_existing_filepaths(self):
         # Check that returns a list with the paths, in the same order as 
         # the input comma separated list
-        tmp_f1, tmp_path1 = mkstemp(prefix='pyqi_tmp_')
-        tmp_f2, tmp_path2 = mkstemp(prefix='pyqi_tmp_')
+        tmp_f1, tmp_path1 = mkstemp(prefix='pyqi_tmp_testf')
+        tmp_f2, tmp_path2 = mkstemp(prefix='pyqi_tmp_testf')
         self._paths_to_clean_up = [tmp_path1, tmp_path2]
         option = PyqiOption('-f', '--files_test', type='existing_filepaths')
         exp = [tmp_path1, tmp_path2]
@@ -245,8 +247,8 @@ class TypeCheckTests(TestCase):
     def test_check_existing_dirpaths(self):
         # Check that returns a list with the paths, in the same order as the
         # input comma separated list
-        tmp_dirpath1 = mkdtemp(prefix='pyqi_tmp_')
-        tmp_dirpath2 = mkdtemp(prefix='pyqi_tmp_')
+        tmp_dirpath1 = mkdtemp(prefix='pyqi_tmp_testd_')
+        tmp_dirpath2 = mkdtemp(prefix='pyqi_tmp_testd_')
         self._dirs_to_clean_up = [tmp_dirpath1, tmp_dirpath2]
         option = PyqiOption('-d', '--dirs_test', type='existing_dirpaths')
         exp = [tmp_dirpath1, tmp_dirpath2]

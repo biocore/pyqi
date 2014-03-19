@@ -24,7 +24,7 @@ class CodeHeaderGeneratorTests(TestCase):
         obs = self.cmd(author='bob', email='bob@bob.bob',
                        license='very permissive license',
                        copyright='what\'s that?', version='1.0')
-        self.assertEqual(obs.keys(), ['result'])
+        self.assertEqual(list(obs.keys()), ['result'])
 
         obs = obs['result']
         self.assertEqual('\n'.join(obs), exp_header1)
@@ -34,14 +34,14 @@ class CodeHeaderGeneratorTests(TestCase):
                        license='very permissive license',
                        copyright='what\'s that?', version='1.0',
                        credits=['another person', 'another another person'])
-        self.assertEqual(obs.keys(), ['result'])
+        self.assertEqual(list(obs.keys()), ['result'])
 
         obs = obs['result']
         self.assertEqual('\n'.join(obs), exp_header2)
 
         # With no arguments
         obs = self.cmd()
-        self.assertEqual(obs.keys(), ['result'])
+        self.assertEqual(list(obs.keys()), ['result'])
 
         obs = obs['result']
         self.assertEqual('\n'.join(obs), exp_header3)

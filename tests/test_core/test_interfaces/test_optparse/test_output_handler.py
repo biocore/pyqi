@@ -13,7 +13,14 @@ __credits__ = ["Daniel McDonald", "Greg Caporaso", "Doug Wendel",
 
 import os
 import sys
-from StringIO import StringIO
+
+from pyqi.util import is_py2
+
+if is_py2():
+    from StringIO import StringIO
+else:
+    from io import StringIO
+
 from shutil import rmtree
 from tempfile import mkdtemp
 from unittest import TestCase, main

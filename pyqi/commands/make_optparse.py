@@ -10,7 +10,7 @@
 
 from __future__ import division
 from operator import attrgetter
-from pyqi.core.command import (Command, CommandIn, CommandOut, 
+from pyqi.core.command import (Command, CommandIn, CommandOut,
     ParameterCollection)
 from pyqi.commands.code_header_generator import CodeHeaderGenerator
 
@@ -81,7 +81,7 @@ outputs = [
     #                # value will be made available to Handler. This name
     #                # can be either an underscored or dashed version of the
     #                # option name (e.g., 'output_fp' or 'output-fp')
-    #                InputName='output-fp'), 
+    #                InputName='output-fp'),
     #
     # An example option that does not map to a CommandIn.
     # OptparseResult(Parameter=cmd_out_lookup('some_other_result'),
@@ -112,7 +112,7 @@ default_block_format = """# Default=%(default)s, # implied by Parameter
 class MakeOptparse(CodeHeaderGenerator):
     BriefDescription = "Consume a Command, stub out an optparse configuration"
     LongDescription = """Construct and stub out the basic optparse configuration for a given Command. This template provides comments and examples of what to fill in."""
-    
+
     CommandIns = ParameterCollection(
         CodeHeaderGenerator.CommandIns.Parameters + [
         CommandIn(Name='command', DataType=Command,
@@ -155,8 +155,9 @@ class MakeOptparse(CodeHeaderGenerator):
                 action = 'store'
                 data_type = cmdin.DataType
 
-            fmt = {'name':cmdin.Name, 'datatype':data_type, 'action':action,
-                   'required':str(cmdin.Required),
+            fmt = {'name':cmdin.Name,
+                   'datatype':getattr(data_type, '__name__', None),
+                   'action':action, 'required':str(cmdin.Required),
                    'help':cmdin.Description, 'default_block':default_block}
             cmdin_formatted.append(input_format % fmt)
 
