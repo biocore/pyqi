@@ -17,8 +17,6 @@ from unittest import TestCase, main
 from pyqi.util import get_version_string
 from pyqi.core.exception import MissingVersionInfoError
 
-import sys
-print sys.version_info
 
 class UtilTests(TestCase):
     def test_get_version_string(self):
