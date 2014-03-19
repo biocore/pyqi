@@ -22,7 +22,7 @@ class MakeOptparseTests(TestCase):
 
     def test_run(self):
         exp = win_text
-        
+
         pc = CommandIn(Name='DUN', Required=True, DataType=str, Description="")
         bool_param = CommandIn(Name='imabool', DataType=bool,
                                Description='zero or one', Required=False)
@@ -39,9 +39,9 @@ class MakeOptparseTests(TestCase):
                           'copyright': 'what\'s that?',
                           'version': '1.0'
         })
-        
+
         self.assertEqual(obs['result'], exp.splitlines())
-        
+
 win_text = """#!/usr/bin/env python
 from __future__ import division
 
@@ -105,7 +105,7 @@ inputs = [
     #                Help='output filepath')
 
     OptparseOption(Parameter=cmd_in_lookup('DUN'),
-                   Type=<type 'str'>,
+                   Type=str,
                    Action='store', # default is 'store', change if desired
                    Handler=None, # must be defined if desired
                    ShortName=None, # must be defined if desired
@@ -136,7 +136,7 @@ outputs = [
     #                # value will be made available to Handler. This name
     #                # can be either an underscored or dashed version of the
     #                # option name (e.g., 'output_fp' or 'output-fp')
-    #                InputName='output-fp'), 
+    #                InputName='output-fp'),
     #
     # An example option that does not map to a CommandIn.
     # OptparseResult(Parameter=cmd_out_lookup('some_other_result'),
