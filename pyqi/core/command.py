@@ -29,14 +29,14 @@ class Parameter(object):
 
     def __init__(self, Name, DataType, Description, ValidateValue=None):
         """
-        
+
         ``Name`` should be a valid Python name so that users can supply either
         a dictionary as input or named arguments.
 
         ``DataType`` specifies the type that the input must be. The input
         should be an instance of type ``DataType``.
 
-        ``ValidateValue`` can be set as a function that will validate the 
+        ``ValidateValue`` can be set as a function that will validate the
         value associated with a ``Parameter``.
         """
         if not self._is_valid_name(Name):
@@ -67,23 +67,23 @@ class Parameter(object):
 
 class CommandIn(Parameter):
     """A ``Command`` input variable type"""
-    def __init__(self, Name, DataType, Description, Required=False, 
+    def __init__(self, Name, DataType, Description, Required=False,
                  Default=None, DefaultDescription=None, **kwargs):
         self.Required = Required
         self.Default = Default
         self.DefaultDescription = DefaultDescription
-        
+
         if Required and Default is not None:
             raise IncompetentDeveloperError("Found required CommandIn '%s' "
                     "with default value '%r'. Required CommandIns cannot have "
                     "default values." % (Name, Default))
-        
+
         super(CommandIn, self).__init__(Name, DataType, Description, **kwargs)
 
 class CommandOut(Parameter):
     """A ``Command`` output variable type"""
     def __init__(self, Name, DataType, Description, **kwargs):
-        super(CommandOut, self).__init__(Name, DataType, Description, 
+        super(CommandOut, self).__init__(Name, DataType, Description,
                                          **kwargs)
 
 class ParameterCollection(dict):
@@ -112,7 +112,7 @@ class ParameterCollection(dict):
 class Command(object):
     """Base class for ``Command``
 
-    A ``Command`` is interface agnostic, knows how to run itself and knows 
+    A ``Command`` is interface agnostic, knows how to run itself and knows
     about the arguments that it can take (via ``Parameters``).
 
     """
@@ -129,15 +129,15 @@ class Command(object):
         """Safely execute a ``Command``"""
         self_str = str(self.__class__)
         self._logger.info('Starting command: %s' % self_str)
-        
+
         self._validate_kwargs(kwargs)
         self._set_defaults(kwargs)
 
         try:
             result = self.run(**kwargs)
-        except Exception as e:
+        except Exception:
             self._logger.fatal('Error executing command: %s' % self_str)
-            raise e
+            raise
         else:
             self._logger.info('Completed command: %s' % self_str)
 
@@ -155,7 +155,7 @@ class Command(object):
 
     def _validate_kwargs(self, kwargs):
         """Validate input kwargs prior to executing a ``Command``
-        
+
         This method can be overridden by subclasses. The baseclass defines only
         a basic validation.
         """
@@ -164,7 +164,7 @@ class Command(object):
         # check required parameters
         for p in self.CommandIns.values():
             if p.Required and p.Name not in kwargs:
-                err_msg = 'Missing required CommandIn %s in %s' % (p.Name, 
+                err_msg = 'Missing required CommandIn %s in %s' % (p.Name,
                                                                    self_str)
                 self._logger.fatal(err_msg)
                 raise MissingParameterError(err_msg)
@@ -182,7 +182,7 @@ class Command(object):
                 err_msg = 'Unknown CommandIn %s in %s' % (opt, self_str)
                 self._logger.fatal(err_msg)
                 raise UnknownParameterError(err_msg)
-    
+
     def _validate_result(self, result):
         """Validate the result from a ``Command.run``"""
         self_str = str(self.__class__)
@@ -206,7 +206,7 @@ class Command(object):
 
     def run(self, **kwargs):
         """Exexcute a ``Command``
-        
+
         A ``Command`` must accept **kwargs to run, and must return a ``dict``
         as a result.
         """
