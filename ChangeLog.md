@@ -1,9 +1,13 @@
 pyqi ChangeLog
 ==============
 
-pyqi 0.3.1-dev
---------------
+pyqi 0.3.2
+----------
 
+Minor release, released on May 13th 2014
+
+* minor release to support BIOM dev
+* Simple HTML inferface
 * native python 3 support
 * painless profiling: just set the environment variable PYQI_PROFILE_COMMAND
 
