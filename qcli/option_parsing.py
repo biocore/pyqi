@@ -30,6 +30,14 @@ __version__ = "0.1.0"
 __maintainer__ = "Greg Caporaso"
 __email__ = "gregcaporaso@gmail.com"
 
+
+class QOptionParser(OptionParser):
+    """QCLI's OptionParser subclass"""
+    def error(self, msg):
+        # based on the built-in optparse.py error method
+        self.exit(2, "%s: error: %s\n" % (self.get_prog_name(), msg))
+
+
 ## Definition of CogentOption option type, a subclass of Option that
 ## contains specific types for filepaths and directory paths. This 
 ## will be particularly useful for graphical interfaces that make 
@@ -274,7 +282,7 @@ def parse_command_line_parameters(**kwargs):
     version = 'Version: %prog ' + version
     
     # Instantiate the command line parser object
-    parser = OptionParser(usage=usage, version=version)
+    parser = QOptionParser(usage=usage, version=version)
     parser.exit = set_parameter('exit_func',kwargs,parser.exit)
     
     # If no arguments were provided, print the help string (unless the
