@@ -26,9 +26,23 @@ __credits__ = ["Greg Caporaso",
                "Rob Knight",
                "Jose Antonio Navas Molina"]
 __license__ = "GPL"
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 __maintainer__ = "Greg Caporaso"
 __email__ = "gregcaporaso@gmail.com"
+
+
+class QOptionParser(OptionParser):
+    """QCLI's OptionParser subclass"""
+    def __init__(self, error_suffix='', **kwargs):
+        OptionParser.__init__(self, **kwargs)
+        # error suffix specifies a message that will be appended to every
+        # error shown with the error method
+        self.error_suffix = error_suffix
+
+    def error(self, msg):
+        # based on the built-in optparse.py error method
+        self.exit(2, "Error in %s: %s\n%s" % (self.get_prog_name(), msg,
+                                            self.error_suffix))
 
 ## Definition of CogentOption option type, a subclass of Option that
 ## contains specific types for filepaths and directory paths. This 
@@ -274,7 +288,8 @@ def parse_command_line_parameters(**kwargs):
     version = 'Version: %prog ' + version
     
     # Instantiate the command line parser object
-    parser = OptionParser(usage=usage, version=version)
+    parser = QOptionParser(error_suffix=kwargs.pop('error_suffix', ''),
+                           usage=usage, version=version)
     parser.exit = set_parameter('exit_func',kwargs,parser.exit)
     
     # If no arguments were provided, print the help string (unless the
